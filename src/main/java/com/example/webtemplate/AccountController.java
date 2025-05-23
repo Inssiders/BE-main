@@ -19,52 +19,52 @@ import org.springframework.web.bind.annotation.RestController;
 // end::hateoas-imports[]
 
 @RestController
-class UserController {
+class AccountController {
 
-	private final UserRepository repository;
+	private final AccountRepository repository;
 
-	UserController(UserRepository repository) {
+	AccountController(AccountRepository repository) {
 		this.repository = repository;
 	}
 
 	// Aggregate root
 
 	// tag::get-aggregate-root[]
-	@GetMapping("/users")
-	CollectionModel<EntityModel<User>> all() {
+	@GetMapping("/accounts")
+	CollectionModel<EntityModel<Account>> all() {
 
-		List<EntityModel<User>> users = repository.findAll().stream()
+		List<EntityModel<Account>> accounts = repository.findAll().stream()
 				.map(employee -> EntityModel.of(employee,
-						linkTo(methodOn(UserController.class).one(employee.getId())).withSelfRel(),
-						linkTo(methodOn(UserController.class).all()).withRel("users")))
+						linkTo(methodOn(AccountController.class).one(employee.getId())).withSelfRel(),
+						linkTo(methodOn(AccountController.class).all()).withRel("accounts")))
 				.toList();
 
-		return CollectionModel.of(users, linkTo(methodOn(UserController.class).all()).withSelfRel());
+		return CollectionModel.of(accounts, linkTo(methodOn(AccountController.class).all()).withSelfRel());
 	}
 	// end::get-aggregate-root[]
 
-	@PostMapping("/users")
-	User newEmployee(@RequestBody User newEmployee) {
+	@PostMapping("/accounts")
+	Account newEmployee(@RequestBody Account newEmployee) {
 		return repository.save(newEmployee);
 	}
 
 	// Single item
 
 	// tag::get-single-item[]
-	@GetMapping("/users/{id}")
-	EntityModel<User> one(@PathVariable("id") Long id) {
+	@GetMapping("/accounts/{id}")
+	EntityModel<Account> one(@PathVariable("id") Long id) {
 
-		User employee = repository.findById(id) //
-				.orElseThrow(() -> new UserNotFoundException(id));
+		Account employee = repository.findById(id) //
+				.orElseThrow(() -> new AccountNotFoundException(id));
 
 		return EntityModel.of(employee, //
-				linkTo(methodOn(UserController.class).one(id)).withSelfRel(),
-				linkTo(methodOn(UserController.class).all()).withRel("users"));
+				linkTo(methodOn(AccountController.class).one(id)).withSelfRel(),
+				linkTo(methodOn(AccountController.class).all()).withRel("accounts"));
 	}
 	// end::get-single-item[]
 
-	@PutMapping("/users/{id}")
-	User replaceEmployee(@RequestBody User newEmployee, @PathVariable("id") Long id) {
+	@PutMapping("/accounts/{id}")
+	Account replaceEmployee(@RequestBody Account newEmployee, @PathVariable("id") Long id) {
 
 		return repository.findById(id) //
 				.map(employee -> {
@@ -75,7 +75,7 @@ class UserController {
 				.orElseGet(() -> repository.save(newEmployee));
 	}
 
-	@DeleteMapping("/users/{id}")
+	@DeleteMapping("/accounts/{id}")
 	void deleteEmployee(@PathVariable("id") Long id) {
 		repository.deleteById(id);
 	}

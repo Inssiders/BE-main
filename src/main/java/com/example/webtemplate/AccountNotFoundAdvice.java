@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-class UserNotFoundAdvice {
+class AccountNotFoundAdvice {
 
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(AccountNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ProblemDetail userNotFoundHandler(UserNotFoundException ex) {
+    public ProblemDetail userNotFoundHandler(AccountNotFoundException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problemDetail.setType(Util.buildAbsoluteUri("/error/user-not-found"));
         problemDetail.setTitle("User Not Found");

@@ -8,17 +8,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users")
-class User {
+@Table(name = "accounts")
+class Account {
 
     private @Id @GeneratedValue Long id;
     private String name;
     private String role;
 
-    User() {
+    Account() {
     }
 
-    User(String name, String role) {
+    Account(String name, String role) {
 
         this.name = name;
         this.role = role;
@@ -53,9 +53,9 @@ class User {
 
         if (this == o)
             return true;
-        if (!(o instanceof User))
+        if (!(o instanceof Account))
             return false;
-        User user = (User) o;
+        Account user = (Account) o;
         return Objects.equals(this.id, user.id) && Objects.equals(this.name, user.name)
                 && Objects.equals(this.role, user.role);
     }

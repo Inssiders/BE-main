@@ -63,7 +63,7 @@ services:
           "wget",
           "--spider",
           "-q",
-          "http://localhost:${APP_PORT}/users/1",
+          "http://localhost:${APP_PORT}/accounts/1",
         ]
 
   # == PROFILE: PROD ==
