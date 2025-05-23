@@ -28,8 +28,8 @@ gradlew test -Dspring.profiles.active=dev -t
 gradlew bootRun -Dspring.profiles.active=dev
 # + IDE extension으로도 실행 가능
 
-docker exec -it inssider-spring-template-postgres-1 psql -U user -d dev
-SELECT * FROM users;
+docker exec -it be-main-postgres-1 psql -U user -d dev
+SELECT * FROM accounts;
 ```
 
 # stage

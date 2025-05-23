@@ -2,11 +2,11 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Spring Boot Application",
+      "name": "Spring Boot-WebtemplateApplication<BE-main>",
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "mainClass": "com.example.webtemplate.WebtemplateApplication",
-      "projectName": "webtemplate-inssider-spring-template",
+      "projectName": "BE-main",
       "args": "--spring.profiles.active=dev",
       "envFile": "${workspaceFolder}/.env"
     }
