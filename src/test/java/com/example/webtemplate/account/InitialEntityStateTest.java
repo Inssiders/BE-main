@@ -1,4 +1,4 @@
-package com.example.webtemplate;
+package com.example.webtemplate.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
