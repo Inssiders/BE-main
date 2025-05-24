@@ -1,4 +1,4 @@
-package com.example.webtemplate;
+package com.example.webtemplate.common;
 
 import java.net.URI;
 
