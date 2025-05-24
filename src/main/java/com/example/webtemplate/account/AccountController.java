@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-// tag::hateoas-imports[]
-// end::hateoas-imports[]
-
 @RestController
 class AccountController {
 
@@ -27,9 +24,6 @@ class AccountController {
 		this.repository = repository;
 	}
 
-	// Aggregate root
-
-	// tag::get-aggregate-root[]
 	@GetMapping("/accounts")
 	CollectionModel<EntityModel<Account>> all() {
 
@@ -41,37 +35,28 @@ class AccountController {
 
 		return CollectionModel.of(accounts, linkTo(methodOn(AccountController.class).all()).withSelfRel());
 	}
-	// end::get-aggregate-root[]
 
 	@PostMapping("/accounts")
 	Account newEmployee(@RequestBody Account newEmployee) {
 		return repository.save(newEmployee);
 	}
 
-	// Single item
-
-	// tag::get-single-item[]
 	@GetMapping("/accounts/{id}")
 	EntityModel<Account> one(@PathVariable("id") Long id) {
-
-		Account employee = repository.findById(id) //
-				.orElseThrow(() -> new AccountNotFoundException(id));
-
-		return EntityModel.of(employee, //
+		Account employee = repository.findById(id).orElseThrow();
+		return EntityModel.of(employee,
 				linkTo(methodOn(AccountController.class).one(id)).withSelfRel(),
 				linkTo(methodOn(AccountController.class).all()).withRel("accounts"));
 	}
-	// end::get-single-item[]
 
 	@PutMapping("/accounts/{id}")
 	Account replaceEmployee(@RequestBody Account newEmployee, @PathVariable("id") Long id) {
-
-		return repository.findById(id) //
+		return repository.findById(id)
 				.map(employee -> {
 					employee.setName(newEmployee.getName());
 					employee.setRole(newEmployee.getRole());
 					return repository.save(employee);
-				}) //
+				})
 				.orElseGet(() -> repository.save(newEmployee));
 	}
 
