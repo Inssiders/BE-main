@@ -1,10 +1,12 @@
 package com.example.webtemplate.account;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
+import com.example.webtemplate.account.AccountDataTypes.AccountType;
+import com.example.webtemplate.account.AccountDataTypes.RegisterType;
+import com.example.webtemplate.account.AccountDataTypes.RoleType;
 import com.example.webtemplate.common.Util;
 
 @Service
@@ -16,32 +18,47 @@ public class AccountService {
     this.repository = repository;
   }
 
-  List<Account> getAllAccounts() {
-    return repository.findAll();
-  }
+  Account register(RegisterType registerType, String email, String password) throws IllegalArgumentException {
+    return switch (registerType) {
 
-  Account createAccount(Account newAccount) {
-    return repository.save(newAccount);
+      case PASSWORD -> {
+        var newAccount = buildLocalUserAccount(email, password);
+        if (!isValidLocalUserAccount(newAccount)) {
+          throw new IllegalArgumentException("Invalid request: " + newAccount);
+        }
+        yield repository.save(newAccount);
+      }
+
+      case ADMIN -> throw new IllegalArgumentException("Admin registration not permitted");
+      default -> throw new IllegalArgumentException("Unsupported registration type: " + registerType);
+    };
   }
 
   Account patchAccountPassword(Long id, String newPassword) throws NoSuchElementException {
+
+    if (!Util.isValidPassword(newPassword)) {
+      throw new IllegalArgumentException("Invalid password format");
+    }
+
     return repository.findById(id).map(account -> {
-      if (newPassword != null && !newPassword.isBlank()) {
-        account.setPassword(Util.argon2Hash(newPassword));
-      }
+      account.setPassword(Util.argon2Hash(newPassword));
       return repository.save(account);
     }).orElseThrow();
   }
 
-  Account findById(Long id) throws NoSuchElementException {
-    return repository.findById(id).orElseThrow();
+  private boolean isValidLocalUserAccount(Account account) {
+    return account.getRole() == RoleType.USER
+        && account.getAccountType().isLocal()
+        && Util.isValidEmail(account.getEmail())
+        && Util.isValidPassword(account.getPassword());
   }
 
-  void save(Account account) {
-    repository.save(account);
-  }
-
-  void deleteById(Long id) {
-    repository.deleteById(id);
+  private Account buildLocalUserAccount(String email, String password) {
+    return Account.builder()
+        .accountType(AccountType.PASSWORD)
+        .email(email)
+        .password(Util.argon2Hash(password))
+        .role(RoleType.USER)
+        .build();
   }
 }

@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import com.example.webtemplate.account.model.AccountType;
-import com.example.webtemplate.account.model.RoleType;
+import com.example.webtemplate.account.AccountDataTypes.AccountType;
+import com.example.webtemplate.account.AccountDataTypes.RoleType;
 
 @Configuration
 @Profile("dev")
@@ -19,10 +19,30 @@ class AccountLoadDatabase {
   @Bean
   CommandLineRunner initDatabase(AccountRepository repository) {
     return _ -> {
+
       log.info("Preloading {}", repository
-          .save(new Account(AccountType.LOCAL, RoleType.USER, "asd1@gmail.com", "asd", "asd")));
+          .save(Account.builder()
+              .accountType(AccountType.OTHER)
+              .role(RoleType.SUPERADMIN)
+              .email("asd3@gmail.com")
+              .password("password3")
+              .build()));
+
       log.info("Preloading {}", repository
-          .save(new Account(AccountType.LOCAL, RoleType.USER, "asd2@gmail.com", "asd", "asd")));
+          .save(Account.builder()
+              .accountType(AccountType.PASSWORD)
+              .role(RoleType.CONTENT_MANAGER)
+              .email("asd2@gmail.com")
+              .password("password2")
+              .build()));
+
+      log.info("Preloading {}", repository
+          .save(Account.builder()
+              .accountType(AccountType.PASSWORD)
+              .role(RoleType.USER)
+              .email("asd1@gmail.com")
+              .password("password1")
+              .build()));
     };
   }
 }

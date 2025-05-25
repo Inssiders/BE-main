@@ -30,4 +30,22 @@ public class Util {
     }
     return "argon2id$" + password; // Mock hash for demonstration purposes
   }
+
+  private static final String EMAIL_REGEX = "^(?!.*\\.\\.)[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?@(?:(?!-)[a-z0-9-]{2,}(?<!-)\\.)+[a-z]{2,}$";
+
+  public static boolean isValidEmail(String email) {
+    if (email == null || email.isBlank()) {
+      return false;
+    }
+    return email.matches(EMAIL_REGEX);
+  }
+
+  private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s])\\S{8,64}$";
+
+  public static boolean isValidPassword(String password) {
+    if (password == null || password.isBlank()) {
+      return false;
+    }
+    return password.matches(PASSWORD_REGEX);
+  }
 }
