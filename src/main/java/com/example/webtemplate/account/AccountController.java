@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,10 +39,8 @@ class AccountController {
   }
 
   @PatchMapping("/me/password")
-  ResponseEntity<ResponseWrapper<Account>> changePassword(
-      @RequestAttribute("id") Long id,
-      @RequestAttribute("password") String password) {
-    // [ ] use a security context to get the current user's ID
+  ResponseEntity<ResponseWrapper<Account>> changePassword(@RequestBody Long id, @RequestBody String password) {
+    // [ ] `id` will be removed after implementing security context
     return BaseResponse.of(200, service.patchAccountPassword(id, password));
   }
 }

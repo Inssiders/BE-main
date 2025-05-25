@@ -30,6 +30,7 @@ gradlew bootRun -Dspring.profiles.active=dev
 
 docker exec -it be-main-postgres-1 psql -U user -d dev
 SELECT * FROM accounts;
+SELECT * FROM user_profiles;
 ```
 
 # stage
