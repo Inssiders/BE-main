@@ -23,8 +23,7 @@ class WebtemplateApplicationTests {
       return; // buildProperties only created after build, not test
     }
 
-    LocalDate buildDate = buildProperties.getTime().atZone(ZoneOffset.UTC)
-        .toLocalDate();
+    LocalDate buildDate = buildProperties.getTime().atZone(ZoneOffset.UTC).toLocalDate();
     LocalDate today = LocalDate.now(ZoneOffset.UTC);
 
     assertEquals(today, buildDate);

@@ -14,18 +14,15 @@ import com.example.webtemplate.account.model.RoleType;
 @Profile("dev")
 class AccountLoadDatabase {
 
-  private static final Logger log = LoggerFactory.getLogger(
-      AccountLoadDatabase.class);
+  private static final Logger log = LoggerFactory.getLogger(AccountLoadDatabase.class);
 
   @Bean
   CommandLineRunner initDatabase(AccountRepository repository) {
     return _ -> {
-      log.info("Preloading {}", repository.save(
-          new Account(AccountType.LOCAL, RoleType.USER,
-              "asd1@gmail.com", "asd", "asd")));
-      log.info("Preloading {}", repository.save(
-          new Account(AccountType.LOCAL, RoleType.USER,
-              "asd2@gmail.com", "asd", "asd")));
+      log.info("Preloading {}", repository
+          .save(new Account(AccountType.LOCAL, RoleType.USER, "asd1@gmail.com", "asd", "asd")));
+      log.info("Preloading {}", repository
+          .save(new Account(AccountType.LOCAL, RoleType.USER, "asd2@gmail.com", "asd", "asd")));
     };
   }
 }

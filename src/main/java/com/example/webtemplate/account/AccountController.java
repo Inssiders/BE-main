@@ -31,10 +31,8 @@ class AccountController {
 
     List<EntityModel<Account>> accounts = service.getAllAccounts().stream()
         .map(employee -> EntityModel.of(employee,
-            linkTo(methodOn(AccountController.class).one(
-                employee.getId())).withSelfRel(),
-            linkTo(methodOn(AccountController.class).all()).withRel(
-                "accounts")))
+            linkTo(methodOn(AccountController.class).one(employee.getId())).withSelfRel(),
+            linkTo(methodOn(AccountController.class).all()).withRel("accounts")))
         .toList();
 
     return CollectionModel.of(accounts,
@@ -49,10 +47,8 @@ class AccountController {
   @GetMapping("/accounts/{id}")
   EntityModel<Account> one(@PathVariable("id") Long id) {
     Account employee = service.findById(id);
-    return EntityModel.of(employee,
-        linkTo(methodOn(AccountController.class).one(id)).withSelfRel(),
-        linkTo(methodOn(AccountController.class).all()).withRel(
-            "accounts"));
+    return EntityModel.of(employee, linkTo(methodOn(AccountController.class).one(id)).withSelfRel(),
+        linkTo(methodOn(AccountController.class).all()).withRel("accounts"));
   }
 
   @PatchMapping("/accounts/{id}/password")

@@ -1,9 +1,11 @@
 package com.example.webtemplate.account;
 
-import com.example.webtemplate.common.Util;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import org.springframework.stereotype.Service;
+
+import com.example.webtemplate.common.Util;
 
 @Service
 public class AccountService {
@@ -22,8 +24,7 @@ public class AccountService {
     return repository.save(newAccount);
   }
 
-  Account patchAccountPassword(Long id, String newPassword)
-      throws NoSuchElementException {
+  Account patchAccountPassword(Long id, String newPassword) throws NoSuchElementException {
     return repository.findById(id).map(account -> {
       if (newPassword != null && !newPassword.isBlank()) {
         account.setPassword(Util.argon2Hash(newPassword));

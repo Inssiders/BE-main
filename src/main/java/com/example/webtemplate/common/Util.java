@@ -26,8 +26,7 @@ public class Util {
 
     // simple mock implementation for demonstration
     if (password == null || password.isBlank()) {
-      throw new IllegalArgumentException(
-          "Password cannot be null or blank");
+      throw new IllegalArgumentException("Password cannot be null or blank");
     }
     return "argon2id$" + password; // Mock hash for demonstration purposes
   }
