@@ -61,12 +61,7 @@ public enum ResponseMessage {
      * HttpStatus로 ResponseMessage 찾기
      */
     public static ResponseMessage of(HttpStatus status) {
-        for (ResponseMessage message : values()) {
-            if (message.status == status) {
-                return message;
-            }
-        }
-        return INTERNAL_SERVER_ERROR; // 기본값
+        return of(status.value());
     }
 
     /**
