@@ -5,5 +5,8 @@
 
   // https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-6.1-Release-Notes#parameter-name-retention
   "spring-boot.ls.problem.boot2.WEB_ANNOTATION_NAMES": "IGNORE",
-  "java.settings.url": "./.vscode/.prefs"
+  "java.settings.url": "./.vscode/.prefs",
+  "java.test.config": {
+    "vmArgs": ["-Dspring.profiles.active=dev"]
+  }
 }
