@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.webtemplate.account.AccountRequestsDto.Register;
 import com.example.webtemplate.account.AccountResponsesDto.AccountCreated;
-import com.example.webtemplate.common.response.StandardResponse;
-import com.example.webtemplate.common.response.StandardResponse.ResponseWrapper;
+import com.example.webtemplate.common.response.BaseResponse;
+import com.example.webtemplate.common.response.BaseResponse.ResponseWrapper;
 
 @RestController
 @RequestMapping("/accounts")
@@ -30,7 +30,7 @@ class AccountController {
   @PostMapping
   ResponseEntity<ResponseWrapper<AccountCreated>> register(@RequestBody Register reqBody) {
     var data = service.register(reqBody.registerType(), reqBody.email(), reqBody.password());
-    return StandardResponse.of(201, new AccountCreated(data.getEmail(), new Date()));
+    return BaseResponse.of(201, new AccountCreated(data.getEmail(), new Date()));
   }
 
   @DeleteMapping("/me")
@@ -44,6 +44,6 @@ class AccountController {
       @RequestAttribute("id") Long id,
       @RequestAttribute("password") String password) {
     // [ ] use a security context to get the current user's ID
-    return StandardResponse.of(200, service.patchAccountPassword(id, password));
+    return BaseResponse.of(200, service.patchAccountPassword(id, password));
   }
 }

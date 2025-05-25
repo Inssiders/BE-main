@@ -1,18 +1,10 @@
 package com.example.webtemplate.common.response;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import java.util.List;
 
-import com.example.webtemplate.common.ResponseMessage;
+public class StandardResponse {
 
-public class StandardResponse<T> {
-    public record ResponseWrapper<T>(String message, T data) {
-    }
+    public record IndexResponse(List<Long> index) {
 
-    public static <T> ResponseEntity<ResponseWrapper<T>> of(int status, T data) {
-        HttpStatus httpStatus = HttpStatus.valueOf(status);
-        String message = ResponseMessage.of(status).getMessage();
-        var body = new ResponseWrapper<>(message, data);
-        return new ResponseEntity<>(body, httpStatus);
     }
 }
