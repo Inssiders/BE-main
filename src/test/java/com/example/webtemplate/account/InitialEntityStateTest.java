@@ -15,6 +15,6 @@ class InitialEntityStateTest {
   @Test
   void shouldHaveInitialAccountData() {
     var accounts = repository.findAll();
-    assertEquals(2, accounts.size());
+    assertEquals(3, accounts.size());
   }
 }
