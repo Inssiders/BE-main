@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.webtemplate.account.AccountRequestsDto.ChangePassword;
 import com.example.webtemplate.account.AccountRequestsDto.Register;
 import com.example.webtemplate.account.AccountResponsesDto.AccountCreated;
 import com.example.webtemplate.common.response.BaseResponse;
@@ -39,8 +40,8 @@ class AccountController {
   }
 
   @PatchMapping("/me/password")
-  ResponseEntity<ResponseWrapper<Account>> changePassword(@RequestBody Long id, @RequestBody String password) {
+  ResponseEntity<ResponseWrapper<Account>> changePassword(@RequestBody ChangePassword reqBody) {
     // [ ] `id` will be removed after implementing security context
-    return BaseResponse.of(200, service.patchAccountPassword(id, password));
+    return BaseResponse.of(200, service.patchAccountPassword(reqBody.id(), reqBody.password()));
   }
 }
