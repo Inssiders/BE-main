@@ -8,17 +8,17 @@
 # == POSTGRES TEMPLATE ==
 x-postgres-template: &postgres-template
   image: postgres:latest
-  env_file: [".env"]
+  env_file: [ ".env" ]
   healthcheck:
     test:
-      ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}" ]
     interval: 3s
     timeout: 3s
     retries: 3
 
 # == SPRING APP TEMPLATE ==
 x-app-template: &app-template
-  ports: ["${APP_PORT}:${APP_PORT}"]
+  ports: [ "${APP_PORT}:${APP_PORT}" ]
   healthcheck:
     interval: 3s
     timeout: 3s
@@ -32,7 +32,7 @@ services:
   # == NO PROFILE ==
   postgres:
     <<: *postgres-template
-    ports: ["${POSTGRES_PORT}:${POSTGRES_PORT}"]
+    ports: [ "${POSTGRES_PORT}:${POSTGRES_PORT}" ]
     environment:
       # ref: .env
       POSTGRES_DB: ${POSTGRES_DB:?error}
@@ -44,7 +44,7 @@ services:
   # DEV 프로필에서 자동 초기화를 담당해야하며, 이를 바탕으로 빠른 검증이 가능합니다.
   app-stage:
     <<: *app-template
-    profiles: [stage]
+    profiles: [ stage ]
     build:
       context: .
     environment:
@@ -72,7 +72,7 @@ services:
   # 필요에 따라 `SPRING_PROFILES_ACTIVE`를 변경하여 운영 전략을 수정합니다.
   app:
     <<: *app-template
-    profiles: [prod]
+    profiles: [ prod ]
     image: oomia/inssider-spring-template:0.0.10
     restart: "on-failure:1"
     environment:

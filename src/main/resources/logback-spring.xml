@@ -1,59 +1,59 @@
 <configuration>
-    <!-- 기본 Spring Boot 로깅 설정 포함 -->
-    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+  <!-- 기본 Spring Boot 로깅 설정 포함 -->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
-    <!-- 속성 정의 -->
-    <property name="LOG_DIR" value="logs" />
-    <property name="LOG_FILE_NAME" value="application" />
-    <property name="LOG_FILE" value="${LOG_DIR}/${LOG_FILE_NAME}.log" />
+  <!-- 속성 정의 -->
+  <property name="LOG_DIR" value="logs" />
+  <property name="LOG_FILE_NAME" value="application" />
+  <property name="LOG_FILE" value="${LOG_DIR}/${LOG_FILE_NAME}.log" />
 
-    <!-- 커스텀 로그 패턴 정의 -->
-    <property name="CUSTOM_CONSOLE_LOG_PATTERN"
-        value="%clr(%d{HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}" />
-    <property name="FILE_LOG_PATTERN"
-        value="%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n" />
+  <!-- 커스텀 로그 패턴 정의 -->
+  <property name="CUSTOM_CONSOLE_LOG_PATTERN"
+    value="%clr(%d{HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}" />
+  <property name="FILE_LOG_PATTERN"
+    value="%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n" />
 
-    <!-- dev 프로필 설정 -->
-    <springProfile name="dev">
-        <!-- 콘솔 appender 재정의 (짧은 시간 형식) -->
-        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>${CUSTOM_CONSOLE_LOG_PATTERN}</pattern>
-                <charset>utf8</charset>
-            </encoder>
-        </appender>
+  <!-- dev 프로필 설정 -->
+  <springProfile name="dev">
+    <!-- 콘솔 appender 재정의 (짧은 시간 형식) -->
+    <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
+      <encoder>
+        <charset>utf8</charset>
+        <pattern>${CUSTOM_CONSOLE_LOG_PATTERN}</pattern>
+      </encoder>
+    </appender>
 
-        <!-- 파일 로그 설정 (ANSI 색상 코드 없음) -->
-        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_FILE}</file>
-            <encoder>
-                <pattern>${FILE_LOG_PATTERN}</pattern>
-                <charset>utf8</charset>
-            </encoder>
-            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
-                <maxFileSize>2MB</maxFileSize>
-                <maxHistory>3</maxHistory>
-                <totalSizeCap>10MB</totalSizeCap>
-            </rollingPolicy>
-        </appender>
+    <!-- 파일 로그 설정 (ANSI 색상 코드 없음) -->
+    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+      <encoder>
+        <charset>utf8</charset>
+        <pattern>${FILE_LOG_PATTERN}</pattern>
+      </encoder>
+      <file>${LOG_FILE}</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <fileNamePattern>${LOG_DIR}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+        <maxFileSize>2MB</maxFileSize>
+        <maxHistory>3</maxHistory>
+        <totalSizeCap>10MB</totalSizeCap>
+      </rollingPolicy>
+    </appender>
 
-        <!-- 로그 레벨 설정 -->
-        <logger name="org.springframework" level="INFO" />
-        <logger name="org.hibernate" level="INFO" />
-        <logger name="com.zaxxer.hikari" level="INFO" />
+    <!-- 로그 레벨 설정 -->
+    <logger level="INFO" name="org.springframework" />
+    <logger level="INFO" name="org.hibernate" />
+    <logger level="INFO" name="com.zaxxer.hikari" />
 
-        <root level="INFO">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="FILE" />
-        </root>
-    </springProfile>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE" />
+      <appender-ref ref="FILE" />
+    </root>
+  </springProfile>
 
-    <!-- dev 외 다른 프로필의 기본 설정 -->
-    <springProfile name="!dev">
-        <root level="INFO">
-            <appender-ref ref="CONSOLE" />
-        </root>
-    </springProfile>
+  <!-- dev 외 다른 프로필의 기본 설정 -->
+  <springProfile name="!dev">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE" />
+    </root>
+  </springProfile>
 </configuration>

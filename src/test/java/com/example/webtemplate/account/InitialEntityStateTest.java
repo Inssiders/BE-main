@@ -9,12 +9,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class InitialEntityStateTest {
 
-    @Autowired
-    private AccountRepository repository;
+  @Autowired
+  private AccountRepository repository;
 
-    @Test
-    void shouldHaveInitialAccountData() {
-        var accounts = repository.findAll();
-        assertEquals(2, accounts.size());
-    }
+  @Test
+  void shouldHaveInitialAccountData() {
+    var accounts = repository.findAll();
+    assertEquals(2, accounts.size());
+  }
 }

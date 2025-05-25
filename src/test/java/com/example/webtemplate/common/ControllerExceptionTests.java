@@ -14,12 +14,12 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 public class ControllerExceptionTests {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-    @Test
-    void getNonExistentEntity_shouldReturn404() throws Exception {
-        var request = get("/api/accounts/0").accept(MediaType.APPLICATION_JSON);
-        mockMvc.perform(request).andExpect(status().isNotFound());
-    }
+  @Test
+  void getNonExistentEntity_shouldReturn404() throws Exception {
+    var request = get("/api/accounts/0").accept(MediaType.APPLICATION_JSON);
+    mockMvc.perform(request).andExpect(status().isNotFound());
+  }
 }

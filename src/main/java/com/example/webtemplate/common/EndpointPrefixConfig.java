@@ -6,8 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class EndpointPrefixConfig implements WebMvcConfigurer {
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.addPathPrefix("/api", _ -> true);
-    }
+
+  @Override
+  public void configurePathMatch(PathMatchConfigurer configurer) {
+    configurer.addPathPrefix("/api", _ -> true);
+  }
 }
