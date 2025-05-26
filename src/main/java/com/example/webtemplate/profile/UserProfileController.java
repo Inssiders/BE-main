@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.webtemplate.common.response.StandardResponse.IndexResponse;
 import com.example.webtemplate.common.response.BaseResponse;
 import com.example.webtemplate.common.response.BaseResponse.ResponseWrapper;
+import com.example.webtemplate.common.response.StandardResponse.IndexResponse;
 
 @RestController
 @RequestMapping("/profiles")
