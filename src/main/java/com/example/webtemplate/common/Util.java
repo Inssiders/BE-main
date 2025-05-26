@@ -1,6 +1,9 @@
 package com.example.webtemplate.common;
 
 import java.net.URI;
+import java.security.SecureRandom;
+import java.util.Random;
+import java.util.function.Supplier;
 
 public class Util {
 
@@ -47,5 +50,32 @@ public class Util {
       return false;
     }
     return password.matches(PASSWORD_REGEX);
+  }
+
+  private static final Random random = new SecureRandom();
+
+  private static String generateRandomString(String charset, int length) {
+    return random.ints(length, 0, charset.length())
+        .mapToObj(charset::charAt)
+        .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+        .toString();
+  }
+
+  public static Supplier<String> emailGenerator() {
+    final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+    Supplier<String> randomWord = () -> generateRandomString(LOWERCASE, 3);
+    return () -> {
+      String email = randomWord.get() + "@" + randomWord.get() + "." + randomWord.get();
+      return isValidEmail(email) ? email : emailGenerator().get();
+    };
+  }
+
+  public static Supplier<String> passwordGenerator() {
+    final String PASSWORD = "abcdefgABCDEFG1234567!@#$%^&*";
+    Supplier<String> randomWord = () -> generateRandomString(PASSWORD, 8);
+    return () -> {
+      String password = randomWord.get() + randomWord.get() + randomWord.get();
+      return isValidPassword(password) ? password : passwordGenerator().get();
+    };
   }
 }
