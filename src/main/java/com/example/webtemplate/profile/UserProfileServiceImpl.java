@@ -1,6 +1,7 @@
 package com.example.webtemplate.profile;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,7 @@ import com.example.webtemplate.profile.UserProfileDataTypes.ProfileContext;
 import com.example.webtemplate.profile.UserProfileResponsesDto.OwnerUserProfile;
 import com.example.webtemplate.profile.UserProfileResponsesDto.PrivateUserProfile;
 import com.example.webtemplate.profile.UserProfileResponsesDto.PublicUserProfile;
+import com.example.webtemplate.profile.UserProfileResponsesDto.UpdateProfileResponse;
 import com.example.webtemplate.profile.UserProfileResponsesDto.UserProfileDto;
 
 @Service
@@ -37,7 +39,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         var entity = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User profile not found for id: " + id));
 
-        // [ ] use ProfileContext.SELF only when user authenticated 
+        // [ ] use ProfileContext.SELF only when user authenticated
         var accessLevel = entity.isAccountVisible() ? ProfileContext.SELF : ProfileContext.PRIVATE;
         // accessLevel = ProfileContext.PUBLIC;
 
@@ -48,5 +50,29 @@ public class UserProfileServiceImpl implements UserProfileService {
             case ProfileContext.SELF -> new OwnerUserProfile(entity.getNickname(), entity.getProfileUrl(),
                     entity.getBio(), entity.isAccountVisible(), entity.isFollowerVisibie());
         };
+    }
+
+    @Override
+    public UpdateProfileResponse updateUserProfile(
+            Long id,
+            Optional<String> nickname,
+            Optional<String> profileUrl,
+            Optional<String> bio,
+            Optional<Boolean> accountVisible,
+            Optional<Boolean> followerVisible) {
+
+        var entity = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User profile not found for id: " + id));
+
+        nickname.ifPresent(entity::setNickname);
+        profileUrl.ifPresent(entity::setProfileUrl);
+        bio.ifPresent(entity::setBio);
+        accountVisible.ifPresent(entity::setAccountVisible);
+        followerVisible.ifPresent(entity::setFollowerVisibie);
+
+        entity = repository.save(entity);
+        var updatedAt = entity.getUpdatedAt();
+
+        return new UpdateProfileResponse(findUserProfileIdsById(id), updatedAt);
     }
 }

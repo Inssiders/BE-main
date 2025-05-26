@@ -1,6 +1,8 @@
 package com.example.webtemplate.profile;
 
-public class UserProfileResponsesDto {
+import java.time.LocalDateTime;
+
+class UserProfileResponsesDto {
 
     record PrivateUserProfile(String nickname, String profileUrl) implements UserProfileDto {
     }
@@ -31,4 +33,6 @@ public class UserProfileResponsesDto {
         }
     }
 
+    record UpdateProfileResponse(UserProfileDto data, LocalDateTime updatedAt) {
+    }
 }
