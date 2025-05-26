@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.webtemplate.account.AccountDataTypes;
 import com.example.webtemplate.account.AccountService;
@@ -21,6 +23,8 @@ class EntityBehaviorTest {
   private UserProfileService userProfileService;
 
   @Test
+  @Transactional
+  @Rollback
   void shouldCreateUserProfileWhenAccountCreated() {
 
     long initialSize = userProfileService.count();
