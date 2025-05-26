@@ -1,5 +1,6 @@
 package com.example.webtemplate.account;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
@@ -35,6 +36,22 @@ class AccountServiceImpl implements AccountService {
     };
   }
 
+  private boolean isValidLocalUserAccount(Account account) {
+    return account.getRole() == RoleType.USER
+        && account.getAccountType().isLocal()
+        && Util.isValidEmail(account.getEmail())
+        && Util.isValidPassword(account.getPassword());
+  }
+
+  private Account buildLocalUserAccount(String email, String password) {
+    return Account.builder()
+        .accountType(AccountType.PASSWORD)
+        .email(email)
+        .password(Util.argon2Hash(password))
+        .role(RoleType.USER)
+        .build();
+  }
+
   @Override
   public Account patchAccountPassword(Long id, String newPassword) throws NoSuchElementException {
 
@@ -53,20 +70,11 @@ class AccountServiceImpl implements AccountService {
     return repository.count();
   }
 
-  private boolean isValidLocalUserAccount(Account account) {
-    return account.getRole() == RoleType.USER
-        && account.getAccountType().isLocal()
-        && Util.isValidEmail(account.getEmail())
-        && Util.isValidPassword(account.getPassword());
+  @Override
+  public LocalDateTime softDelete(Long id) throws NoSuchElementException {
+    var account = repository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Account not found with id: " + id));
+    account.delete();
+    return repository.save(account).getDeletedAt();
   }
-
-  private Account buildLocalUserAccount(String email, String password) {
-    return Account.builder()
-        .accountType(AccountType.PASSWORD)
-        .email(email)
-        .password(Util.argon2Hash(password))
-        .role(RoleType.USER)
-        .build();
-  }
-
 }

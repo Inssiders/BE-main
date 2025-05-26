@@ -2,6 +2,7 @@ package com.example.webtemplate.account;
 
 import com.example.webtemplate.account.AccountDataTypes.AccountType;
 import com.example.webtemplate.account.AccountDataTypes.RoleType;
+import com.example.webtemplate.common.model.SoftDeleteable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
@@ -13,6 +14,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
@@ -21,8 +23,9 @@ import lombok.ToString;
 @Entity
 @Table(name = "accounts")
 @Data
+@EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Account {
+public class Account extends SoftDeleteable {
 
   @Id
   @GeneratedValue
@@ -52,8 +55,6 @@ public class Account {
   @ToString.Exclude
   @Setter(AccessLevel.NONE)
   private String providerUserId;
-
-  // [ ] soft-delete support by mixin interface
 
   // [ ] relationship: `Account` 1 -> 1 `UserProfile`
 
