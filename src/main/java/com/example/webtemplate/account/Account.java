@@ -68,13 +68,12 @@ public class Account extends SoftDeleteable {
     this.role = role;
     this.email = email;
     this.password = password;
-    this.providerUserId = null;
 
     this.profile = UserProfile.builder()
         .account(this)
         .nickname(email)
-        .accountVisibility(true)
-        .followerVisibility(true)
+        .accountVisible(true)
+        .followerVisibie(true)
         .build();
   }
 }

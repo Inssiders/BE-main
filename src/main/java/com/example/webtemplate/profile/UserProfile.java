@@ -28,30 +28,28 @@ public class UserProfile {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
-    private String introduction;
-
-    private String profileUrl;
-
     @NonNull
     private String nickname;
 
-    private boolean accountVisibility;
-    private boolean followerVisibility;
+    private String bio;
+    private String profileUrl;
+    private boolean accountVisible;
+    private boolean followerVisibie;
 
     @Builder
     private UserProfile(
             @NonNull Account account,
-            String introduction,
-            String profileUrl,
             @NonNull String nickname,
-            boolean accountVisibility,
-            boolean followerVisibility) {
+            String bio,
+            String profileUrl,
+            boolean accountVisible,
+            boolean followerVisibie) {
         this.account = account;
-        this.introduction = introduction;
-        this.profileUrl = profileUrl;
         this.nickname = nickname;
-        this.accountVisibility = accountVisibility;
-        this.followerVisibility = followerVisibility;
+        this.bio = bio;
+        this.profileUrl = profileUrl;
+        this.accountVisible = accountVisible;
+        this.followerVisibie = followerVisibie;
     }
 
 }
