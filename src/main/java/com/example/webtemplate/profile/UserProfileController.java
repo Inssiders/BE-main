@@ -6,11 +6,13 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.webtemplate.common.response.BaseResponse;
 import com.example.webtemplate.common.response.BaseResponse.ResponseWrapper;
 import com.example.webtemplate.common.response.StandardResponse.IndexResponse;
+import com.example.webtemplate.common.response.StandardResponse.QueryResponse;
 import com.example.webtemplate.profile.UserProfileRequestsDto.UpdateProfile;
 import com.example.webtemplate.profile.UserProfileResponsesDto.UpdateProfileResponse;
 import com.example.webtemplate.profile.UserProfileResponsesDto.UserProfileDto;
@@ -26,6 +28,15 @@ class UserProfileController {
 
   UserProfileController(UserProfileService service) {
     this.service = service;
+  }
+
+  @GetMapping
+  public QueryResponse<UserProfileDto> query(
+      @RequestParam("nickname") String nickname,
+      @RequestParam("sort") String sort,
+      @RequestParam("limit") int limit,
+      @RequestParam("page") int page) {
+    return service.findUserProfilesByNickname(nickname, sort, limit, page);
   }
 
   @GetMapping("/{id}")

@@ -73,7 +73,7 @@ public class Account extends SoftDeleteable {
         .account(this)
         .nickname(email)
         .accountVisible(true)
-        .followerVisibie(true)
+        .followerVisible(true)
         .build();
   }
 }

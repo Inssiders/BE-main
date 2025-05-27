@@ -3,6 +3,7 @@ package com.example.webtemplate.profile;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.webtemplate.common.response.StandardResponse.QueryResponse;
 import com.example.webtemplate.profile.UserProfileResponsesDto.UpdateProfileResponse;
 import com.example.webtemplate.profile.UserProfileResponsesDto.UserProfileDto;
 
@@ -21,5 +22,7 @@ public interface UserProfileService {
             Optional<String> bio,
             Optional<Boolean> accountVisible,
             Optional<Boolean> followerVisible);
+
+    QueryResponse<UserProfileDto> findUserProfilesByNickname(String nickname, String sort, int limit, int page);
 
 }
