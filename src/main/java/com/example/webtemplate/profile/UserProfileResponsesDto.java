@@ -1,7 +1,6 @@
 package com.example.webtemplate.profile;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 class UserProfileResponsesDto {
 
