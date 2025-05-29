@@ -1,8 +1,8 @@
 # initialization
 
 ```sh
-git clone https://github.com/ooMia/inssider-spring-template.git
-cd inssider-spring-template
+git clone https://github.com/Inssiders/BE-main.git
+cd BE-main
 cp .env.example .env
 
 # https://sdkman.io/install/
