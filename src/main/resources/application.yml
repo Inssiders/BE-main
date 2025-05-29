@@ -1,6 +1,12 @@
 server.port: ${APP_PORT}
 
 spring:
+  application:
+    name: inssider-main
+  profiles:
+    active: ${ENVIRONMENT}
+  jackson:
+    time-zone: Asia/Seoul
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
