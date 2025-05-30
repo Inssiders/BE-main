@@ -22,6 +22,6 @@ public class Tag {
 
     @CreatedDate
     @Column(updatable = false)
-    private LocalDateTime createdDate;
+    private LocalDateTime created_at;
 
 }

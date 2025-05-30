@@ -18,15 +18,15 @@ public class ContentBaseEntity {
 
     @CreatedDate
     @Column(updatable = false)
-    private LocalDateTime createDate;
+    private LocalDateTime created_at;
 
     @LastModifiedDate
-    private LocalDateTime updateDate;
+    private LocalDateTime updated_at;
 
     @Column
-    private LocalDateTime deletedAt;
+    private LocalDateTime deleted_at;
 
     @Column
-    private boolean deleted;
+    private boolean is_deleted;
 
 }
