@@ -1,8 +1,8 @@
 #!/bin/bash
 # 루트 디렉토리에서 실행
 
-echo "🧼 운영 컨테이너 정리 중... (로컬 이미지도 삭제)"
-docker compose --env-file .env.prod -f docker-compose.prod.yaml down --rmi local --remove-orphans
+echo "🧼 운영 컨테이너 정리 중..."
+docker compose --env-file .env.prod -f docker-compose.prod.yaml down --remove-orphans
 
 echo "🚀 운영 컨테이너 실행 중..."
 docker compose --env-file .env.prod -f docker-compose.prod.yaml up --build -d

@@ -1,6 +1,3 @@
-server:
-  port: ${APP_PORT}
-
 spring:
   # 서버 실행 시 'schema.sql'이 실행될 수 있도록 하는 설정(임시)
   sql:
