@@ -1,14 +1,20 @@
 package com.example.webtemplate.tag.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "tags")
 public class Tag {
 
@@ -16,7 +22,6 @@ public class Tag {
     @GeneratedValue
     private Long id;
 
-    @NotNull(message = "태그명을 입력해주세요.")
     @Column(nullable = false, length = 255)
     private String name;
 

@@ -3,18 +3,25 @@ package com.example.webtemplate.common.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+
+@Getter
+@SuperBuilder
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ContentBaseEntity {
 
     @Column
-    private String content;
+    protected String content;
 
     @CreatedDate
     @Column(updatable = false)
@@ -26,7 +33,7 @@ public class ContentBaseEntity {
     @Column
     private LocalDateTime deleted_at;
 
-    @Column
-    private boolean is_deleted;
+    @Builder.Default
+    private boolean is_deleted = Boolean.FALSE;
 
 }

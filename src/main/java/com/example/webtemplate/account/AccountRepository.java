@@ -2,6 +2,6 @@ package com.example.webtemplate.account;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-interface AccountRepository extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, Long> {
 
 }

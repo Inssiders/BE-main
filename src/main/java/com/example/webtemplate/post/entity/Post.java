@@ -3,17 +3,20 @@ package com.example.webtemplate.post.entity;
 import com.example.webtemplate.account.Account;
 import com.example.webtemplate.category.entity.Category;
 import com.example.webtemplate.common.entity.ContentBaseEntity;
+import com.example.webtemplate.tag.entity.Tag;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
-@Builder
+@SuperBuilder
 @Table(name = "posts")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,17 +26,14 @@ public class Post extends ContentBaseEntity {
     @GeneratedValue
     private Long id;
 
-    @NotNull(message = "제목을 입력해주세요.")
     @Column(nullable = false, length = 255)
     private String title;
 
-    @NotNull(message = "밈 url을 입력해주세요.")
-    @Column(nullable = false)
-    private String media_url;
+    @Column(name = "media_url", nullable = false, columnDefinition = "TEXT")
+    private String mediaUrl;
 
-    @NotNull(message = "밈 업로드 시간을 입력해주세요.")
-    @Column(nullable = false)
-    private LocalDateTime media_upload_time;
+    @Column(name = "media_upload_time", nullable = false)
+    private LocalDateTime mediaUploadTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
@@ -46,5 +46,16 @@ public class Post extends ContentBaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> postTags = new ArrayList<>();
+
+    public void addTags(List<Tag> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return;
+        }
+        List<PostTag> newPostTags = tags.stream()
+                .map(tag -> new PostTag(this, tag))
+                .collect(Collectors.toList());
+        this.postTags.addAll(newPostTags);
+    }
+
 
 }
