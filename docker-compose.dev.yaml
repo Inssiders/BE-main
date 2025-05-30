@@ -1,0 +1,30 @@
+version: "3.8"
+
+# === TEMPLATES ===
+x-postgres-template: &postgres-template
+  image: postgres:latest
+#  env_file: [.env.dev]
+  healthcheck:
+    test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+    interval: 3s
+    timeout: 3s
+    retries: 3
+
+x-app-template: &app-template
+  env_file: [.env.dev]
+  ports:
+    - "${APP_PORT}:${APP_PORT}"
+
+# === SERVICES ===
+services:
+  postgres:
+    <<: *postgres-template
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?error}
+      POSTGRES_USER: ${POSTGRES_USER:?error}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?error}
+
+  app:
+    <<: *app-template
