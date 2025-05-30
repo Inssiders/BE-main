@@ -16,8 +16,8 @@ public class Tag {
     @GeneratedValue
     private Long id;
 
-    @NotNull(message = "태그명을 필수로 입력해주세요.")
-    @Column(nullable = false)
+    @NotNull(message = "태그명을 입력해주세요.")
+    @Column(nullable = false, length = 255)
     private String name;
 
     @CreatedDate

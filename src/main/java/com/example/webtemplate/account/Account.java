@@ -22,7 +22,7 @@ import lombok.ToString;
 @Table(name = "accounts")
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-class Account {
+public class Account {
 
   @Id
   @GeneratedValue
