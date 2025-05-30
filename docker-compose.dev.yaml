@@ -3,7 +3,7 @@ version: "3.8"
 # === TEMPLATES ===
 x-postgres-template: &postgres-template
   image: postgres:latest
-  env_file: [.env.dev]
+#  env_file: [.env.dev]
   healthcheck:
     test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
     interval: 3s
