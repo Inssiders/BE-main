@@ -24,7 +24,7 @@ public class PostRequestDTO {
 
     private LocalDateTime mediaUploadTime;
 
-    private Long categoryId;
+    private String categoryName;
 
     private List<String> tags;
 }

@@ -13,8 +13,8 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public Optional<Category> getCategory(Long id){
-        return categoryRepository.findById(id);
+    public Optional<Category> getCategory(String categoryName) {
+        return categoryRepository.findByName(categoryName);
     }
 
 }
