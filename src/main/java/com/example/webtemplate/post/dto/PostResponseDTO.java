@@ -1,5 +1,6 @@
 package com.example.webtemplate.post.dto;
 
+import com.example.webtemplate.category.CategoryType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,7 +14,7 @@ public class PostResponseDTO {
     private String content;
     private String mediaUrl;
     private LocalDateTime mediaUploadTime;
-    private String categoryName;
+    private CategoryType categoryType;
     private List<String> tags;
     private LocalDateTime createdAt;
 }

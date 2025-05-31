@@ -29,7 +29,7 @@ public class PostService {
 
     public PostResponseDTO createPost(PostRequestDTO reqBody) {
         Account account = accountRepository.findById(1L).get(); //인증 적용 후 삭제 예정
-        Category category = categoryService.getCategory(reqBody.getCategoryName())
+        Category category = categoryService.getCategory(reqBody.getCategoryType())
                 .orElseThrow(() -> new IllegalArgumentException("카테고리 오류 발생"));
 
         List<Tag> tags = tagService.findOrCreateTags(reqBody.getTags());
@@ -39,6 +39,6 @@ public class PostService {
 
         postRepository.save(post);
 
-        return PostMapper.postToDTO(category.getName(), tags, post);
+        return PostMapper.postToDTO(category.getType(), tags, post);
     }
 }

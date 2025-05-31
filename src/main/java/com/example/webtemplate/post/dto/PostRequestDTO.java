@@ -1,5 +1,6 @@
 package com.example.webtemplate.post.dto;
 
+import com.example.webtemplate.category.CategoryType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -24,7 +25,7 @@ public class PostRequestDTO {
 
     private LocalDateTime mediaUploadTime;
 
-    private String categoryName;
+    private CategoryType categoryType;
 
     private List<String> tags;
 }

@@ -7,10 +7,6 @@ VALUES (1,
         NULL
        );
 
-INSERT INTO public.categories
-VALUES
-    (1,'IT/기술'),
-    (2, '엔터테인먼트'),
-    (3, '일상'),
-    (4, '교육'),
-    (5, '밈');
+INSERT INTO categories (type) VALUES
+                                  ('DANCE'), ('FOOD'), ('BOOKS'),
+                                  ('SPORTS'), ('HOME');

@@ -1,6 +1,7 @@
 package com.example.webtemplate.post.mapper;
 
 import com.example.webtemplate.account.Account;
+import com.example.webtemplate.category.CategoryType;
 import com.example.webtemplate.category.entity.Category;
 import com.example.webtemplate.post.dto.PostRequestDTO;
 import com.example.webtemplate.post.dto.PostResponseDTO;
@@ -25,7 +26,7 @@ public class PostMapper {
                 .build();
     }
 
-    public static PostResponseDTO postToDTO(String categoryName, List<Tag> tag, Post post) {
+    public static PostResponseDTO postToDTO(CategoryType categoryType, List<Tag> tag, Post post) {
         List<String> tags = tag.stream()
                 .map(t -> t.getName())
                 .toList();
@@ -35,7 +36,7 @@ public class PostMapper {
                 .content(post.getContent())
                 .mediaUrl(post.getMediaUrl())
                 .mediaUploadTime(post.getMediaUploadTime())
-                .categoryName(categoryName)
+                .categoryType(categoryType)
                 .tags(tags)
                 .createdAt(post.getCreated_at())
                 .build();
