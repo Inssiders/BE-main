@@ -14,6 +14,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -91,6 +93,14 @@ public class PostService {
     public PostGetDetailResponseDTO getDetail(Long memeId){
         Post currentPost = postRepository.findByIdWithTag(memeId).orElseThrow(() -> new IllegalArgumentException("게시글 오류 발생"));
         return PostMapper.toGetDetailDTO(currentPost);
+    }
+
+    public List<PostGetIdResponseDTO> getIds(LocalDate localDate){
+        if (localDate == null) {
+            return postRepository.findAllIds();
+        }
+        LocalDateTime since = localDate.atStartOfDay();
+        return postRepository.findPostsByCreatedAtAfter(since);
     }
 
 }

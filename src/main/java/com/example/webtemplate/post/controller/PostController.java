@@ -9,6 +9,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Log4j2
 @RestController
 @RequiredArgsConstructor
@@ -38,6 +41,12 @@ public class PostController {
     @GetMapping("/{memeId}")
     ResponseEntity<BaseResponse.ResponseWrapper<PostGetDetailResponseDTO>> getDetail(@PathVariable Long memeId){
         PostGetDetailResponseDTO data = postService.getDetail(memeId);
+        return BaseResponse.of(200, data);
+    }
+
+    @GetMapping("/sitemap")
+    ResponseEntity<BaseResponse.ResponseWrapper<List<PostGetIdResponseDTO>>> getIds( @RequestParam(value = "since", required = false) LocalDate since){
+        List<PostGetIdResponseDTO> data = postService.getIds(since);
         return BaseResponse.of(200, data);
     }
 

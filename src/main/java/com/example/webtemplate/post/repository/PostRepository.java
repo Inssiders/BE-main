@@ -1,11 +1,13 @@
 package com.example.webtemplate.post.repository;
 
-import com.example.webtemplate.category.entity.Category;
+import com.example.webtemplate.post.dto.PostGetIdResponseDTO;
 import com.example.webtemplate.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -16,4 +18,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE p.id = :id")
     Optional<Post> findByIdWithTag(@Param("id") Long postId);
 
+    @Query("SELECT new com.example.webtemplate.post.dto.PostGetIdResponseDTO(p.id, p.created_at) " +
+            "FROM Post p WHERE p.created_at >= :since")
+    List<PostGetIdResponseDTO> findPostsByCreatedAtAfter(@Param("since") LocalDateTime since);
+
+    @Query("SELECT new com.example.webtemplate.post.dto.PostGetIdResponseDTO(p.id, p.created_at) FROM Post p")
+    List<PostGetIdResponseDTO> findAllIds();
 }
