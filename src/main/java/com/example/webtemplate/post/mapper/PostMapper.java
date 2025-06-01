@@ -2,10 +2,7 @@ package com.example.webtemplate.post.mapper;
 
 import com.example.webtemplate.account.Account;
 import com.example.webtemplate.category.entity.Category;
-import com.example.webtemplate.post.dto.PostDeleteResponseDTO;
-import com.example.webtemplate.post.dto.PostCreateRequestDTO;
-import com.example.webtemplate.post.dto.PostCreateResponseDTO;
-import com.example.webtemplate.post.dto.PostUpdateResponseDTO;
+import com.example.webtemplate.post.dto.*;
 import com.example.webtemplate.post.entity.Post;
 
 import org.springframework.stereotype.Component;
@@ -26,12 +23,12 @@ public class PostMapper {
                 .build();
     }
 
-    public static PostCreateResponseDTO postToDTO(Post post) {
+    public static PostResponseDTO postToDTO(Post post) {
         List<String> tags = post.getPostTags().stream()
                 .map(t -> t.getTag().getName())
                 .toList();
 
-        return PostCreateResponseDTO.builder()
+        return PostResponseDTO.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
                 .mediaUrl(post.getMediaUrl())
@@ -61,6 +58,23 @@ public class PostMapper {
         return PostDeleteResponseDTO.builder()
                 .title(post.getTitle())
                 .deletedAt(post.getDeleted_at())
+                .build();
+    }
+
+    //엔티티 구조 변경 후 수정 예정
+    public static PostGetDetailResponseDTO toGetDetailDTO(Post post) {
+        List<String> tags = post.getPostTags().stream()
+                .map(t -> t.getTag().getName())
+                .toList();
+
+        return PostGetDetailResponseDTO.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .mediaUrl(post.getMediaUrl())
+                .mediaUploadTime(post.getMediaUploadTime())
+                .categoryType(post.getCategory().getType())
+                .tags(tags)
+                .createdAt(post.getCreated_at())
                 .build();
     }
 

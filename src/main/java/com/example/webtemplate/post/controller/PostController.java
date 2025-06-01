@@ -18,8 +18,8 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    ResponseEntity<BaseResponse.ResponseWrapper<PostCreateResponseDTO>> register(@Valid @RequestBody PostCreateRequestDTO reqBody) {
-        PostCreateResponseDTO data = postService.create(reqBody);
+    ResponseEntity<BaseResponse.ResponseWrapper<PostResponseDTO>> register(@Valid @RequestBody PostCreateRequestDTO reqBody) {
+        PostResponseDTO data = postService.create(reqBody);
         return BaseResponse.of(201, data);
     }
 
@@ -32,6 +32,12 @@ public class PostController {
     @PatchMapping("/delete/{memeId}")
     ResponseEntity<BaseResponse.ResponseWrapper<PostDeleteResponseDTO>> delete(@PathVariable Long memeId){
         PostDeleteResponseDTO data = postService.delete(memeId);
+        return BaseResponse.of(200, data);
+    }
+
+    @GetMapping("/{memeId}")
+    ResponseEntity<BaseResponse.ResponseWrapper<PostGetDetailResponseDTO>> getDetail(@PathVariable Long memeId){
+        PostGetDetailResponseDTO data = postService.getDetail(memeId);
         return BaseResponse.of(200, data);
     }
 

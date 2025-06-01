@@ -28,7 +28,7 @@ public class PostService {
     //인증 적용 후 삭제 예정
     private final AccountRepository accountRepository;
 
-    public PostCreateResponseDTO create(PostCreateRequestDTO reqBody) {
+    public PostResponseDTO create(PostCreateRequestDTO reqBody) {
         //인증 적용 후 삭제 예정
         Account account = accountRepository.findById(1L).get();
         Category category = categoryService.getCategory(reqBody.getCategoryType())
@@ -88,5 +88,9 @@ public class PostService {
         return PostMapper.deleteDTO(updatedPost);
     }
 
+    public PostGetDetailResponseDTO getDetail(Long memeId){
+        Post currentPost = postRepository.findByIdWithTag(memeId).orElseThrow(() -> new IllegalArgumentException("게시글 오류 발생"));
+        return PostMapper.toGetDetailDTO(currentPost);
+    }
 
 }
