@@ -1,15 +1,13 @@
 package com.example.webtemplate.post.mapper;
 
 import com.example.webtemplate.account.Account;
-import com.example.webtemplate.category.CategoryType;
 import com.example.webtemplate.category.entity.Category;
 import com.example.webtemplate.post.dto.PostDeleteResponseDTO;
-import com.example.webtemplate.post.dto.PostRequestDTO;
-import com.example.webtemplate.post.dto.PostResponseDTO;
+import com.example.webtemplate.post.dto.PostCreateRequestDTO;
+import com.example.webtemplate.post.dto.PostCreateResponseDTO;
 import com.example.webtemplate.post.dto.PostUpdateResponseDTO;
 import com.example.webtemplate.post.entity.Post;
 
-import com.example.webtemplate.tag.entity.Tag;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,7 +15,7 @@ import java.util.List;
 @Component
 public class PostMapper {
 
-    public static Post dtoToPost(Account account, Category category, PostRequestDTO reqBody) {
+    public static Post dtoToPost(Account account, Category category, PostCreateRequestDTO reqBody) {
         return Post.builder()
                 .title(reqBody.getTitle())
                 .content(reqBody.getContent())
@@ -28,12 +26,12 @@ public class PostMapper {
                 .build();
     }
 
-    public static PostResponseDTO postToDTO(Post post) {
+    public static PostCreateResponseDTO postToDTO(Post post) {
         List<String> tags = post.getPostTags().stream()
                 .map(t -> t.getTag().getName())
                 .toList();
 
-        return PostResponseDTO.builder()
+        return PostCreateResponseDTO.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
                 .mediaUrl(post.getMediaUrl())

@@ -28,7 +28,7 @@ public class PostService {
     //인증 적용 후 삭제 예정
     private final AccountRepository accountRepository;
 
-    public PostResponseDTO create(PostRequestDTO reqBody) {
+    public PostCreateResponseDTO create(PostCreateRequestDTO reqBody) {
         //인증 적용 후 삭제 예정
         Account account = accountRepository.findById(1L).get();
         Category category = categoryService.getCategory(reqBody.getCategoryType())
@@ -87,4 +87,6 @@ public class PostService {
 
         return PostMapper.deleteDTO(updatedPost);
     }
+
+
 }

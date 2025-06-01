@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Builder
-public class PostResponseDTO {
+public class PostCreateResponseDTO {
     private String title;
     private String content;
     private String mediaUrl;
