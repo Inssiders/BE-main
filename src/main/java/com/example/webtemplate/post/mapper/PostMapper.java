@@ -27,9 +27,9 @@ public class PostMapper {
                 .build();
     }
 
-    public static PostResponseDTO postToDTO(CategoryType categoryType, List<Tag> tag, Post post) {
-        List<String> tags = tag.stream()
-                .map(t -> t.getName())
+    public static PostResponseDTO postToDTO(Post post) {
+        List<String> tags = post.getPostTags().stream()
+                .map(t -> t.getTag().getName())
                 .toList();
 
         return PostResponseDTO.builder()
@@ -37,7 +37,7 @@ public class PostMapper {
                 .content(post.getContent())
                 .mediaUrl(post.getMediaUrl())
                 .mediaUploadTime(post.getMediaUploadTime())
-                .categoryType(categoryType)
+                .categoryType(post.getCategory().getType())
                 .tags(tags)
                 .createdAt(post.getCreated_at())
                 .build();

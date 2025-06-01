@@ -44,7 +44,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        return PostMapper.postToDTO(category.getType(), tags, post);
+        return PostMapper.postToDTO(post);
     }
 
     public PostUpdateResponseDTO update(Long memeId, PostUpdateRequestDTO reqBody) {
