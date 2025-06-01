@@ -77,9 +77,4 @@ public class Post extends ContentBaseEntity {
     public void updateCategory(Category category){
         this.category = category;
     }
-
-    public void updateTags(List<PostTag> tags){
-        this.postTags = tags;
-    }
-
 }

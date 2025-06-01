@@ -13,14 +13,15 @@ import com.example.webtemplate.post.mapper.PostMapper;
 import com.example.webtemplate.post.repository.PostRepository;
 import com.example.webtemplate.tag.service.TagService;
 import com.example.webtemplate.tag.entity.Tag;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
@@ -47,26 +48,37 @@ public class PostService {
     }
 
     public PostUpdateResponseDTO update(Long memeId, PostUpdateRequestDTO reqBody) {
-        Post post = postRepository.findById(memeId).orElseThrow(() -> new IllegalArgumentException("게시글 오류 발생"));
+        Post currentPost = postRepository.findByIdWithTag(memeId).orElseThrow(() -> new IllegalArgumentException("게시글 오류 발생"));
 
         if(reqBody.hasTitle()) {
-            post.updateTitle(reqBody.getTitle());
+            currentPost.updateTitle(reqBody.getTitle());
         }
 
         if(reqBody.hasContent()) {
-            post.updateContent(reqBody.getContent());
+            currentPost.updateContent(reqBody.getContent());
         }
 
         if(reqBody.hasMediaUrl()) {
-            post.updateMediaUrl(reqBody.getMediaUrl());
+            currentPost.updateMediaUrl(reqBody.getMediaUrl());
         }
 
         if(reqBody.hasMediaUploadTime()) {
-            post.updateMediaUploadTime(reqBody.getMediaUploadTime());
+            currentPost.updateMediaUploadTime(reqBody.getMediaUploadTime());
         }
 
-        postRepository.save(post);
+        if(reqBody.hasCategoryType()) {
+            Category category = categoryService.getCategory(reqBody.getCategoryType())
+                    .orElseThrow(() -> new IllegalArgumentException("카테고리 오류 발생"));
+            currentPost.updateCategory(category);
+        }
 
-        return PostMapper.postToUpdateDTO(post);
+        if(reqBody.hasTags()) {
+            List<Tag> tags = tagService.findOrCreateTags(reqBody.getTags());
+            currentPost.getPostTags().clear();
+            currentPost.addTags(tags);
+        }
+
+        Post updatedPost = postRepository.save(currentPost);
+        return PostMapper.postToUpdateDTO(updatedPost);
     }
 }

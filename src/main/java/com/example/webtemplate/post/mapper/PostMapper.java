@@ -44,12 +44,16 @@ public class PostMapper {
     }
 
     public static PostUpdateResponseDTO postToUpdateDTO(Post post) {
-
+        List<String> tags = post.getPostTags().stream()
+                .map(t -> t.getTag().getName())
+                .toList();
         return PostUpdateResponseDTO.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
                 .mediaUrl(post.getMediaUrl())
                 .mediaUploadTime(post.getMediaUploadTime())
+                .categoryType(post.getCategory().getType())
+                .tags(tags)
                 .updatedAt(post.getUpdated_at())
                 .build();
     }
