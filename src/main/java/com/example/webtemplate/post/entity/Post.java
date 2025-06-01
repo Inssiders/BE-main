@@ -1,6 +1,7 @@
 package com.example.webtemplate.post.entity;
 
 import com.example.webtemplate.account.Account;
+import com.example.webtemplate.category.CategoryType;
 import com.example.webtemplate.category.entity.Category;
 import com.example.webtemplate.common.entity.ContentBaseEntity;
 import com.example.webtemplate.tag.entity.Tag;
@@ -57,5 +58,28 @@ public class Post extends ContentBaseEntity {
         this.postTags.addAll(newPostTags);
     }
 
+    public void updateTitle(String title){
+        this.title = title;
+    }
+
+    public void updateContent(String content){
+        this.content = content;
+    }
+
+    public void updateMediaUrl(String mediaUrl){
+        this.mediaUrl = mediaUrl;
+    }
+
+    public void updateMediaUploadTime(LocalDateTime mediaUploadTime){
+        this.mediaUploadTime = mediaUploadTime;
+    }
+
+    public void updateCategory(Category category){
+        this.category = category;
+    }
+
+    public void updateTags(List<PostTag> tags){
+        this.postTags = tags;
+    }
 
 }

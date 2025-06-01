@@ -1,0 +1,26 @@
+package com.example.webtemplate.post.dto;
+
+import com.example.webtemplate.category.CategoryType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class PostUpdateResponseDTO {
+
+    private String title;
+    private String content;
+    private String mediaUrl;
+    private LocalDateTime mediaUploadTime;
+    private CategoryType categoryType;
+    private List<String> tags;
+    private LocalDateTime updatedAt;
+
+}

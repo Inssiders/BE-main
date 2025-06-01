@@ -3,15 +3,14 @@ package com.example.webtemplate.post.controller;
 import com.example.webtemplate.common.response.BaseResponse;
 import com.example.webtemplate.post.dto.PostRequestDTO;
 import com.example.webtemplate.post.dto.PostResponseDTO;
+import com.example.webtemplate.post.dto.PostUpdateRequestDTO;
+import com.example.webtemplate.post.dto.PostUpdateResponseDTO;
 import com.example.webtemplate.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RestController
@@ -23,8 +22,14 @@ public class PostController {
 
     @PostMapping
     ResponseEntity<BaseResponse.ResponseWrapper<PostResponseDTO>> register(@Valid @RequestBody PostRequestDTO reqBody) {
-        PostResponseDTO data = postService.createPost(reqBody);
+        PostResponseDTO data = postService.create(reqBody);
         return BaseResponse.of(201, data);
+    }
+
+    @PatchMapping("/{memeId}")
+    ResponseEntity<BaseResponse.ResponseWrapper<PostUpdateResponseDTO>> update(@PathVariable Long memeId, @RequestBody PostUpdateRequestDTO reqBody){
+        PostUpdateResponseDTO data = postService.update(memeId, reqBody);
+        return BaseResponse.of(200, data);
     }
 
 }

@@ -5,6 +5,7 @@ import com.example.webtemplate.category.CategoryType;
 import com.example.webtemplate.category.entity.Category;
 import com.example.webtemplate.post.dto.PostRequestDTO;
 import com.example.webtemplate.post.dto.PostResponseDTO;
+import com.example.webtemplate.post.dto.PostUpdateResponseDTO;
 import com.example.webtemplate.post.entity.Post;
 
 import com.example.webtemplate.tag.entity.Tag;
@@ -39,6 +40,17 @@ public class PostMapper {
                 .categoryType(categoryType)
                 .tags(tags)
                 .createdAt(post.getCreated_at())
+                .build();
+    }
+
+    public static PostUpdateResponseDTO postToUpdateDTO(Post post) {
+
+        return PostUpdateResponseDTO.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .mediaUrl(post.getMediaUrl())
+                .mediaUploadTime(post.getMediaUploadTime())
+                .updatedAt(post.getUpdated_at())
                 .build();
     }
 
