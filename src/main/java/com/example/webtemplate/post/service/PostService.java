@@ -4,10 +4,7 @@ import com.example.webtemplate.account.Account;
 import com.example.webtemplate.account.AccountRepository;
 import com.example.webtemplate.category.entity.Category;
 import com.example.webtemplate.category.service.CategoryService;
-import com.example.webtemplate.post.dto.PostRequestDTO;
-import com.example.webtemplate.post.dto.PostResponseDTO;
-import com.example.webtemplate.post.dto.PostUpdateRequestDTO;
-import com.example.webtemplate.post.dto.PostUpdateResponseDTO;
+import com.example.webtemplate.post.dto.*;
 import com.example.webtemplate.post.entity.Post;
 import com.example.webtemplate.post.mapper.PostMapper;
 import com.example.webtemplate.post.repository.PostRepository;
@@ -31,7 +28,7 @@ public class PostService {
     //인증 적용 후 삭제 예정
     private final AccountRepository accountRepository;
 
-    public PostResponseDTO create(PostRequestDTO reqBody) {
+    public PostCreateResponseDTO create(PostCreateRequestDTO reqBody) {
         //인증 적용 후 삭제 예정
         Account account = accountRepository.findById(1L).get();
         Category category = categoryService.getCategory(reqBody.getCategoryType())
@@ -81,4 +78,15 @@ public class PostService {
         Post updatedPost = postRepository.save(currentPost);
         return PostMapper.postToUpdateDTO(updatedPost);
     }
+
+    public PostDeleteResponseDTO delete(Long memeId){
+        Post currentPost = postRepository.findByIdWithTag(memeId).orElseThrow(() -> new IllegalArgumentException("게시글 오류 발생"));
+        currentPost.updateIsDeleted();
+        currentPost.updateDeletedAt();
+        Post updatedPost = postRepository.save(currentPost);
+
+        return PostMapper.deleteDTO(updatedPost);
+    }
+
+
 }

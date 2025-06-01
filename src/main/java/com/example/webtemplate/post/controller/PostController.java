@@ -1,8 +1,8 @@
 package com.example.webtemplate.post.controller;
 
 import com.example.webtemplate.common.response.BaseResponse;
-import com.example.webtemplate.post.dto.PostRequestDTO;
-import com.example.webtemplate.post.dto.PostResponseDTO;
+import com.example.webtemplate.post.dto.PostCreateRequestDTO;
+import com.example.webtemplate.post.dto.PostCreateResponseDTO;
 import com.example.webtemplate.post.dto.PostUpdateRequestDTO;
 import com.example.webtemplate.post.dto.PostUpdateResponseDTO;
 import com.example.webtemplate.post.service.PostService;
@@ -21,8 +21,8 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    ResponseEntity<BaseResponse.ResponseWrapper<PostResponseDTO>> register(@Valid @RequestBody PostRequestDTO reqBody) {
-        PostResponseDTO data = postService.create(reqBody);
+    ResponseEntity<BaseResponse.ResponseWrapper<PostCreateResponseDTO>> register(@Valid @RequestBody PostCreateRequestDTO reqBody) {
+        PostCreateResponseDTO data = postService.create(reqBody);
         return BaseResponse.of(201, data);
     }
 
