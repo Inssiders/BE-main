@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @Builder
-public class PostCreateRequestDTO {
+public class PostRequestDTO {
 
     @NotBlank(message = "제목을 입력해주세요.")
     @Size(max = 255, message = "제목을 255자 이내로 작성해주세요.")
