@@ -3,7 +3,6 @@ package com.example.webtemplate.post.mapper;
 import com.example.webtemplate.account.Account;
 import com.example.webtemplate.category.CategoryType;
 import com.example.webtemplate.category.entity.Category;
-import com.example.webtemplate.post.dto.PostDeleteResponseDTO;
 import com.example.webtemplate.post.dto.PostRequestDTO;
 import com.example.webtemplate.post.dto.PostResponseDTO;
 import com.example.webtemplate.post.dto.PostUpdateResponseDTO;
@@ -59,11 +58,5 @@ public class PostMapper {
                 .build();
     }
 
-    public static PostDeleteResponseDTO deleteDTO(Post post) {
-        return PostDeleteResponseDTO.builder()
-                .title(post.getTitle())
-                .deletedAt(post.getDeleted_at())
-                .build();
-    }
 
 }

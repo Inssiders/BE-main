@@ -31,9 +31,9 @@ public class ContentBaseEntity {
     private LocalDateTime updated_at;
 
     @Column
-    protected LocalDateTime deleted_at;
+    private LocalDateTime deleted_at;
 
     @Builder.Default
-    protected boolean is_deleted = Boolean.FALSE;
+    private boolean is_deleted = Boolean.FALSE;
 
 }
