@@ -6,6 +6,9 @@ spring:
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
 
 spring.jpa.open-in-view: false
 spring.jpa.hibernate.ddl-auto: none
