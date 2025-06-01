@@ -77,4 +77,12 @@ public class Post extends ContentBaseEntity {
     public void updateCategory(Category category){
         this.category = category;
     }
+
+    public void updateIsDeleted(){
+        this.is_deleted = true;
+    }
+
+    public void updateDeletedAt(){
+        this.deleted_at = LocalDateTime.now();
+    }
 }

@@ -1,10 +1,7 @@
 package com.example.webtemplate.post.controller;
 
 import com.example.webtemplate.common.response.BaseResponse;
-import com.example.webtemplate.post.dto.PostRequestDTO;
-import com.example.webtemplate.post.dto.PostResponseDTO;
-import com.example.webtemplate.post.dto.PostUpdateRequestDTO;
-import com.example.webtemplate.post.dto.PostUpdateResponseDTO;
+import com.example.webtemplate.post.dto.*;
 import com.example.webtemplate.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +28,12 @@ public class PostController {
         PostUpdateResponseDTO data = postService.update(memeId, reqBody);
         return BaseResponse.of(200, data);
     }
+
+    @PatchMapping("/delete/{memeId}")
+    ResponseEntity<BaseResponse.ResponseWrapper<PostDeleteResponseDTO>> delete(@PathVariable Long memeId){
+        PostDeleteResponseDTO data = postService.delete(memeId);
+        return BaseResponse.of(200, data);
+    }
+
 
 }
