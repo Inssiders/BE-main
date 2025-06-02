@@ -1,7 +1,8 @@
 package com.example.webtemplate.account;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.webtemplate.common.repository.SoftDeleteRepository;
 
-public interface AccountRepository extends JpaRepository<Account, Long> {
+
+public interface AccountRepository extends SoftDeleteRepository<Account, Long> {
 
 }
