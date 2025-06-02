@@ -13,7 +13,7 @@ services:
       - app
 
   app:
-    image: jidak/inssider-be-main:1.0.0
+    image: jidak/inssider-be-main:${IMAGE_TAG}
     restart: "on-failure"
 #    env_file: [.env.prod]
     environment:
