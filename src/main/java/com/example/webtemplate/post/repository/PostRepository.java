@@ -18,10 +18,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE p.id = :id")
     Optional<Post> findByIdWithTag(@Param("id") Long postId);
 
-    @Query("SELECT new com.example.webtemplate.post.dto.PostGetIdResponseDTO(p.id, p.created_at) " +
-            "FROM Post p WHERE p.created_at >= :since")
+    @Query("SELECT new com.example.webtemplate.post.dto.PostGetIdResponseDTO(p.id, p.createdAt) " +
+            "FROM Post p WHERE p.createdAt >= :since")
     List<PostGetIdResponseDTO> findPostsByCreatedAtAfter(@Param("since") LocalDateTime since);
 
-    @Query("SELECT new com.example.webtemplate.post.dto.PostGetIdResponseDTO(p.id, p.created_at) FROM Post p")
+    @Query("SELECT new com.example.webtemplate.post.dto.PostGetIdResponseDTO(p.id, p.createdAt) FROM Post p")
     List<PostGetIdResponseDTO> findAllIds();
 }

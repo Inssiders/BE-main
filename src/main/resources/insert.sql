@@ -8,5 +8,15 @@ VALUES (1,
        );
 
 INSERT INTO categories (type) VALUES
-                                  ('DANCE'), ('FOOD'), ('BOOKS'),
-                                  ('SPORTS'), ('HOME');
+                                  ('KPOP'),
+                                  ('ENTERTAINMENT'),
+                                  ('DRAMA'),
+                                  ('INFLUENCER'),
+                                  ('NEWS'),
+                                  ('MOVIE'),
+                                  ('ANIMATION'),
+                                  ('CHALLENGE'),
+                                  ('NEW_SLANG'),
+                                  ('TRENDING'),
+                                  ('ETC'),
+                                  ('USER_CONTENTS');

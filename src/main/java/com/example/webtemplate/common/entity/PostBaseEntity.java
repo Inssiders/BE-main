@@ -18,22 +18,22 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ContentBaseEntity {
+public class PostBaseEntity {
 
     @Column
     protected String content;
 
     @CreatedDate
     @Column(updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
     @Column
-    protected LocalDateTime deleted_at;
+    protected LocalDateTime deletedAt;
 
     @Builder.Default
-    protected boolean is_deleted = Boolean.FALSE;
+    protected boolean isDeleted = Boolean.FALSE;
 
 }

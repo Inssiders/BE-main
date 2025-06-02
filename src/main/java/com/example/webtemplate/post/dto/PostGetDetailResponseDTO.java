@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 public class PostGetDetailResponseDTO {
-    private String writer; //엔티티 구조 수정 후 반영 예정
+    private String writer;
     private String title;
     private String content;
     private String mediaUrl;

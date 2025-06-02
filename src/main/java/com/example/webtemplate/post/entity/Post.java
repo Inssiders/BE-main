@@ -1,9 +1,8 @@
 package com.example.webtemplate.post.entity;
 
 import com.example.webtemplate.account.Account;
-import com.example.webtemplate.category.CategoryType;
 import com.example.webtemplate.category.entity.Category;
-import com.example.webtemplate.common.entity.ContentBaseEntity;
+import com.example.webtemplate.common.entity.PostBaseEntity;
 import com.example.webtemplate.tag.entity.Tag;
 import jakarta.persistence.*;
 
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 @Table(name = "posts")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post extends ContentBaseEntity {
+public class Post extends PostBaseEntity {
 
     @Id
     @GeneratedValue
@@ -79,10 +78,10 @@ public class Post extends ContentBaseEntity {
     }
 
     public void updateIsDeleted() {
-        this.is_deleted = true;
+        this.isDeleted = true;
     }
 
     public void updateDeletedAt() {
-        this.deleted_at = LocalDateTime.now();
+        this.deletedAt = LocalDateTime.now();
     }
 }

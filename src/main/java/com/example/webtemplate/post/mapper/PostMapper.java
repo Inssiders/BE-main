@@ -35,7 +35,7 @@ public class PostMapper {
                 .mediaUploadTime(post.getMediaUploadTime())
                 .categoryType(post.getCategory().getType())
                 .tags(tags)
-                .createdAt(post.getCreated_at())
+                .createdAt(post.getCreatedAt())
                 .build();
     }
 
@@ -50,14 +50,14 @@ public class PostMapper {
                 .mediaUploadTime(post.getMediaUploadTime())
                 .categoryType(post.getCategory().getType())
                 .tags(tags)
-                .updatedAt(post.getUpdated_at())
+                .updatedAt(post.getUpdatedAt())
                 .build();
     }
 
     public static PostDeleteResponseDTO deleteDTO(Post post) {
         return PostDeleteResponseDTO.builder()
                 .title(post.getTitle())
-                .deletedAt(post.getDeleted_at())
+                .deletedAt(post.getDeletedAt())
                 .build();
     }
 
@@ -74,7 +74,7 @@ public class PostMapper {
                 .mediaUploadTime(post.getMediaUploadTime())
                 .categoryType(post.getCategory().getType())
                 .tags(tags)
-                .createdAt(post.getCreated_at())
+                .createdAt(post.getCreatedAt())
                 .build();
     }
 
