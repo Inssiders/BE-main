@@ -5,11 +5,8 @@ import com.example.webtemplate.category.entity.Category;
 import com.example.webtemplate.post.dto.*;
 import com.example.webtemplate.post.entity.Post;
 
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 
-@Component
 public class PostMapper {
 
     public static Post dtoToPost(Account account, Category category, PostCreateRequestDTO reqBody) {
