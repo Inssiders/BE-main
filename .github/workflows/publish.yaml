@@ -12,12 +12,15 @@ jobs:
     env:
       DOCKER_BUILD_RECORD_RETENTION_DAYS: 1
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5.7.0
         with:
           images: |
-            ${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
+            ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}

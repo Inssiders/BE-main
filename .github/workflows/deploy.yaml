@@ -38,15 +38,27 @@ jobs:
           username: ubuntu
           key: ${{ secrets.AWS_SSH_PK }}
           script: |
+            echo "🚀 EC2에 배포 시작"
+            
             # 1. 레포지토리 pull
             cd BE-main
             git pull origin main
+            
+            RAW_TAG="${{ github.event.workflow_run.head_branch }}"
+            IMAGE_TAG="${RAW_TAG#v}"
+            echo "📦 전달받은 Git 태그: $RAW_TAG → 이미지 태그: $IMAGE_TAG"
             
             # 2. .env.prod 존재하지 않으면 에러
             if [ ! -f .env.prod ]; then
               echo "❌ .env.prod 파일이 없습니다. 수동으로 업로드해주세요."
               exit 1
             fi
+            
+            echo "📝 .env.prod IMAGE_TAG 업데이트"
+            # 기존 IMAGE_TAG 라인이 있으면 덮어쓰기, 없으면 추가
+            grep -q '^IMAGE_TAG=' .env.prod && \
+              sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=$IMAGE_TAG/" .env.prod || \
+              echo "IMAGE_TAG=$IMAGE_TAG" >> .env.prod
 
             # 3. 배포 스크립트 실행
             chmod +x scripts/run-docker-prod.sh
