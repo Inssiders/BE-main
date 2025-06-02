@@ -35,12 +35,22 @@ jobs:
         with:
           host: ${{ secrets.AWS_INSTANCE_HOST }}
           port: ${{ secrets.AWS_SSH_PORT }}
-          username: oomia
+          username: ubuntu
           key: ${{ secrets.AWS_SSH_PK }}
           script: |
-            cd inssider-spring-template
-            docker compose pull
-            docker compose up -d -y
+            # 1. 레포지토리 pull
+            cd BE-main
+            git pull origin main
+            
+            # 2. .env.prod 존재하지 않으면 에러
+            if [ ! -f .env.prod ]; then
+              echo "❌ .env.prod 파일이 없습니다. 수동으로 업로드해주세요."
+              exit 1
+            fi
+
+            # 3. 배포 스크립트 실행
+            chmod +x scripts/run-docker-prod.sh
+            ./scripts/run-docker-prod.sh
 
       - name: Close SSH port after deploy
         run: |
