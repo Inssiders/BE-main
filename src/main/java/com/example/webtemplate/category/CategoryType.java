@@ -29,14 +29,4 @@ public enum CategoryType {
     public String getDisplayName() {
         return displayName;
     }
-
-//    // 코드로 CategoryType 찾기
-//    public static CategoryType fromCode(int code) {
-//        for (CategoryType type : values()) {
-//            if (type.code == code) {
-//                return type;
-//            }
-//        }
-//        throw new IllegalArgumentException("Unknown category code: " + code);
-//    }
 }
