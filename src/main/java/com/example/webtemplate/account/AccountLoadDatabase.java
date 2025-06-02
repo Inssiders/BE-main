@@ -28,6 +28,8 @@ class AccountLoadDatabase {
               .password("password3")
               .build()));
 
+      repository.softDelete(1L);
+
       log.info("Preloading {}", repository
           .save(Account.builder()
               .accountType(AccountType.PASSWORD)

@@ -1,23 +1,28 @@
 package com.example.webtemplate.profile;
 
 import java.util.List;
+import java.util.Optional;
 
-import org.springframework.stereotype.Service;
+import com.example.webtemplate.common.response.StandardResponse.QueryResponse;
+import com.example.webtemplate.profile.UserProfileResponsesDto.UpdateProfileResponse;
+import com.example.webtemplate.profile.UserProfileResponsesDto.UserProfileDto;
 
-@Service
-class UserProfileService {
+public interface UserProfileService {
 
-    private final UserProfileRepository repository;
+    List<Long> getAllUserProfileIds();
 
-    UserProfileService(UserProfileRepository repository) {
-        this.repository = repository;
-    }
+    long count();
 
-    public List<Long> getAllUserProfileIds() {
-        return repository.findAll().stream()
-                .map(profile -> profile.getId())
-                .filter(id -> id != null)
-                .toList();
-    }
+    UserProfileDto findUserProfileIdsById(Long id);
+
+    UpdateProfileResponse updateUserProfile(
+            Long id,
+            Optional<String> nickname,
+            Optional<String> profileUrl,
+            Optional<String> bio,
+            Optional<Boolean> accountVisible,
+            Optional<Boolean> followerVisible);
+
+    QueryResponse<UserProfileDto> findUserProfilesByNickname(String nickname, String sort, int limit, int page);
 
 }
