@@ -28,6 +28,7 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 public class Account extends SoftDeleteable {
 
   @Id
