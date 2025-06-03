@@ -2,21 +2,11 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Spring Boot-WebtemplateApplication<BE-main>",
+      "name": "Spring Boot-MainWebApplication<api-BE-main>",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "mainClass": "com.example.webtemplate.WebtemplateApplication",
-      "projectName": "BE-main",
-      "args": "--spring.profiles.active=dev",
-      "envFile": "${workspaceFolder}/.env"
-    },
-    {
-      "type": "java",
-      "name": "Spring Boot-WebtemplateApplication<webtemplate-BE-main>",
-      "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "mainClass": "com.example.webtemplate.WebtemplateApplication",
-      "projectName": "webtemplate-BE-main",
+      "mainClass": "com.inssider.api.MainWebApplication",
+      "projectName": "api-BE-main",
       "args": "--spring.profiles.active=dev",
       "envFile": "${workspaceFolder}/.env"
     }

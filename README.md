@@ -1,17 +1,17 @@
 # initialization
 
 ```sh
-git clone https://github.com/ooMia/inssider-spring-template.git
-cd inssider-spring-template
+git clone https://github.com/Inssiders/BE-main.git
+cd BE-main
 cp .env.example .env
 
 # https://sdkman.io/install/
 sdk install java 24-tem
 java --version
 
-# https://github.com/pinterest/ktlint
-brew install ktlint
-ktlint --format
+# https://github.com/diffplug/spotless/tree/main/plugin-gradle
+gradlew spotlessApply
+gradlew spotlessCheck
 
 docker build --check .
 ```

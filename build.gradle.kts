@@ -2,9 +2,10 @@ plugins {
     java
     id("org.springframework.boot") version "4.0.0-SNAPSHOT"
     id("io.spring.dependency-management") version "1.1.7"
+    id("com.diffplug.spotless") version "7.0.4"
 }
 
-group = "com.example"
+group = "com.inssider"
 version = "0.0.10-SNAPSHOT"
 
 springBoot {
@@ -42,6 +43,7 @@ dependencies {
     implementation("org.postgresql:postgresql")
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
@@ -62,5 +64,20 @@ tasks {
     }
     withType<org.springframework.boot.gradle.tasks.run.BootRun> {
         systemProperty("spring.profiles.active", activeProfile)
+    }
+}
+
+spotless {
+    setEnforceCheck(false)
+    java {
+        googleJavaFormat("1.27.0")
+    }
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint()
+    }
+    format("styling") {
+        target("*.{xml,yml,yaml,properties,Dockerfile,json,md,sql}")
+        prettier()
     }
 }
