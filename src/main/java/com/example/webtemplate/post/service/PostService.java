@@ -103,4 +103,8 @@ public class PostService {
         return postRepository.findPostsByCreatedAtAfter(since);
     }
 
+    public boolean isPost(Long postId){
+        return postRepository.existsById(postId);
+    }
+
 }
