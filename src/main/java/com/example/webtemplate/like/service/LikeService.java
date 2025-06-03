@@ -53,7 +53,7 @@ public class LikeService {
         switch (targetType) {
             case POST:
                 if (!postService.isPost(targetId)) {
-                    throw new EntityNotFoundException("존재하지 않는 게시글입니다.");
+                    throw new EntityNotFoundException("존재하지 않는 콘텐츠입니다.");
                 }
                 break;
             case COMMENT: //추가 예정
