@@ -61,6 +61,11 @@ tasks {
     withType<Test> {
         useJUnitPlatform()
         systemProperty("spring.profiles.active", activeProfile)
+        testLogging {
+            events("passed", "skipped", "failed", "standardOut", "standardError")
+            showStandardStreams = true
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
     }
     withType<org.springframework.boot.gradle.tasks.run.BootRun> {
         systemProperty("spring.profiles.active", activeProfile)

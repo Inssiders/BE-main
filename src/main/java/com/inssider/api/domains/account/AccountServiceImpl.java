@@ -6,6 +6,7 @@ import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountDataTypes.RoleType;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -86,5 +87,15 @@ class AccountServiceImpl implements AccountService {
             .orElseThrow(() -> new NoSuchElementException("Account not found with id: " + id));
     account.delete();
     return repository.save(account).getDeletedAt();
+  }
+
+  @Override
+  public boolean existsByEmail(String email) {
+    return repository.existsByEmail(email);
+  }
+
+  @Override
+  public Optional<Account> findByEmail(String email) {
+    return repository.findByEmail(email);
   }
 }

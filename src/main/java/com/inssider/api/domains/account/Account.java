@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.inssider.api.common.model.SoftDeleteable;
 import com.inssider.api.domains.account.AccountDataTypes.AccountType;
 import com.inssider.api.domains.account.AccountDataTypes.RoleType;
+import com.inssider.api.domains.auth.token.refresh.RefreshToken;
 import com.inssider.api.domains.profile.UserProfile;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -34,20 +35,19 @@ public class Account extends SoftDeleteable {
   @OneToOne(mappedBy = "account", cascade = CascadeType.PERSIST)
   private UserProfile profile;
 
+  @OneToOne(mappedBy = "account", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  private RefreshToken refreshToken;
+
   @NonNull
   @ToString.Exclude
-  @Setter(AccessLevel.NONE)
   @Enumerated(EnumType.STRING)
   private AccountType accountType;
 
   @NonNull
-  @Setter(AccessLevel.NONE)
   @Enumerated(EnumType.STRING)
   private RoleType role;
 
-  @NonNull
-  @Setter(AccessLevel.NONE)
-  private String email;
+  @NonNull private String email;
 
   @NonNull
   @ToString.Exclude
@@ -55,9 +55,7 @@ public class Account extends SoftDeleteable {
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String password;
 
-  @ToString.Exclude
-  @Setter(AccessLevel.NONE)
-  private String providerUserId;
+  @ToString.Exclude private String providerUserId;
 
   @Builder
   private Account(AccountType accountType, RoleType role, String email, String password) {
