@@ -63,7 +63,7 @@ services:
           "wget",
           "--spider",
           "-q",
-          "http://localhost:${APP_PORT}/api/profiles/1",
+          "http://localhost:${APP_PORT}/actuator/health",
         ]
 
   # == PROFILE: PROD ==
