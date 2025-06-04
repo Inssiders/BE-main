@@ -2,7 +2,7 @@
 # check=experimental=all
 
 # base 공통 베이스 이미지 및 유틸리티 설치
-FROM bellsoft/liberica-openjdk-alpine:24 AS base
+FROM bellsoft/liberica-openjdk-alpine:21 AS base
 LABEL maintainer="ooMia"
 RUN apk add --no-cache dos2unix
 
@@ -23,7 +23,7 @@ COPY . .
 RUN ./gradlew bootJar -x test --no-daemon
 
 # runner 실행용 경량 이미지 생성
-FROM bellsoft/liberica-openjre-alpine:24 AS runner
+FROM bellsoft/liberica-openjre-alpine:21 AS runner
 WORKDIR /app
 
 # wget 설치

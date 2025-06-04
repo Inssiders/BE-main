@@ -6,7 +6,7 @@ cd BE-main
 cp .env.example .env
 
 # https://sdkman.io/install/
-sdk install java 24-tem
+sdk install java 21-tem
 java --version
 
 # https://github.com/diffplug/spotless/tree/main/plugin-gradle
