@@ -8,5 +8,7 @@
   "java.settings.url": "./.vscode/.prefs",
   "java.test.config": {
     "vmArgs": ["-Dspring.profiles.active=dev"]
-  }
+  },
+  "java.format.enabled": false,
+  "java.debug.settings.onBuildFailureProceed": true
 }

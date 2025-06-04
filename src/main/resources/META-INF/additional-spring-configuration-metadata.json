@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "springdoc.swagger-ui.use-root-path",
+      "type": "java.lang.Boolean",
+      "description": "If set to true, the swagger-ui will be accessible from the application root path directly.",
+      "defaultValue": false
+    }
+  ]
+}
