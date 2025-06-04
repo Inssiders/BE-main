@@ -1,11 +1,15 @@
 INSERT INTO accounts
-VALUES (1,
+VALUES (false,
+        NOW(),
+        NULL,
+        1,
+        NOW(),
         'PASSWORD',
-        'USER',
-        'testuser@example.com',
+        'user@naver.com',
         '1234',
-        NULL
-       );
+        '1',
+        'USER');
+
 
 INSERT INTO categories (type) VALUES
                                   ('KPOP'),
