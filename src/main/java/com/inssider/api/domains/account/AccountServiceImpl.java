@@ -6,7 +6,6 @@ import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountDataTypes.RoleType;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -75,11 +74,6 @@ class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public long count() {
-    return repository.count();
-  }
-
-  @Override
   public LocalDateTime softDelete(Long id) throws NoSuchElementException {
     var account =
         repository
@@ -90,12 +84,7 @@ class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public boolean existsByEmail(String email) {
-    return repository.existsByEmail(email);
-  }
-
-  @Override
-  public Optional<Account> findByEmail(String email) {
-    return repository.findByEmail(email);
+  public AccountRepository getRepository() {
+    return repository;
   }
 }

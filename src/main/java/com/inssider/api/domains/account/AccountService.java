@@ -1,11 +1,12 @@
 package com.inssider.api.domains.account;
 
+import com.inssider.api.common.service.BaseCRUDService;
 import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public interface AccountService {
+public interface AccountService extends BaseCRUDService<Account, Long, AccountRepository> {
   Account register(RegisterType registerType, String email, String password)
       throws IllegalArgumentException;
 
@@ -13,12 +14,14 @@ public interface AccountService {
 
   Account patchAccountPassword(Long id, String newPassword) throws NoSuchElementException;
 
-  long count();
-
   LocalDateTime softDelete(Long id) throws NoSuchElementException;
 
   // Repository 메서드들을 위한 서비스 메서드들
-  boolean existsByEmail(String email);
+  default boolean existsByEmail(String email) {
+    return getRepository().existsByEmail(email);
+  }
 
-  Optional<Account> findByEmail(String email);
+  default Optional<Account> findByEmail(String email) {
+    return getRepository().findByEmail(email);
+  }
 }
