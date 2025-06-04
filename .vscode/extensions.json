@@ -1,7 +1,8 @@
 {
   "recommendations": [
     "vscjava.vscode-spring-boot-dashboard",
-    "vscjava.vscode-gradle"
+    "vscjava.vscode-gradle",
+    "shengchen.vscode-checkstyle"
   ],
   "unwantedRecommendations": []
 }

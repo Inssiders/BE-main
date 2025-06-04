@@ -6,7 +6,7 @@
 name: Integration Test (profile:stage)
 on:
   push:
-    branches: [develop]
+    branches: [ develop ]
 jobs:
   test:
     runs-on: ubuntu-latest
