@@ -5,8 +5,6 @@ on:
     workflows: [ "Publish Docker image on Semver tag push" ]
     types:
       - completed
-    branches:
-      - main
 
 permissions:
   id-token: write
