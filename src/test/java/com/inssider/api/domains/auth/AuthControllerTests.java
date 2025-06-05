@@ -1,22 +1,16 @@
 package com.inssider.api.domains.auth;
 
-import static com.inssider.api.domains.auth.AuthDataTypes.GrantType.AUTHORIZATION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inssider.api.common.Util;
+import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
-import com.inssider.api.domains.auth.AuthRequestsDto.AuthorizationCodeLoginRequest;
+import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
 import com.inssider.api.domains.auth.AuthRequestsDto.EmailChallengeRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.EmailVerifyRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.LoginRequest;
+import com.inssider.api.domains.auth.code.email.EmailAuthCode;
 import com.inssider.api.domains.auth.code.email.EmailAuthService;
 import com.inssider.api.domains.auth.token.JwtService;
 import java.util.UUID;
@@ -24,122 +18,69 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AuthControllerTests {
 
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private ObjectMapper objectMapper;
-
-  private static final String TEST_CODE = "123456";
+  @Autowired private AuthController controller;
 
   @Autowired private AccountService accountService;
-
+  @Autowired private EmailAuthService emailAuthService;
   @Autowired private EmailAuthService emailAuthorizationService;
   @Autowired private JwtService jwtService;
 
   @Test
   @Transactional
-  void testEmailAuthFlow() throws Exception {
+  void 로그인() {
     // 0. 계정 생성 (테스트용)
-    var email = createTestAccount();
+    var account = createTestAccount();
+    var email = account.getEmail();
     assertEquals(1, accountService.count());
 
     // 1. 이메일 인증 요청
-    requestEmailChallenge(email);
-    assertEquals(1, emailAuthorizationService.countEmailCodes());
+    {
+      var request = new EmailChallengeRequest(email);
+      controller.challengeEmailAuth(request);
+    }
+    assertEquals(1, emailAuthorizationService.countEmailCodes()); // 이메일 인증 코드 생성
+
+    // 1.5 이메일 인증 코드 획득
+    String code =
+        emailAuthService
+            .findById(email)
+            .map(EmailAuthCode::getCode)
+            .orElseThrow(() -> new AssertionError("Email code not found"));
 
     // 2. 이메일 인증 확인 및 authorization code 획득
-    UUID authorizationCode = verifyEmailAndGetAuthCode(email, TEST_CODE);
-    assertEquals(0, emailAuthorizationService.countEmailCodes());
-    assertEquals(1, jwtService.countAuthorizationCodes());
+    UUID authorizationCode;
+    {
+      var request = new EmailVerifyRequest(email, code);
+      var response = controller.verifyEmailAuth(request).getBody().data();
+      authorizationCode = response.authorization_code();
+    }
+    assertNotNull(authorizationCode);
+    assertEquals(0, emailAuthorizationService.countEmailCodes()); // 인증 코드 사용 후 삭제
+    assertEquals(1, jwtService.countAuthorizationCodes()); // authorization code 생성 확인
 
     // 3. authorization code로 토큰 생성
-    String accessToken = createTokenWithAuthCode(authorizationCode);
+    String accessToken;
+    String refreshToken;
+    {
+      var request =
+          new AuthRequestsDto.AuthorizationCodeLoginRequest(
+              GrantType.AUTHORIZATION_CODE, authorizationCode);
+      var response = controller.createToken(request).getBody().data();
+      accessToken = response.accessToken();
+      refreshToken = response.refreshToken();
+    }
     assertNotNull(accessToken);
+    assertNull(refreshToken);
   }
 
-  // ========== Helper Methods ==========
-
-  private String createTestAccount() {
-    var entity = Util.accountGenerator().get();
-    accountService.register(entity);
-    return entity.getEmail();
-  }
-
-  /** 이메일 인증 코드 요청 */
-  private void requestEmailChallenge(String email) throws Exception {
-    EmailChallengeRequest request = new EmailChallengeRequest(email);
-
-    MvcResult result =
-        mockMvc
-            .perform(
-                post("/api/auth/email/challenge")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.data.email").value(email))
-            .andReturn();
-
-    // 실제 응답 내용을 출력해서 구조 확인
-    String responseBody = result.getResponse().getContentAsString();
-    System.out.println("Email challenge response: " + responseBody);
-  }
-
-  /** 이메일 인증 확인 및 authorization code 반환 */
-  private UUID verifyEmailAndGetAuthCode(String email, String code) throws Exception {
-    EmailVerifyRequest request = new EmailVerifyRequest(email, code);
-
-    MvcResult result =
-        mockMvc
-            .perform(
-                post("/api/auth/email/verify")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.data.authorization_code").exists())
-            .andReturn();
-
-    // JSON 응답에서 authorization_code 추출
-    String responseBody = result.getResponse().getContentAsString();
-    JsonNode jsonNode = objectMapper.readTree(responseBody);
-    return UUID.fromString(jsonNode.get("data").get("authorization_code").asText());
-  }
-
-  /** Authorization code로 액세스 토큰 생성 */
-  private String createTokenWithAuthCode(UUID authCode) throws Exception {
-    LoginRequest request = new AuthorizationCodeLoginRequest(AUTHORIZATION_CODE, authCode);
-
-    MvcResult result =
-        mockMvc
-            .perform(
-                post("/api/auth/token")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data.access_token").exists())
-            .andExpect(
-                jsonPath("$.data.refresh_token").value((String) null)) // Refresh token은 null로 설정
-            .andExpect(jsonPath("$.data.token_type").value("Bearer"))
-            .andExpect(jsonPath("$.data.expires_in").exists())
-            .andReturn();
-
-    String responseBody = result.getResponse().getContentAsString();
-    JsonNode jsonNode = objectMapper.readTree(responseBody);
-    JsonNode dataNode = jsonNode.get("data");
-
-    String accessToken = dataNode.get("access_token").asText();
-    return accessToken;
+  private Account createTestAccount() {
+    var account = Util.accountGenerator().get();
+    return accountService.register(account);
   }
 }
