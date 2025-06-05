@@ -1,6 +1,7 @@
 package com.inssider.api.domains.account;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.inssider.api.common.Util;
 import com.inssider.api.common.model.SoftDeleteable;
 import com.inssider.api.domains.account.AccountDataTypes.AccountType;
 import com.inssider.api.domains.account.AccountDataTypes.RoleType;
@@ -13,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -71,5 +74,11 @@ public class Account extends SoftDeleteable {
             .accountVisible(true)
             .followerVisible(true)
             .build();
+  }
+
+  @PrePersist
+  @PreUpdate
+  private void hashPassword() {
+    this.password = Util.argon2Hash(this.password);
   }
 }

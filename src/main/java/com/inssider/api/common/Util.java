@@ -93,7 +93,7 @@ public class Util {
           .accountType(AccountType.PASSWORD)
           .email(email)
           .role(RoleType.USER)
-          .password(argon2Hash(password))
+          .password(password)
           .build();
     };
   }

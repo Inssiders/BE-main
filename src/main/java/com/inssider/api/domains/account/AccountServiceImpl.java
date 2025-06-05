@@ -97,11 +97,12 @@ class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public Long verifyPassword(String email, String password)
+  public Long verifyPassword(String email, String rawPassword)
       throws IllegalArgumentException, NoSuchElementException {
     var entity = repository.findByEmail(email).orElseThrow();
-    if (!Util.argon2Hash(password).equals(entity.getPassword())) {
-      throw new IllegalArgumentException("Invalid password for account: " + email);
+    if (!Util.argon2Hash(rawPassword).equals(entity.getPassword())) {
+      throw new IllegalArgumentException(
+          rawPassword + " is not matched with " + entity.getPassword());
     }
     return entity.getId();
   }

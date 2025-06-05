@@ -26,8 +26,8 @@ class TokenServiceImpl implements TokenService {
       case PasswordLoginRequest req -> {
         // [ ] add validation if needed
         var email = req.email(); // email uniqueness & regex validation
-        var password = req.password(); // password regex validation
-        yield jwtService.permitTokensByPassword(email, password);
+        var rawPassword = req.password(); // password regex validation
+        yield jwtService.permitTokensByPassword(email, rawPassword);
       }
 
       case RefreshTokenLoginRequest req -> {

@@ -92,8 +92,8 @@ public class JwtServiceImpl implements JwtService {
   }
 
   @Override
-  public TokenResponse permitTokensByPassword(String email, String password) {
-    Long accountId = accountService.verifyPassword(email, password);
+  public TokenResponse permitTokensByPassword(String email, String rawPassword) {
+    Long accountId = accountService.verifyPassword(email, rawPassword);
     return generateTokenResponse(GrantType.PASSWORD, accountId);
   }
 }
