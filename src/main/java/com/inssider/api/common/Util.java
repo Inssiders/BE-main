@@ -2,6 +2,7 @@ package com.inssider.api.common;
 
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountDataTypes.AccountType;
+import com.inssider.api.domains.account.AccountDataTypes.RoleType;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Random;
@@ -91,6 +92,7 @@ public class Util {
       return Account.builder()
           .accountType(AccountType.PASSWORD)
           .email(email)
+          .role(RoleType.USER)
           .password(argon2Hash(password))
           .build();
     };

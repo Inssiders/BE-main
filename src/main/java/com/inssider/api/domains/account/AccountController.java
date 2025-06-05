@@ -24,7 +24,8 @@ class AccountController {
   private final AccountService service;
 
   @PostMapping
-  ResponseEntity<ResponseWrapper<AccountCreated>> register(RegisterRequestDto reqBody) {
+  ResponseEntity<ResponseWrapper<AccountCreated>> register(
+      @RequestBody RegisterRequestDto reqBody) {
     var data = service.register(reqBody.registerType(), reqBody.email(), reqBody.password());
     return BaseResponse.of(201, new AccountCreated(data.getEmail(), new Date()));
   }

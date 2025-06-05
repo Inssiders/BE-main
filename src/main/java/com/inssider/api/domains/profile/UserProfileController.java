@@ -7,6 +7,7 @@ import com.inssider.api.common.response.StandardResponse.QueryResponse;
 import com.inssider.api.domains.profile.UserProfileRequestsDto.UpdateProfile;
 import com.inssider.api.domains.profile.UserProfileResponsesDto.UpdateProfileResponse;
 import com.inssider.api.domains.profile.UserProfileResponsesDto.UserProfileDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,17 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/profiles")
 class UserProfileController {
 
-  // 예약된 빈 `ProfileController`과의 충돌
-  // -> `UserProfileController`로 이름 변경
-
   private final UserProfileService service;
-
-  UserProfileController(UserProfileService service) {
-    this.service = service;
-  }
 
   @GetMapping
   public QueryResponse<UserProfileDto> query(
