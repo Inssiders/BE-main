@@ -35,7 +35,7 @@ class AccountController {
   ResponseEntity<ResponseWrapper<Void>> deleteAccount(
       @RequestHeader("Authorization") String authorizationHeader) {
     Account account = service.getAccountFromToken(authorizationHeader);
-    service.deleteById(account.getId());
+    service.softDelete(account.getId());
     return BaseResponse.of(200, null);
   }
 

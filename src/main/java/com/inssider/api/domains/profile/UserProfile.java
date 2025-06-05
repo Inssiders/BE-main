@@ -13,16 +13,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
+@Setter(AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class UserProfile extends Auditable {
 
   @Id
@@ -34,28 +36,13 @@ public class UserProfile extends Auditable {
   @JoinColumn(name = "account_id", nullable = false)
   private Account account;
 
-  @NonNull private String nickname;
-
+  private String nickname;
   private String bio;
   private String profileUrl;
-  private boolean accountVisible;
-  private boolean followerVisible;
 
-  @Builder
-  private UserProfile(
-      @NonNull Account account,
-      @NonNull String nickname,
-      String bio,
-      String profileUrl,
-      boolean accountVisible,
-      boolean followerVisible) {
-    this.account = account;
-    this.nickname = nickname;
-    this.bio = bio;
-    this.profileUrl = profileUrl;
-    this.accountVisible = accountVisible;
-    this.followerVisible = followerVisible;
-  }
+  @Builder.Default private boolean accountVisible = true;
+
+  @Builder.Default private boolean followerVisible = true;
 
   /**
    * UserProfile 엔티티를 접근 수준에 따라 적절한 UserProfileDto로 변환합니다.

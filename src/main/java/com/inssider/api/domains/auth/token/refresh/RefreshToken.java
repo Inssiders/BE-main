@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,6 +22,7 @@ public class RefreshToken {
   @OneToOne
   @MapsId
   @JoinColumn(name = "account_id", nullable = false)
+  @Setter
   private Account account;
 
   @NonNull private String token;

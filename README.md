@@ -36,6 +36,9 @@ SELECT * FROM user_profiles;
 # stage
 
 ```sh
+# export ddl and append on `schema.sql`
+gradlew bootRun -Dspring.profiles.active=dev,stage
+
 docker compose --profile stage up --wait
 ```
 

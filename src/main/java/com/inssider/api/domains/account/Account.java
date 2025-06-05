@@ -67,6 +67,25 @@ public class Account extends SoftDeleteable {
     this.email = email;
     this.password = password;
 
+    this.profile = UserProfile.builder().account(this).nickname(email).build();
+  }
+
+  @PrePersist
+  @PreUpdate
+  private void hashPassword() {
+    this.password = Util.argon2Hash(this.password);
+  }
+
+  @Override
+  public void delete() {
+    super.delete();
+    this.profile = null;
+    this.refreshToken = null;
+  }
+
+  @Override
+  public void restore() {
+    super.restore();
     this.profile =
         UserProfile.builder()
             .account(this)
@@ -74,11 +93,5 @@ public class Account extends SoftDeleteable {
             .accountVisible(true)
             .followerVisible(true)
             .build();
-  }
-
-  @PrePersist
-  @PreUpdate
-  private void hashPassword() {
-    this.password = Util.argon2Hash(this.password);
   }
 }
