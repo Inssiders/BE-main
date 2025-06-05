@@ -26,6 +26,7 @@ class AccountServiceImpl implements AccountService {
         if (!isValidLocalUserAccount(newAccount)) {
           throw new IllegalArgumentException("Invalid request: " + newAccount);
         }
+        handleExistingSoftDeletedAccount(email);
         yield register(newAccount);
       }
 
@@ -33,6 +34,24 @@ class AccountServiceImpl implements AccountService {
       default ->
           throw new IllegalArgumentException("Unsupported registration type: " + registerType);
     };
+  }
+
+  /**
+   * 기존에 soft delete된 계정이 있다면 완전 삭제 처리
+   *
+   * @param email 확인할 이메일
+   */
+  private void handleExistingSoftDeletedAccount(String email) {
+    repository
+        .findByEmail(email)
+        .ifPresent(
+            existingAccount -> {
+              if (existingAccount.isDeleted()) {
+                repository.delete(existingAccount);
+              } else {
+                throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + email);
+              }
+            });
   }
 
   @Override

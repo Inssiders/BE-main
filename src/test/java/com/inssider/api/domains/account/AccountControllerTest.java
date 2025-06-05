@@ -2,6 +2,7 @@ package com.inssider.api.domains.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.inssider.api.common.Util;
 import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
@@ -42,8 +43,8 @@ class AccountControllerTest {
     // 0. 회원가입 요청 given
     String email;
     String rawPassword;
+    Account account = Util.accountGenerator().get();
     {
-      Account account = Util.accountGenerator().get();
       email = account.getEmail();
       rawPassword = account.getPassword();
       accountService.register(account);
@@ -64,17 +65,24 @@ class AccountControllerTest {
       var response = accountController.deleteAccount(accessToken);
       assertEquals(200, response.getStatusCode().value());
     }
+
+    // 4. soft-delete 된 계정 확인 then
     assertEquals(0, accountService.count());
     assertEquals(1, accountRepository.findAllDeleted().size());
     assertEquals(0, userProfileService.count());
 
-    // 4. soft-delete 된 계정 확인 then
     // 5. 회원 탈퇴 후, 로그인 시도 시 실패 then
+    {
+      var request = new PasswordLoginRequest(GrantType.PASSWORD, email, rawPassword);
+      assertThrows(IllegalArgumentException.class, () -> authService.createToken(request));
+    }
+
     // 6. 재가입 시, 기존 계정 hard delete 후 계정 생성 확인 then
-    // 2. header Authorization 토큰 given
-    // 3. 회원 탈퇴 요청 when
-    // 4. soft-delete 된 계정 확인 then
-    // 5. 회원 탈퇴 후, 로그인 시도 시 실패 then
-    // 6. 재가입 시, 기존 계정 hard delete 후 계정 생성 확인 then
+    {
+      accountService.register(RegisterType.PASSWORD, email, rawPassword);
+    }
+    assertEquals(0, accountRepository.findAllDeleted().size());
+    assertEquals(1, accountRepository.findAllIncludeDeleted().size());
+    assertEquals(1, accountService.count());
   }
 }
