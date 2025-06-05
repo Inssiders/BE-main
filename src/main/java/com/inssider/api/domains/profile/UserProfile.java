@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +20,6 @@ import lombok.NonNull;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_profiles")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -62,10 +60,9 @@ public class UserProfile extends Auditable {
   /**
    * UserProfile 엔티티를 접근 수준에 따라 적절한 UserProfileDto로 변환합니다.
    *
-   * @param accessLevel 프로필에 대한 접근 수준 (PRIVATE, PUBLIC, SELF)
    * @return 변환된 UserProfileDto 객체
    */
-  public UserProfileDto convertToDto() {
+  UserProfileDto convertToDto() {
     var accessLevel = determineAccessLevel(this);
     return switch (accessLevel) {
       case PRIVATE -> new PrivateUserProfile(this.nickname, this.profileUrl);

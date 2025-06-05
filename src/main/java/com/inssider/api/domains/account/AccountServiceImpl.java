@@ -6,16 +6,16 @@ import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountDataTypes.RoleType;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 class AccountServiceImpl implements AccountService {
 
   private final AccountRepository repository;
-
-  AccountServiceImpl(AccountRepository repository) {
-    this.repository = repository;
-  }
+  private final JwtDecoder jwtDecoder;
 
   @Override
   public Account register(RegisterType registerType, String email, String password)
@@ -86,5 +86,23 @@ class AccountServiceImpl implements AccountService {
   @Override
   public AccountRepository getRepository() {
     return repository;
+  }
+
+  @Override
+  public Account getAccountFromToken(String authorizationHeader) {
+    var token = authorizationHeader.replace("Bearer ", "");
+    var claims = jwtDecoder.decode(token);
+    Long id = Long.parseLong(claims.getSubject());
+    return repository.findById(id).orElseThrow();
+  }
+
+  @Override
+  public Long verifyPassword(String email, String password)
+      throws IllegalArgumentException, NoSuchElementException {
+    var entity = repository.findByEmail(email).orElseThrow();
+    if (!Util.argon2Hash(password).equals(entity.getPassword())) {
+      throw new IllegalArgumentException("Invalid password for account: " + email);
+    }
+    return entity.getId();
   }
 }

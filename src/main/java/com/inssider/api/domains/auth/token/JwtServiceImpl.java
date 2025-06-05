@@ -2,7 +2,6 @@ package com.inssider.api.domains.auth.token;
 
 import static com.inssider.api.domains.auth.AuthDataTypes.GrantType.AUTHORIZATION_CODE;
 
-import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
 import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
@@ -13,6 +12,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
   private final JwtEncoder jwtEncoder;
@@ -28,19 +29,6 @@ public class JwtServiceImpl implements JwtService {
   private final AuthorizationCodeService authorizationCodeService;
   private final RefreshTokenService refreshTokenService;
   private final AccountService accountService;
-
-  public JwtServiceImpl(
-      JwtEncoder jwtEncoder,
-      JwtDecoder jwtDecoder,
-      AuthorizationCodeService authorizationCodeService,
-      RefreshTokenService refreshTokenService,
-      AccountService accountService) {
-    this.jwtEncoder = jwtEncoder;
-    this.jwtDecoder = jwtDecoder;
-    this.authorizationCodeService = authorizationCodeService;
-    this.refreshTokenService = refreshTokenService;
-    this.accountService = accountService;
-  }
 
   // [ ] Set configuration properties for token expiration times
   @Value("${jwt.access-token.expiration:3600}")
@@ -59,24 +47,18 @@ public class JwtServiceImpl implements JwtService {
     AuthorizationCode authCodeEntity =
         authorizationCodeService.findById(authorizationCode).orElseThrow();
 
-    Account account =
-        accountService
-            .findByEmail(authCodeEntity.getEmail())
-            .orElseThrow(
-                () ->
-                    new IllegalArgumentException(
-                        "Account not found for email: " + authCodeEntity.getEmail()));
+    Long accountId = accountService.findByEmail(authCodeEntity.getEmail()).orElseThrow().getId();
     authorizationCodeService.deleteById(authCodeEntity.getId());
-    return generateTokenResponse(AUTHORIZATION_CODE, account);
+    return generateTokenResponse(AUTHORIZATION_CODE, accountId);
   }
 
   @Override
-  public TokenResponse generateTokenResponse(GrantType grantType, Account account) {
-    String accessToken = generateToken(account.getId(), accessTokenExpiration, "access");
+  public TokenResponse generateTokenResponse(GrantType grantType, Long accountId) {
+    String accessToken = generateToken(accountId, accessTokenExpiration, "access");
     String refreshToken = null;
 
     if (grantType != AUTHORIZATION_CODE) {
-      refreshToken = generateToken(account.getId(), refreshTokenExpiration, "refresh");
+      refreshToken = generateToken(accountId, refreshTokenExpiration, "refresh");
     }
 
     assert accessToken != null;
@@ -107,5 +89,11 @@ public class JwtServiceImpl implements JwtService {
   @Override
   public Long countAuthorizationCodes() {
     return authorizationCodeService.count();
+  }
+
+  @Override
+  public TokenResponse permitTokensByPassword(String email, String password) {
+    Long accountId = accountService.verifyPassword(email, password);
+    return generateTokenResponse(GrantType.PASSWORD, accountId);
   }
 }

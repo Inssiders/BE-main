@@ -5,17 +5,15 @@ import com.inssider.api.domains.auth.AuthRequestsDto.LoginRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.PasswordLoginRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.RefreshTokenLoginRequest;
 import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /** 토큰 관리 서비스 구현체 JWT 토큰 생성, 검증, 무효화 등의 기능을 구현 */
-@Component
+@Service
+@RequiredArgsConstructor
 class TokenServiceImpl implements TokenService {
 
   private final JwtService jwtService;
-
-  TokenServiceImpl(JwtService jwtService) {
-    this.jwtService = jwtService;
-  }
 
   @Override
   public TokenResponse createToken(LoginRequest request) {
@@ -25,8 +23,9 @@ class TokenServiceImpl implements TokenService {
         yield jwtService.permitAccessTokenByAuthorizationCode(authCode);
       }
       case PasswordLoginRequest passwordLoginRequest -> {
-        // Password login logic - 구현 필요
-        throw new UnsupportedOperationException("Password login not implemented yet");
+        var email = passwordLoginRequest.email();
+        var password = passwordLoginRequest.password();
+        yield jwtService.permitTokensByPassword(email, password);
       }
       case RefreshTokenLoginRequest refreshTokenLoginRequest -> {
         // Refresh token logic - 구현 필요

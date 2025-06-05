@@ -71,11 +71,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     PageRequest pageRequest = PageRequest.of(page, limit, parseSort(sort));
     Page<UserProfile> userProfilePage = repository.findAll(example, pageRequest);
 
-    Page<UserProfileDto> userProfileDtoPage =
-        userProfilePage.map(
-            profile -> {
-              return profile.convertToDto();
-            });
+    Page<UserProfileDto> userProfileDtoPage = userProfilePage.map(UserProfile::convertToDto);
 
     List<UserProfileDto> items = userProfileDtoPage.getContent();
     return QueryResponse.of(items, userProfileDtoPage, limit);

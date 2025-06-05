@@ -6,23 +6,22 @@ import com.inssider.api.domains.account.AccountRequestsDto.ChangePasswordRequest
 import com.inssider.api.domains.account.AccountRequestsDto.RegisterRequestDto;
 import com.inssider.api.domains.account.AccountResponsesDto.AccountCreated;
 import java.util.Date;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/accounts")
 class AccountController {
 
   private final AccountService service;
-
-  AccountController(AccountService service) {
-    this.service = service;
-  }
 
   @PostMapping
   ResponseEntity<ResponseWrapper<AccountCreated>> register(RegisterRequestDto reqBody) {
@@ -30,11 +29,13 @@ class AccountController {
     return BaseResponse.of(201, new AccountCreated(data.getEmail(), new Date()));
   }
 
+  // 회원 탈퇴
   @DeleteMapping("/me")
-  ResponseEntity<ResponseWrapper<String>> signOut() {
-    // TODO: Implement security context to get current user's ID
-    // For now, returning a placeholder response
-    return BaseResponse.of(200, "Sign out successful");
+  ResponseEntity<ResponseWrapper<Void>> deleteAccount(
+      @RequestHeader("Authorization") String authorizationHeader) {
+    Account account = service.getAccountFromToken(authorizationHeader);
+    service.deleteById(account.getId());
+    return BaseResponse.of(200, null);
   }
 
   @PatchMapping("/me/password")

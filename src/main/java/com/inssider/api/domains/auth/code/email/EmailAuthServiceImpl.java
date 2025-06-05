@@ -7,20 +7,15 @@ import com.inssider.api.domains.auth.code.AuthorizationCodeService;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class EmailAuthServiceImpl implements EmailAuthService {
 
   private final EmailAuthCodeRepository emailCodeRepository;
   private final AuthorizationCodeService authorizationCodeService;
-
-  public EmailAuthServiceImpl(
-      EmailAuthCodeRepository emailCodeRepository,
-      AuthorizationCodeService authorizationCodeService) {
-    this.emailCodeRepository = emailCodeRepository;
-    this.authorizationCodeService = authorizationCodeService;
-  }
 
   @Override
   public Long countEmailCodes() {

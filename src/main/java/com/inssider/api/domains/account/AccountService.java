@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public interface AccountService extends BaseCRUDService<Account, Long, AccountRepository> {
+public interface AccountService
+    extends BaseCRUDService<Account, Long, @lombok.NonNull AccountRepository> {
+
   Account register(RegisterType registerType, String email, String password)
       throws IllegalArgumentException;
 
@@ -15,6 +17,11 @@ public interface AccountService extends BaseCRUDService<Account, Long, AccountRe
   Account patchAccountPassword(Long id, String newPassword) throws NoSuchElementException;
 
   LocalDateTime softDelete(Long id) throws NoSuchElementException;
+
+  Account getAccountFromToken(String authorizationHeader);
+
+  Long verifyPassword(String email, String password)
+      throws IllegalArgumentException, NoSuchElementException;
 
   // Repository 메서드들을 위한 서비스 메서드들
   default boolean existsByEmail(String email) {

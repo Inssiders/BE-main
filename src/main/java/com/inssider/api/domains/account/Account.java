@@ -13,10 +13,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -24,9 +22,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "accounts")
 @Getter
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account extends SoftDeleteable {
 
@@ -58,7 +54,11 @@ public class Account extends SoftDeleteable {
   @ToString.Exclude private String providerUserId;
 
   @Builder
-  private Account(AccountType accountType, RoleType role, String email, String password) {
+  private Account(
+      @NonNull AccountType accountType,
+      @NonNull RoleType role,
+      @NonNull String email,
+      @NonNull String password) {
     this.accountType = accountType;
     this.role = role;
     this.email = email;

@@ -31,7 +31,7 @@ class EmailCodeEntityBehaviorTests {
     assertEquals(1, service.countEmailCodes());
 
     var newCode = service.findById(email).orElseThrow().getCode();
-    assertNotEquals(entity, newCode);
+    assertNotEquals(entity.getCode(), newCode);
 
     service.verifyEmail(email, newCode);
     assertEquals(0, service.countEmailCodes());

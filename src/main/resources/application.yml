@@ -23,3 +23,5 @@ springdoc:
   swagger-ui:
     use-root-path: true
     display-request-duration: true
+
+spring.jpa.hibernate.naming.physical-strategy: com.inssider.api.common.config.PluralSnakeCaseNamingStrategy
