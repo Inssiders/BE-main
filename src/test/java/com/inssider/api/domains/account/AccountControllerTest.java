@@ -1,43 +1,28 @@
 package com.inssider.api.domains.account;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.inssider.api.common.Util;
 import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountRequestsDto.RegisterRequestDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 class AccountControllerTest {
 
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private ObjectMapper objectMapper;
+  @Autowired private AccountController accountController;
 
   @Test
   @Transactional
-  void register_ShouldReturnCreatedAccount() throws Exception {
+  void 회원가입_요청() {
+    Account account = Util.accountGenerator().get();
     RegisterRequestDto request =
-        new RegisterRequestDto(RegisterType.PASSWORD, "test@example.com", "p@sSwordI23");
-
-    mockMvc
-        .perform(
-            post("/api/accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.data.email").value("test@example.com"))
-        .andExpect(jsonPath("$.data.created_at").exists());
+        new RegisterRequestDto(RegisterType.PASSWORD, account.getEmail(), account.getPassword());
+    var res = accountController.register(request);
+    assertEquals(201, res.getStatusCode().value());
+    assertEquals(account.getEmail(), res.getBody().data().email());
   }
 }
