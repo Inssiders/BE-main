@@ -75,11 +75,8 @@ class AccountServiceImpl implements AccountService {
 
   @Override
   public LocalDateTime softDelete(Long id) throws NoSuchElementException {
-    var account =
-        repository
-            .findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Account not found with id: " + id));
-    account.delete();
+    var account = repository.findById(id).orElseThrow();
+    account.softDelete();
     return repository.save(account).getDeletedAt();
   }
 

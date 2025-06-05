@@ -31,7 +31,9 @@ public class Account extends SoftDeleteable {
 
   @Id @GeneratedValue private Long id;
 
-  @OneToOne(mappedBy = "account", cascade = CascadeType.PERSIST)
+  @OneToOne(
+      mappedBy = "account",
+      cascade = {CascadeType.PERSIST, CascadeType.DETACH})
   private UserProfile profile;
 
   @OneToOne(mappedBy = "account", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -77,21 +79,12 @@ public class Account extends SoftDeleteable {
   }
 
   @Override
-  public void delete() {
-    super.delete();
-    this.profile = null;
-    this.refreshToken = null;
+  public void postSoftDelete() {
+    this.profile.softDelete(); // cascade soft delete to profile
   }
 
   @Override
-  public void restore() {
-    super.restore();
-    this.profile =
-        UserProfile.builder()
-            .account(this)
-            .nickname(email)
-            .accountVisible(true)
-            .followerVisible(true)
-            .build();
+  public void postRestore() {
+    this.profile.restore(); // cascade restore to profile
   }
 }

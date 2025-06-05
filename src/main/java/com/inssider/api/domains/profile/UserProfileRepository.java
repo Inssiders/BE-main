@@ -1,5 +1,5 @@
 package com.inssider.api.domains.profile;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.inssider.api.common.repository.SoftDeleteRepository;
 
-interface UserProfileRepository extends JpaRepository<UserProfile, Long> {}
+interface UserProfileRepository extends SoftDeleteRepository<UserProfile, Long> {}

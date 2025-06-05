@@ -1,6 +1,6 @@
 package com.inssider.api.domains.profile;
 
-import com.inssider.api.common.model.Auditable;
+import com.inssider.api.common.model.SoftDeleteable;
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.profile.UserProfileDataTypes.ProfileContext;
 import com.inssider.api.domains.profile.UserProfileResponsesDto.OwnerUserProfile;
@@ -25,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserProfile extends Auditable {
+public class UserProfile extends SoftDeleteable {
 
   @Id
   @GeneratedValue
