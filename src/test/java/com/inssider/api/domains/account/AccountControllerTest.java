@@ -66,7 +66,7 @@ class AccountControllerTest {
     }
     assertEquals(0, accountService.count());
     assertEquals(1, accountRepository.findAllDeleted().size());
-    assertEquals(1, userProfileService.count());
+    assertEquals(0, userProfileService.count());
 
     // 4. soft-delete 된 계정 확인 then
     // 5. 회원 탈퇴 후, 로그인 시도 시 실패 then
