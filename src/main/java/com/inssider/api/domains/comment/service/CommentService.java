@@ -5,6 +5,7 @@ import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.comment.dto.CommentCreateRequestDTO;
 import com.inssider.api.domains.comment.dto.CommentCreateResponseDTO;
 import com.inssider.api.domains.comment.dto.CommentDeleteResponseDTO;
+import com.inssider.api.domains.comment.dto.CommentGetResponseDTO;
 import com.inssider.api.domains.comment.entity.Comment;
 import com.inssider.api.domains.comment.mapper.CommentMapper;
 import com.inssider.api.domains.comment.repository.CommentRepository;
@@ -12,8 +13,10 @@ import com.inssider.api.domains.post.entity.Post;
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -63,6 +66,14 @@ public class CommentService {
         Comment updatedComment = commentRepository.save(currentComment);
 
         return CommentMapper.deleteDTO(updatedComment);
+    }
+
+    public List<CommentGetResponseDTO> get(Long memeId) {
+        if(postService.isPost(memeId)){
+            List<Comment> comments = commentRepository.findAllByPostIdWithAccount(memeId);
+            return CommentMapper.toGetResponseDTO(comments);
+        }
+        throw new NoSuchElementException("존재하지 않는 콘텐츠입니다.");
     }
 
     public Comment findById(Long commentId) {

@@ -4,6 +4,7 @@ import com.inssider.api.common.response.BaseResponse;
 import com.inssider.api.domains.comment.dto.CommentCreateRequestDTO;
 import com.inssider.api.domains.comment.dto.CommentCreateResponseDTO;
 import com.inssider.api.domains.comment.dto.CommentDeleteResponseDTO;
+import com.inssider.api.domains.comment.dto.CommentGetResponseDTO;
 import com.inssider.api.domains.comment.service.CommentService;
 
 import jakarta.validation.Valid;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -34,4 +37,10 @@ public class CommentController {
         return BaseResponse.of(200, data);
     }
 
+    @GetMapping("/{memeId}")
+    ResponseEntity<BaseResponse.ResponseWrapper<List<CommentGetResponseDTO>>> get(
+            @PathVariable Long memeId) {
+        List<CommentGetResponseDTO> data = commentService.get(memeId);
+        return BaseResponse.of(200, data);
+    }
 }

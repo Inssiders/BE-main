@@ -18,3 +18,18 @@ INSERT INTO categories (type) VALUES
                                   ('TRENDING'),
                                   ('ETC'),
                                   ('USER_CONTENTS');
+
+-- 여러 개의 샘플 데이터 INSERT
+INSERT INTO user_profiles (
+    id,
+    account_id,
+    nickname,
+    bio,
+    profileUrl,
+    accountvisible,
+    followervisible,
+    created_at,
+    updated_at
+) VALUES
+      (1, 1,'철수', 'Software Developer at TechCorp', 'https://example.com.jpg', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+      (2,2, '훈이', 'Designer & Creative Director', 'https://example.com.jpg', true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
