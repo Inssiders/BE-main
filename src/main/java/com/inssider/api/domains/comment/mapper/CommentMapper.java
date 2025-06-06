@@ -3,6 +3,7 @@ package com.inssider.api.domains.comment.mapper;
 import com.inssider.api.domains.comment.dto.CommentCreateResponseDTO;
 import com.inssider.api.domains.comment.dto.CommentDeleteResponseDTO;
 import com.inssider.api.domains.comment.dto.CommentGetResponseDTO;
+import com.inssider.api.domains.comment.dto.CommentUpdateResponseDTO;
 import com.inssider.api.domains.comment.entity.Comment;
 
 import java.util.ArrayList;
@@ -56,4 +57,10 @@ public class CommentMapper {
                 .collect(Collectors.toList());
     }
 
+    public static CommentUpdateResponseDTO toUpdateDTO(Comment comment) {
+        return CommentUpdateResponseDTO.builder()
+                .content(comment.getContent())
+                .updatedAt(comment.getUpdatedAt())
+                .build();
+    }
 }

@@ -1,10 +1,7 @@
 package com.inssider.api.domains.comment.controller;
 
 import com.inssider.api.common.response.BaseResponse;
-import com.inssider.api.domains.comment.dto.CommentCreateRequestDTO;
-import com.inssider.api.domains.comment.dto.CommentCreateResponseDTO;
-import com.inssider.api.domains.comment.dto.CommentDeleteResponseDTO;
-import com.inssider.api.domains.comment.dto.CommentGetResponseDTO;
+import com.inssider.api.domains.comment.dto.*;
 import com.inssider.api.domains.comment.service.CommentService;
 
 import jakarta.validation.Valid;
@@ -34,6 +31,13 @@ public class CommentController {
     ResponseEntity<BaseResponse.ResponseWrapper<CommentDeleteResponseDTO>> delete(
             @PathVariable Long commentId) {
         CommentDeleteResponseDTO data = commentService.delete(commentId);
+        return BaseResponse.of(200, data);
+    }
+
+    @PatchMapping("/{commentId}")
+    ResponseEntity<BaseResponse.ResponseWrapper<CommentUpdateResponseDTO>> update(
+            @PathVariable Long commentId, @RequestBody CommentUpdateRequestDTO reqBody) {
+        CommentUpdateResponseDTO data = commentService.update(commentId, reqBody);
         return BaseResponse.of(200, data);
     }
 

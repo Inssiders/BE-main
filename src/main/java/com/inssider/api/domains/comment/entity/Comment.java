@@ -43,4 +43,8 @@ public class Comment extends PostBaseEntity {
         child.parentComment = this;
     }
 
+    public void updateContent(String content){
+        this.content = content;
+    }
+
 }
