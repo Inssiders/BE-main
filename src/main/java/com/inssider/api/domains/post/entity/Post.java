@@ -83,11 +83,4 @@ public class Post extends PostBaseEntity {
     this.category = category;
   }
 
-  public void updateIsDeleted() {
-    this.isDeleted = true;
-  }
-
-  public void updateDeletedAt() {
-    this.deletedAt = LocalDateTime.now();
-  }
 }

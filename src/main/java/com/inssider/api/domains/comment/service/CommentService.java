@@ -2,9 +2,9 @@ package com.inssider.api.domains.comment.service;
 
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
-import com.inssider.api.domains.category.service.CategoryService;
 import com.inssider.api.domains.comment.dto.CommentCreateRequestDTO;
 import com.inssider.api.domains.comment.dto.CommentCreateResponseDTO;
+import com.inssider.api.domains.comment.dto.CommentDeleteResponseDTO;
 import com.inssider.api.domains.comment.entity.Comment;
 import com.inssider.api.domains.comment.mapper.CommentMapper;
 import com.inssider.api.domains.comment.repository.CommentRepository;
@@ -33,7 +33,8 @@ public class CommentService {
 
         Comment parentComment = null;
         if (requestDTO.getParentCommentId() != null) {
-            parentComment = getParent(requestDTO.getParentCommentId());
+            parentComment = findById(requestDTO.getParentCommentId());
+
         }
 
         Comment comment = Comment.builder()
@@ -43,12 +44,29 @@ public class CommentService {
                 .parentComment(parentComment)
                 .build();
 
+        if (parentComment != null) {
+            parentComment.addChild(comment);
+        }
+
         Comment createdComment = commentRepository.save(comment);
         return CommentMapper.toDTO(createdComment);
     }
 
-    public Comment getParent(Long commentId) {
+    public CommentDeleteResponseDTO delete(Long commentId) {
+        Comment currentComment = findById(commentId);
+
+        if(!currentComment.getChildComments().isEmpty())
+            throw new IllegalStateException("하위 댓글이 존재하여 삭제가 불가능합니다.");
+
+        currentComment.updateIsDeleted();
+        currentComment.updateDeletedAt();
+        Comment updatedComment = commentRepository.save(currentComment);
+
+        return CommentMapper.deleteDTO(updatedComment);
+    }
+
+    public Comment findById(Long commentId) {
         return commentRepository.findById(commentId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 상위 댓글입니다."));
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 댓글입니다."));
     }
 }

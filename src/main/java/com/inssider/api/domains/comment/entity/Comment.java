@@ -38,4 +38,9 @@ public class Comment extends PostBaseEntity {
     @Builder.Default
     private List<Comment> childComments = new ArrayList<>();
 
+    public void addChild(Comment child) {
+        this.childComments.add(child);
+        child.parentComment = this;
+    }
+
 }
