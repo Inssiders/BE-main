@@ -17,7 +17,7 @@ class EmailCodeEntityBehaviorTests {
 
   @Test
   @Transactional
-  void 이메일_코드_생성_및_저장() {
+  void 이메일_인증코드_생명주기() {
 
     String email = Util.emailGenerator().get();
 

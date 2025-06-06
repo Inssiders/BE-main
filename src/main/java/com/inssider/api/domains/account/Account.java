@@ -37,6 +37,7 @@ public class Account extends SoftDeleteable {
   private UserProfile profile;
 
   @OneToOne(mappedBy = "account", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @Setter
   private RefreshToken refreshToken;
 
   @NonNull

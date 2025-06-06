@@ -109,7 +109,16 @@ class AccountServiceImpl implements AccountService {
     var token = authorizationHeader.replace("Bearer ", "");
     var claims = jwtDecoder.decode(token);
     Long id = Long.parseLong(claims.getSubject());
-    return repository.findById(id).orElseThrow();
+    var account = repository.findById(id).orElseThrow();
+
+    if (account.getRefreshToken() == null) {
+      throw new IllegalArgumentException("로그인 상태가 아닙니다. 다시 로그인 해주세요.");
+    }
+    if (account.isDeleted()) {
+      throw new IllegalArgumentException("이미 탈퇴한 계정입니다.");
+    }
+
+    return account;
   }
 
   @Override
