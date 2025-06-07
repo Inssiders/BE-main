@@ -1,21 +1,19 @@
 package com.inssider.api.domains.account;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.inssider.api.common.Util;
 import com.inssider.api.common.model.SoftDeleteable;
 import com.inssider.api.domains.account.AccountDataTypes.AccountType;
 import com.inssider.api.domains.account.AccountDataTypes.RoleType;
 import com.inssider.api.domains.auth.token.refresh.RefreshToken;
 import com.inssider.api.domains.profile.UserProfile;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,7 +47,9 @@ public class Account extends SoftDeleteable {
   @Enumerated(EnumType.STRING)
   private RoleType role;
 
-  @NonNull private String email;
+  @NonNull
+  @Column(unique = true)
+  private String email;
 
   @NonNull
   @ToString.Exclude
@@ -71,12 +71,6 @@ public class Account extends SoftDeleteable {
     this.password = password;
 
     this.profile = UserProfile.builder().account(this).nickname(email).build();
-  }
-
-  @PrePersist
-  @PreUpdate
-  private void hashPassword() {
-    this.password = Util.argon2Hash(this.password);
   }
 
   @Override

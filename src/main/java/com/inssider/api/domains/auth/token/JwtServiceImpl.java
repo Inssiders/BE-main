@@ -76,7 +76,7 @@ public class JwtServiceImpl implements JwtService {
             .subject(String.valueOf(accountId))
             .issuer("inssider-api")
             .issuedAt(now)
-            .audience(List.of("inssider-api", "inssider-app"))
+            .audience(List.of(String.valueOf(accountId)))
             .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
             .claim("type", tokenType)
             .build();

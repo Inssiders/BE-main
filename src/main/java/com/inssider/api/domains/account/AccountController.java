@@ -41,8 +41,10 @@ class AccountController {
 
   @PatchMapping("/me/password")
   ResponseEntity<ResponseWrapper<Account>> changePassword(
+      // [ ] delegate auth to @AuthenticationPrincipal or SecurityContextHolder
+      @RequestHeader("Authorization") String authorizationHeader,
       @RequestBody ChangePasswordRequestDto reqBody) {
-    // [ ] `id` will be removed after implementing security context
-    return BaseResponse.of(200, service.patchAccountPassword(reqBody.id(), reqBody.password()));
+    Account account = service.getAccountFromToken(authorizationHeader);
+    return BaseResponse.of(200, service.patchAccountPassword(account.getId(), reqBody.password()));
   }
 }

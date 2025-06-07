@@ -26,4 +26,3 @@ springdoc:
   swagger-ui:
     use-root-path: true
     display-request-duration: true
-    
