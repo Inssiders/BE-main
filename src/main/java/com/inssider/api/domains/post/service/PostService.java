@@ -4,13 +4,7 @@ import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.category.entity.Category;
 import com.inssider.api.domains.category.service.CategoryService;
-import com.inssider.api.domains.post.dto.PostCreateRequestDTO;
-import com.inssider.api.domains.post.dto.PostDeleteResponseDTO;
-import com.inssider.api.domains.post.dto.PostGetDetailResponseDTO;
-import com.inssider.api.domains.post.dto.PostGetIdResponseDTO;
-import com.inssider.api.domains.post.dto.PostResponseDTO;
-import com.inssider.api.domains.post.dto.PostUpdateRequestDTO;
-import com.inssider.api.domains.post.dto.PostUpdateResponseDTO;
+import com.inssider.api.domains.post.dto.*;
 import com.inssider.api.domains.post.entity.Post;
 import com.inssider.api.domains.post.mapper.PostMapper;
 import com.inssider.api.domains.post.repository.PostRepository;
@@ -23,7 +17,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -131,5 +128,30 @@ public class PostService {
   public Post get(Long postId) {
     return postRepository.findById(postId)
             .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
+  }
+
+
+  public Page<PostDTO> getList(int page, int limit, String keyword, Long categoryId, String sort) {
+    if (keyword != null && !keyword.trim().isEmpty()) {
+      keyword = "%" + keyword + "%";
+    }
+    Sort sortObj = checkSort(sort);
+    Pageable customPageable = PageRequest.of(page, limit, sortObj);
+    Page<PostDTO> postDTOs = postRepository.findPostsWithSearchDTO(customPageable, keyword, categoryId);
+    return postDTOs;
+  }
+
+  private Sort checkSort(String sort) {
+    if (sort == null || sort.trim().isEmpty()) {
+      return Sort.by(Sort.Direction.DESC, "createdAt");
+    }
+    switch (sort.toLowerCase().trim()) {
+      case "title":
+        return Sort.by(Sort.Direction.ASC, "title");
+      case "created_at":
+        return Sort.by(Sort.Direction.DESC, "createdAt");
+      default:
+        return Sort.by(Sort.Direction.DESC, "createdAt");
+    }
   }
 }

@@ -1,28 +1,22 @@
 package com.inssider.api.domains.post.controller;
 
 import com.inssider.api.common.response.BaseResponse;
-import com.inssider.api.domains.post.dto.PostCreateRequestDTO;
-import com.inssider.api.domains.post.dto.PostDeleteResponseDTO;
-import com.inssider.api.domains.post.dto.PostGetDetailResponseDTO;
-import com.inssider.api.domains.post.dto.PostGetIdResponseDTO;
-import com.inssider.api.domains.post.dto.PostResponseDTO;
-import com.inssider.api.domains.post.dto.PostUpdateRequestDTO;
-import com.inssider.api.domains.post.dto.PostUpdateResponseDTO;
+import com.inssider.api.common.response.PageInfo;
+import com.inssider.api.domains.post.dto.*;
+
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RestController
@@ -65,5 +59,19 @@ public class PostController {
       @RequestParam(value = "since", required = false) LocalDate since) {
     List<PostGetIdResponseDTO> data = postService.getIds(since);
     return BaseResponse.of(200, data);
+  }
+
+  @GetMapping
+  public ResponseEntity<BaseResponse.SearchResponseWrapper<PostDTO>> getList(
+          @RequestParam(defaultValue = "0") Integer page,
+          @RequestParam(defaultValue = "10") Integer limit,
+          @RequestParam(required = false) String keyword,
+          @RequestParam(name = "category_id", required = false) Long categoryId,
+          @RequestParam(defaultValue = "createdAt") String sort,
+          PagedResourcesAssembler<PostDTO> assembler) {
+    Page<PostDTO> data = postService.getList(page, limit, keyword, categoryId, sort);
+    PagedModel<EntityModel<PostDTO>> model = assembler.toModel(data);
+    PageInfo pageInfo = BaseResponse.createPageInfo(data.getNumber(), data.getSize(), data.getTotalElements(), data.getTotalPages());
+    return BaseResponse.of(200, model, pageInfo);
   }
 }
