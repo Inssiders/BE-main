@@ -1,6 +1,5 @@
 package com.inssider.api.common;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,9 +9,15 @@ import com.inssider.api.domains.account.AccountService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@Transactional
 class UtilTest {
+  private static final String ENCODED_PASSWORD_PATTERN = "^\\{[a-zA-Z0-9@_]+}\\$.*";
+
+  @Autowired private PasswordEncoder passwordEncoder;
 
   @Autowired private AccountService accountService;
 
@@ -22,11 +27,11 @@ class UtilTest {
     String actual;
     {
       Account account = Util.accountGenerator().get();
-      expected = Util.argon2Hash(account.getPassword());
+      expected = account.getPassword();
       var entity = accountService.register(account);
       actual = entity.getPassword();
     }
-    assertEquals(expected, actual);
+    assertTrue(passwordEncoder.matches(expected, actual));
   }
 
   @Test
@@ -48,19 +53,19 @@ class UtilTest {
     String plainPassword = Util.passwordGenerator().get();
     assertNotNull(plainPassword);
     assertTrue(plainPassword.length() >= 8);
-    assertFalse(plainPassword.startsWith("argon2id$"));
+    assertFalse(plainPassword.matches(ENCODED_PASSWORD_PATTERN));
 
     {
       String plainPassword2 = Util.accountGenerator().get().getPassword();
       assertNotNull(plainPassword2);
       assertTrue(plainPassword2.length() >= 8);
-      assertFalse(plainPassword2.startsWith("argon2id$"));
+      assertFalse(plainPassword2.matches(ENCODED_PASSWORD_PATTERN));
     }
 
-    String hashedPassword = Util.argon2Hash(plainPassword);
-    assertTrue(hashedPassword.startsWith("argon2id$"));
+    String hashedPassword = passwordEncoder.encode(plainPassword);
+    assertTrue(hashedPassword.matches(ENCODED_PASSWORD_PATTERN));
 
-    String rehashedPassword = Util.argon2Hash(plainPassword);
-    assertEquals(hashedPassword, rehashedPassword);
+    String rehashedPassword = passwordEncoder.encode(plainPassword);
+    assertTrue(passwordEncoder.matches(plainPassword, rehashedPassword));
   }
 }
