@@ -10,6 +10,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class RefreshToken {
   private Account account;
 
   @NonNull
+  @Getter
   @Column(length = 1000)
   private String token;
 

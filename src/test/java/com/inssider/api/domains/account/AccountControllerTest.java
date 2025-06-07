@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inssider.api.common.Util;
 import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountRequestsDto.RegisterRequestDto;
@@ -13,10 +14,13 @@ import com.inssider.api.domains.auth.AuthService;
 import com.inssider.api.domains.profile.UserProfileService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 class AccountControllerTest {
   @Autowired private AccountController accountController;
   @Autowired private AccountService accountService;
@@ -24,6 +28,9 @@ class AccountControllerTest {
 
   @Autowired private UserProfileService userProfileService;
   @Autowired private AuthService authService;
+
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
 
   @Test
   @Transactional
@@ -83,5 +90,45 @@ class AccountControllerTest {
     assertEquals(0, accountRepository.findAllDeleted().size());
     assertEquals(1, accountRepository.findAllIncludeDeleted().size());
     assertEquals(1, accountService.count());
+  }
+
+  @Test
+  @Transactional
+  void 비밀번호_변경() {
+    // 0. 회원가입 요청 given
+    String email;
+    String rawPassword;
+    Account account = Util.accountGenerator().get();
+    {
+      email = account.getEmail();
+      rawPassword = account.getPassword();
+      accountService.register(account);
+    }
+    assertEquals(1, accountService.count());
+
+    // 1. 로그인 given
+    String accessToken;
+    {
+      var request = new PasswordLoginRequest(GrantType.PASSWORD, email, rawPassword);
+      var response = authService.createToken(request);
+      accessToken = response.accessToken();
+    }
+    assertNotNull(accessToken);
+
+    // 2. 비밀번호 변경 요청 when
+    String newPassword = Util.passwordGenerator().get();
+    {
+      var response =
+          accountController.changePassword(
+              account, new AccountRequestsDto.ChangePasswordRequestDto(newPassword));
+      assertEquals(200, response.getStatusCode().value());
+    }
+
+    // 3. 변경된 비밀번호로 로그인 시도 then
+    {
+      var request = new PasswordLoginRequest(GrantType.PASSWORD, email, newPassword);
+      var response = authService.createToken(request);
+      assertNotNull(response.accessToken());
+    }
   }
 }

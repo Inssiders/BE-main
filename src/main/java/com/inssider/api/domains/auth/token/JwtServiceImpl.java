@@ -59,9 +59,17 @@ public class JwtServiceImpl implements JwtService {
     String refreshToken = null;
 
     if (grantType != AUTHORIZATION_CODE) {
-      refreshToken = generateToken(accountId, refreshTokenExpiration, "refresh");
       var account = accountService.findById(accountId).orElseThrow();
-      refreshTokenService.save(new RefreshToken(account, refreshToken));
+      refreshToken =
+          refreshTokenService
+              .findById(accountId)
+              .orElseGet(
+                  () -> {
+                    var newRefreshToken =
+                        generateToken(accountId, refreshTokenExpiration, "refresh");
+                    return refreshTokenService.save(new RefreshToken(account, newRefreshToken));
+                  })
+              .getToken();
     }
 
     assert accessToken != null;
