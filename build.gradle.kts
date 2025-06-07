@@ -45,6 +45,8 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
+    implementation ("org.springframework.boot:spring-boot-starter-hateoas")
+
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
