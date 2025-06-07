@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 class EmailCodeEntityBehaviorTests {
+
   @Autowired private EmailAuthService service;
 
   @Test

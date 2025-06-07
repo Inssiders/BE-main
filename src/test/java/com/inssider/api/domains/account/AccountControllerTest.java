@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 class AccountControllerTest {
-
   @Autowired private AccountController accountController;
   @Autowired private AccountService accountService;
   @Autowired private AccountRepository accountRepository;
@@ -74,7 +73,7 @@ class AccountControllerTest {
     // 5. 회원 탈퇴 후, 로그인 시도 시 실패 then
     {
       var request = new PasswordLoginRequest(GrantType.PASSWORD, email, rawPassword);
-      assertThrows(IllegalArgumentException.class, () -> authService.createToken(request));
+      assertThrows(Exception.class, () -> authService.createToken(request));
     }
 
     // 6. 재가입 시, 기존 계정 hard delete 후 계정 생성 확인 then

@@ -13,8 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class UserProfileEntityBehaviorTests {
-  @Autowired private AccountService accountService;
 
+  @Autowired private AccountService accountService;
   @Autowired private UserProfileService service;
   @Autowired private UserProfileRepository repository;
 

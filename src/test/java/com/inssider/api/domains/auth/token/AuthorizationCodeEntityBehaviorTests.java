@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 class AuthAuthorizationCodeEntityBehaviorTests {
+
   @Autowired private AuthorizationCodeService service;
 
   @Test
