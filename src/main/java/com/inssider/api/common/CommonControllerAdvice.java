@@ -40,4 +40,16 @@ class CommonControllerAdvice {
     problemDetail.setDetail("An unexpected error occurred");
     return problemDetail;
   }
+
+  @ExceptionHandler(IllegalStateException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ProblemDetail conflictHandler(IllegalStateException ex) {
+    ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+    problemDetail.setType(Util.buildAbsoluteUri("/error/conflict"));
+    problemDetail.setTitle("Conflict");
+    problemDetail.setDetail(ex.getMessage());
+    return problemDetail;
+  }
+
+
 }
