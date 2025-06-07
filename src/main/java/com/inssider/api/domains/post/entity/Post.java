@@ -82,5 +82,4 @@ public class Post extends PostBaseEntity {
   public void updateCategory(Category category) {
     this.category = category;
   }
-
 }

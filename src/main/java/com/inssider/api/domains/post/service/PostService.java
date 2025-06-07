@@ -21,9 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -129,7 +127,8 @@ public class PostService {
   }
 
   public Post get(Long postId) {
-    return postRepository.findById(postId)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
+    return postRepository
+        .findById(postId)
+        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
   }
 }
