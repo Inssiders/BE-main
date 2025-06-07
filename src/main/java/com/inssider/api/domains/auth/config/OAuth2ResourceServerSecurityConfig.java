@@ -58,7 +58,8 @@ public class OAuth2ResourceServerSecurityConfig {
             "/api/posts",
             "/api/posts/{id}",
             "/api/memes/sitemap",
-            "/api/comments/{id}")
+            "/api/comments/{id}",
+            "/api/categories")
         .permitAll()
 
         // 4. 나머지 모든 API는 인증 필요
