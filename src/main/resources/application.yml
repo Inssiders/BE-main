@@ -13,8 +13,11 @@ spring:
     property-naming-strategy: SNAKE_CASE
     time-zone: Asia/Seoul
 
-spring.jpa.open-in-view: false
-spring.jpa.hibernate.ddl-auto: none
+spring.jpa:
+  open-in-view: false
+  hibernate:
+    ddl-auto: none
+    naming.physical-strategy: com.inssider.api.common.config.PluralSnakeCaseNamingStrategy
 
 management.endpoints.web.exposure.include: health
 
@@ -23,5 +26,3 @@ springdoc:
   swagger-ui:
     use-root-path: true
     display-request-duration: true
-
-spring.jpa.hibernate.naming.physical-strategy: com.inssider.api.common.config.PluralSnakeCaseNamingStrategy

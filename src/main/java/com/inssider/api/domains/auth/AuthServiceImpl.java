@@ -8,21 +8,18 @@ import com.inssider.api.domains.auth.code.email.EmailAuthCode;
 import com.inssider.api.domains.auth.code.email.EmailAuthService;
 import com.inssider.api.domains.auth.token.TokenService;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 /** 통합 인증 서비스 구현체 이메일 인증과 토큰 관리 서비스를 조합하여 통합 인증 기능을 제공 */
 @Service
+@RequiredArgsConstructor
 @Primary
 class AuthServiceImpl implements AuthService {
 
   private final EmailAuthService emailAuthService;
   private final TokenService tokenService;
-
-  AuthServiceImpl(EmailAuthService emailAuthService, TokenService tokenService) {
-    this.emailAuthService = emailAuthService;
-    this.tokenService = tokenService;
-  }
 
   // === EmailAuthService 메서드 위임 ===
 

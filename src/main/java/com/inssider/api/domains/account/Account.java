@@ -7,6 +7,7 @@ import com.inssider.api.domains.account.AccountDataTypes.RoleType;
 import com.inssider.api.domains.auth.token.refresh.RefreshToken;
 import com.inssider.api.domains.profile.UserProfile;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,10 +29,13 @@ public class Account extends SoftDeleteable {
 
   @Id @GeneratedValue private Long id;
 
-  @OneToOne(mappedBy = "account", cascade = CascadeType.PERSIST)
+  @OneToOne(
+      mappedBy = "account",
+      cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   private UserProfile profile;
 
   @OneToOne(mappedBy = "account", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @Setter
   private RefreshToken refreshToken;
 
   @NonNull
@@ -43,7 +47,9 @@ public class Account extends SoftDeleteable {
   @Enumerated(EnumType.STRING)
   private RoleType role;
 
-  @NonNull private String email;
+  @NonNull
+  @Column(unique = true)
+  private String email;
 
   @NonNull
   @ToString.Exclude
@@ -64,12 +70,16 @@ public class Account extends SoftDeleteable {
     this.email = email;
     this.password = password;
 
-    this.profile =
-        UserProfile.builder()
-            .account(this)
-            .nickname(email)
-            .accountVisible(true)
-            .followerVisible(true)
-            .build();
+    this.profile = UserProfile.builder().account(this).nickname(email).build();
+  }
+
+  @Override
+  public void postSoftDelete() {
+    this.profile.softDelete(); // cascade soft delete to profile
+  }
+
+  @Override
+  public void postRestore() {
+    this.profile.restore(); // cascade restore to profile
   }
 }

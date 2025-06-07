@@ -20,7 +20,7 @@ public interface AccountService
 
   Account getAccountFromToken(String authorizationHeader);
 
-  Long verifyPassword(String email, String password)
+  Long verifyPassword(String email, String rawPassword)
       throws IllegalArgumentException, NoSuchElementException;
 
   // Repository 메서드들을 위한 서비스 메서드들

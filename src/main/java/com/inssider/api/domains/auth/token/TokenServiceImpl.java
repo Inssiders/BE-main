@@ -18,16 +18,19 @@ class TokenServiceImpl implements TokenService {
   @Override
   public TokenResponse createToken(LoginRequest request) {
     return switch (request) {
-      case AuthorizationCodeLoginRequest authCodeRequest -> {
-        var authCode = authCodeRequest.uuid();
+      case AuthorizationCodeLoginRequest req -> {
+        var authCode = req.uuid();
         yield jwtService.permitAccessTokenByAuthorizationCode(authCode);
       }
-      case PasswordLoginRequest passwordLoginRequest -> {
-        var email = passwordLoginRequest.email();
-        var password = passwordLoginRequest.password();
-        yield jwtService.permitTokensByPassword(email, password);
+
+      case PasswordLoginRequest req -> {
+        // [ ] add validation if needed
+        var email = req.email(); // email uniqueness & regex validation
+        var rawPassword = req.password(); // password regex validation
+        yield jwtService.permitTokensByPassword(email, rawPassword);
       }
-      case RefreshTokenLoginRequest refreshTokenLoginRequest -> {
+
+      case RefreshTokenLoginRequest req -> {
         // Refresh token logic - 구현 필요
         throw new UnsupportedOperationException("Refresh token login not implemented yet");
       }

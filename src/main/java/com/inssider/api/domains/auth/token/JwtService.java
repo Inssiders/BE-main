@@ -16,5 +16,5 @@ public interface JwtService {
 
   TokenResponse permitAccessTokenByAuthorizationCode(UUID authorizationCode);
 
-  TokenResponse permitTokensByPassword(String email, String password);
+  TokenResponse permitTokensByPassword(String email, String rawPassword);
 }

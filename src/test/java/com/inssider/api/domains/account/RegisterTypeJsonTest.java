@@ -2,6 +2,7 @@ package com.inssider.api.domains.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
@@ -34,11 +35,11 @@ class RegisterTypeJsonTest {
   }
 
   @Test
-  void registerType_대소문자_테스트() throws Exception {
+  void registerType_camelCase_필드명_테스트() throws Exception {
     String json =
         """
         {
-          "registerType": "password",
+          "registerType": "PASSWORD",
           "email": "test@gmail.com",
           "password": "1@qQ12323"
         }
@@ -46,15 +47,25 @@ class RegisterTypeJsonTest {
 
     RegisterRequestDto result = objectMapper.readValue(json, RegisterRequestDto.class);
 
-    assertNull(result.registerType()); // 대소문자 구분 없이 들어오면 null로 처리됨
+    assertNull(result.registerType()); // camelCase 필드명은 인식되지 않아 null로 처리됨
   }
 
   @Test
-  void registerType_직접_변환_테스트() {
-    RegisterType result = RegisterType.valueOf("PASSWORD");
-    assertEquals(RegisterType.PASSWORD, result);
+  void registerType_소문자_값_테스트() throws Exception {
+    String json =
+        """
+        {
+          "register_type": "password",
+          "email": "test@gmail.com",
+          "password": "1@qQ12323"
+        }
+        """;
 
-    RegisterType result2 = RegisterType.valueOf("password".toUpperCase());
-    assertEquals(RegisterType.PASSWORD, result2);
+    assertThrows(
+        com.fasterxml.jackson.databind.exc.InvalidFormatException.class,
+        () ->
+            objectMapper.readValue(
+                json, RegisterRequestDto.class) // "password"는 RegisterType enum에 정의된 값이 아니므로 예외 발생
+        );
   }
 }

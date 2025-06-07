@@ -7,6 +7,7 @@ import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
 import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
 import com.inssider.api.domains.auth.code.AuthorizationCode;
 import com.inssider.api.domains.auth.code.AuthorizationCodeService;
+import com.inssider.api.domains.auth.token.refresh.RefreshToken;
 import com.inssider.api.domains.auth.token.refresh.RefreshTokenService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -59,6 +60,8 @@ public class JwtServiceImpl implements JwtService {
 
     if (grantType != AUTHORIZATION_CODE) {
       refreshToken = generateToken(accountId, refreshTokenExpiration, "refresh");
+      var account = accountService.findById(accountId).orElseThrow();
+      refreshTokenService.save(new RefreshToken(account, refreshToken));
     }
 
     assert accessToken != null;
@@ -73,7 +76,7 @@ public class JwtServiceImpl implements JwtService {
             .subject(String.valueOf(accountId))
             .issuer("inssider-api")
             .issuedAt(now)
-            .audience(List.of("inssider-api", "inssider-app"))
+            .audience(List.of(String.valueOf(accountId)))
             .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
             .claim("type", tokenType)
             .build();
@@ -92,8 +95,9 @@ public class JwtServiceImpl implements JwtService {
   }
 
   @Override
-  public TokenResponse permitTokensByPassword(String email, String password) {
-    Long accountId = accountService.verifyPassword(email, password);
-    return generateTokenResponse(GrantType.PASSWORD, accountId);
+  public TokenResponse permitTokensByPassword(String email, String rawPassword) {
+    Long accountId = accountService.verifyPassword(email, rawPassword);
+    var response = generateTokenResponse(GrantType.PASSWORD, accountId);
+    return response;
   }
 }
