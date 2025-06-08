@@ -9,6 +9,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class EmailAuthServiceImpl implements EmailAuthService {
   @Override
   public EmailCodeResponse challengeEmail(String email) {
     emailCodeRepository.findById(email).ifPresent(emailCodeRepository::delete);
-    assert emailCodeRepository.save(email).getCode() != null;
+    Assert.notNull(emailCodeRepository.save(email).getCode(), "Email code should not be null");
     return new EmailCodeResponse(email, 300);
   }
 

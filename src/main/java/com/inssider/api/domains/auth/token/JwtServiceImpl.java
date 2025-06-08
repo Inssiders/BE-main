@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +73,7 @@ public class JwtServiceImpl implements JwtService {
               .getToken();
     }
 
-    assert accessToken != null;
+    Assert.notNull(accessToken, "Access token should not be null");
     return new TokenResponse(accessToken, refreshToken, "Bearer", accessTokenExpiration);
   }
 
