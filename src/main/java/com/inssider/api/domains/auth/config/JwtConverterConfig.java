@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 @Configuration
 @RequiredArgsConstructor
-public class JwtConverterConfig {
+class JwtConverterConfig {
 
   private final AccountService accountService;
 

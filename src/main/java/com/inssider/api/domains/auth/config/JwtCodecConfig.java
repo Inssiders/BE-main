@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 @Configuration
-public class JwtCodecConfig {
+class JwtCodecConfig {
 
   private final RSAKey rsaKey = generateRSAKey();
 

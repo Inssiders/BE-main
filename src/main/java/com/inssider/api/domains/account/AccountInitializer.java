@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @RequiredArgsConstructor
 @Profile("load")
-public class AccountInitializer {
+class AccountInitializer {
   // reference to repository and add some entities to the database
 
   private AccountRepository accountRepository;

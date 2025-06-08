@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
 
 @Service
 @RequiredArgsConstructor
-public class EmailAuthServiceImpl implements EmailAuthService {
+class EmailAuthServiceImpl implements EmailAuthService {
 
   private final EmailAuthCodeRepository emailCodeRepository;
   private final AuthorizationCodeService authorizationCodeService;

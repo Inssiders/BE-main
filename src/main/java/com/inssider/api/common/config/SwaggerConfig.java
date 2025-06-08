@@ -23,7 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.method.HandlerMethod;
 
 @Configuration
-public class SwaggerConfig {
+class SwaggerConfig {
 
   @Bean
   @Primary
