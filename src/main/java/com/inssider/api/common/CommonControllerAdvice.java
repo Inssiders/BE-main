@@ -50,6 +50,4 @@ class CommonControllerAdvice {
     problemDetail.setDetail(ex.getMessage());
     return problemDetail;
   }
-
-
 }
