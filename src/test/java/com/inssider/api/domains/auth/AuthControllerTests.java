@@ -93,7 +93,7 @@ public class AuthControllerTests {
     var email = account.getEmail();
     var plainPassword = account.getPassword();
     accountService.register(account);
-    assertFalse(plainPassword.startsWith("argon2id$"));
+    assertFalse(plainPassword.matches("\\{.+\\}$"));
     assertEquals(1, accountService.count());
 
     // 1. 로그인 요청
@@ -116,7 +116,7 @@ public class AuthControllerTests {
     var email = account.getEmail();
     var plainPassword = account.getPassword();
     accountService.register(account);
-    assertFalse(plainPassword.startsWith("argon2id$"));
+    assertFalse(plainPassword.matches("\\{.+\\}$"));
     assertEquals(1, accountService.count());
 
     // 1. 로그인 요청
@@ -130,11 +130,13 @@ public class AuthControllerTests {
 
     // 2. 로그아웃 요청
     {
-      controller.revokeToken(accessToken);
+      mockMvc
+          .perform(delete("/api/auth/token").header("Authorization", "Bearer " + accessToken))
+          .andExpect(status().isOk());
     }
-    assertNull(account.getRefreshToken()); // 로그아웃 후 refresh_token 삭제
+    assertNull(account.getRefreshToken()); // 로그아웃 -> refresh_token 삭제
 
-    // 3. 로그아웃 후 만료된 access_token으로 회원탈퇴 요청 시 예외 발생 확인
+    // 3. 로그아웃 후 이전 access_token으로 회원탈퇴 요청 시 예외 발생 확인
     {
       mockMvc
           .perform(delete("/api/accounts/me").header("Authorization", "Bearer " + accessToken))

@@ -55,17 +55,31 @@ public class JwtServiceImpl implements JwtService {
 
   @Override
   public TokenResponse generateTokenResponse(GrantType grantType, Long accountId) {
-    String accessToken = generateToken(accountId, accessTokenExpiration, "access");
-    String refreshToken = null;
+    return switch (grantType) {
+      case AUTHORIZATION_CODE -> {
+        String accessToken =
+            generateToken(accountId, accessTokenExpiration, "single_access"); // 일회용 액세스 토큰
+        yield new TokenResponse(accessToken, null, "Bearer", accessTokenExpiration);
+      }
+      case PASSWORD, REFRESH_TOKEN -> {
+        String accessToken = generateToken(accountId, accessTokenExpiration, "access");
+        String refreshToken = getOrCreateRefreshToken(accountId);
+        yield new TokenResponse(accessToken, refreshToken, "Bearer", accessTokenExpiration);
+      }
+    };
+  }
 
-    if (grantType != AUTHORIZATION_CODE) {
-      refreshToken = generateToken(accountId, refreshTokenExpiration, "refresh");
-      var account = accountService.findById(accountId).orElseThrow();
-      refreshTokenService.save(new RefreshToken(account, refreshToken));
-    }
-
-    assert accessToken != null;
-    return new TokenResponse(accessToken, refreshToken, "Bearer", accessTokenExpiration);
+  private String getOrCreateRefreshToken(Long accountId) {
+    return refreshTokenService
+        .findById(accountId)
+        .map(RefreshToken::getToken)
+        .orElseGet(
+            () -> {
+              var account = accountService.findById(accountId).orElseThrow();
+              String newRefreshToken = generateToken(accountId, refreshTokenExpiration, "refresh");
+              refreshTokenService.save(new RefreshToken(account, newRefreshToken));
+              return newRefreshToken;
+            });
   }
 
   private String generateToken(Long accountId, long expiration, String tokenType) {
@@ -73,10 +87,10 @@ public class JwtServiceImpl implements JwtService {
 
     JwtClaimsSet claims =
         JwtClaimsSet.builder()
-            .subject(String.valueOf(accountId))
-            .issuer("inssider-api")
+            .issuer("api.inssider.com")
             .issuedAt(now)
-            .audience(List.of(String.valueOf(accountId)))
+            .audience(List.of("inssider-app"))
+            .subject(String.valueOf(accountId))
             .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
             .claim("type", tokenType)
             .build();

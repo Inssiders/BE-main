@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
@@ -71,11 +72,7 @@ public class OAuth2ResourceServerSecurityConfig {
         .permitAll();
   }
 
-  private void configureOAuth2ResourceServer(
-      org.springframework.security.config.annotation.web.configurers.oauth2.server.resource
-                  .OAuth2ResourceServerConfigurer<
-              HttpSecurity>
-          oauth2) {
+  private void configureOAuth2ResourceServer(OAuth2ResourceServerConfigurer<HttpSecurity> oauth2) {
     oauth2.jwt(Customizer.withDefaults()); // use JwtDecoder bean
     oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(customConverter));
   }
