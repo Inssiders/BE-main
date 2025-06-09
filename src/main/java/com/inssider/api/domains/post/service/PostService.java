@@ -17,10 +17,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -130,28 +127,14 @@ public class PostService {
             .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
   }
 
+  public PostCursorResponseDTO get(Long lastId, int size, String keyword, Long categoryId) {
+    PostCursorRequestDTO request = PostCursorRequestDTO.builder()
+            .lastId(lastId)
+            .size(size)
+            .keyword(keyword)
+            .categoryId(categoryId)
+            .build();
 
-  public Page<PostDTO> getList(int page, int limit, String keyword, Long categoryId, String sort) {
-    if (keyword != null && !keyword.trim().isEmpty()) {
-      keyword = "%" + keyword + "%";
-    }
-    Sort sortObj = checkSort(sort);
-    Pageable customPageable = PageRequest.of(page, limit, sortObj);
-    Page<PostDTO> postDTOs = postRepository.findPostsWithSearchDTO(customPageable, keyword, categoryId);
-    return postDTOs;
-  }
-
-  private Sort checkSort(String sort) {
-    if (sort == null || sort.trim().isEmpty()) {
-      return Sort.by(Sort.Direction.DESC, "createdAt");
-    }
-    switch (sort.toLowerCase().trim()) {
-      case "title":
-        return Sort.by(Sort.Direction.ASC, "title");
-      case "created_at":
-        return Sort.by(Sort.Direction.DESC, "createdAt");
-      default:
-        return Sort.by(Sort.Direction.DESC, "createdAt");
-    }
+    return postRepository.findPostsWithCursor(request);
   }
 }

@@ -47,14 +47,29 @@ dependencies {
 
     implementation ("org.springframework.boot:spring-boot-starter-hateoas")
 
+    implementation ("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+
     compileOnly("org.projectlombok:lombok")
+
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+val querydslDir = "src/main/generated"
+sourceSets {
+    main {
+        java {
+            srcDirs(querydslDir)
+        }
+    }
 }
 
 tasks {
@@ -71,6 +86,10 @@ tasks {
     }
     withType<org.springframework.boot.gradle.tasks.run.BootRun> {
         systemProperty("spring.profiles.active", activeProfile)
+    }
+
+    withType<JavaCompile> {
+        options.generatedSourceOutputDirectory = file(querydslDir)
     }
 }
 
