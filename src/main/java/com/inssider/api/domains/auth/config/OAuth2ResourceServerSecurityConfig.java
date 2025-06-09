@@ -19,7 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class OAuth2ResourceServerSecurityConfig {
+class OAuth2ResourceServerSecurityConfig {
 
   private final Converter<Jwt, AbstractAuthenticationToken> customConverter;
 
