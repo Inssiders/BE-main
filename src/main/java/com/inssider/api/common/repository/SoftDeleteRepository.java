@@ -3,7 +3,6 @@ package com.inssider.api.common.repository;
 import com.inssider.api.common.model.SoftDeleteable;
 import java.util.List;
 import java.util.Optional;
-import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,13 +14,11 @@ public interface SoftDeleteRepository<T extends SoftDeleteable, ID> extends JpaR
 
   @Override
   @Query("SELECT e FROM #{#entityName} e WHERE e.isDeleted = false")
-  @NonNull
   List<T> findAll();
 
   @Override
   @Query("SELECT e FROM #{#entityName} e WHERE e.id = ?1 AND e.isDeleted = false")
-  @NonNull
-  Optional<T> findById(@NonNull ID id);
+  Optional<T> findById(ID id);
 
   @Override
   @Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.isDeleted = false")

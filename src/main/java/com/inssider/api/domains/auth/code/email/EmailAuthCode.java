@@ -1,4 +1,4 @@
-package com.inssider.api.domains.auth.code;
+package com.inssider.api.domains.auth.code.email;
 
 import com.inssider.api.common.Util;
 import jakarta.persistence.Column;
@@ -6,18 +6,22 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.PostPersist;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
+@Table(name = "email_verification_codes")
 @Getter
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class EmailAuthenticationCode {
+public class EmailAuthCode {
 
   @Id private String email;
 
@@ -25,13 +29,13 @@ public class EmailAuthenticationCode {
   private String code;
 
   @CreatedDate
-  @Column(nullable = false, updatable = false)
+  @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
-  @Column(updatable = false)
+  @Column(name = "expired_at")
   private LocalDateTime expiredAt;
 
-  public EmailAuthenticationCode(String email) {
+  public EmailAuthCode(String email) {
     this.email = email;
     this.code = Util.codeGenerator().get();
   }

@@ -33,12 +33,4 @@ public class PostBaseEntity {
   @Column protected LocalDateTime deletedAt;
 
   @Builder.Default protected boolean isDeleted = Boolean.FALSE;
-
-  public void updateIsDeleted() {
-    this.isDeleted = true;
-  }
-
-  public void updateDeletedAt() {
-    this.deletedAt = LocalDateTime.now();
-  }
 }
