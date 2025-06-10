@@ -5,6 +5,7 @@ import com.inssider.api.common.response.BaseResponse.ResponseWrapper;
 import com.inssider.api.domains.account.AccountRequestsDto.ChangePasswordRequestDto;
 import com.inssider.api.domains.account.AccountRequestsDto.RegisterRequestDto;
 import com.inssider.api.domains.account.AccountResponsesDto.AccountCreated;
+import com.inssider.api.domains.auth.AuthService;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 class AccountController {
 
   private final AccountService service;
+  private final AuthService authService;
 
   @PostMapping
   ResponseEntity<ResponseWrapper<AccountCreated>> register(
@@ -40,6 +42,8 @@ class AccountController {
   @PatchMapping("/me/password")
   ResponseEntity<ResponseWrapper<Account>> changePassword(
       @AuthenticationPrincipal Account account, @RequestBody ChangePasswordRequestDto reqBody) {
-    return BaseResponse.of(200, service.patchAccountPassword(account.getId(), reqBody.password()));
+    var response = service.patchAccountPassword(account.getId(), reqBody.password());
+    authService.revokeRefreshToken(account);
+    return BaseResponse.of(200, response);
   }
 }

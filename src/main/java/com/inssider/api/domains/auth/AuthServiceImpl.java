@@ -1,13 +1,15 @@
 package com.inssider.api.domains.auth;
 
+import com.inssider.api.domains.account.Account;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthorizationCodeLoginRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.LoginRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.PasswordLoginRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.TokenRefreshLoginRequest;
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
 import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
-import com.inssider.api.domains.auth.code.email.EmailAuthCode;
-import com.inssider.api.domains.auth.code.email.EmailAuthService;
-import com.inssider.api.domains.auth.token.TokenService;
-import java.util.Optional;
+import com.inssider.api.domains.auth.code.AuthCodeService;
+import com.inssider.api.domains.auth.token.AuthTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -18,40 +20,43 @@ import org.springframework.stereotype.Service;
 @Primary
 class AuthServiceImpl implements AuthService {
 
-  private final EmailAuthService emailAuthService;
-  private final TokenService tokenService;
+  private final AuthCodeService codeService;
+  private final AuthTokenService tokenService;
 
   // === EmailAuthService 메서드 위임 ===
 
   @Override
-  public Long countEmailCodes() {
-    return emailAuthService.countEmailCodes();
-  }
-
-  @Override
   public EmailCodeResponse challengeEmail(String email) {
-    return emailAuthService.challengeEmail(email);
+    return codeService.challengeEmail(email);
   }
 
   @Override
   public EmailVerificationResponse verifyEmail(String email, String code) {
-    return emailAuthService.verifyEmail(email, code);
-  }
-
-  @Override
-  public Optional<EmailAuthCode> findById(String email) {
-    return emailAuthService.findById(email);
+    return codeService.verifyEmail(email, code);
   }
 
   // === TokenService 메서드 위임 ===
 
   @Override
-  public TokenResponse createToken(LoginRequest request) {
-    return tokenService.createToken(request);
+  public TokenResponse createTokens(LoginRequest request) {
+    return switch (request) {
+      case PasswordLoginRequest req -> {
+        var email = req.email();
+        var rawPassword = req.password();
+        yield tokenService.permitTokensByPassword(email, rawPassword);
+      }
+      case TokenRefreshLoginRequest req -> {
+        var refreshToken = req.refreshToken();
+        yield tokenService.permitTokensByRefreshToken(refreshToken);
+      }
+      case AuthorizationCodeLoginRequest req -> {
+        yield tokenService.permitTokensByAuthorizationCode(req.uuid());
+      }
+    };
   }
 
   @Override
-  public void revokeToken(String token) {
-    tokenService.revokeToken(token);
+  public void revokeRefreshToken(Account account) {
+    tokenService.revokeRefreshToken(account);
   }
 }

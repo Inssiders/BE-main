@@ -67,14 +67,14 @@ class AuthController {
                       }))
           @RequestBody
           LoginRequest request) {
-    return BaseResponse.of(200, authService.createToken(request));
+    return BaseResponse.of(200, authService.createTokens(request));
   }
 
   // 로그아웃
   @DeleteMapping("/token")
   public ResponseEntity<ResponseWrapper<Void>> revokeToken(
       @AuthenticationPrincipal Account account) {
-    authService.revokeToken(account.getRefreshToken().getToken());
+    authService.revokeRefreshToken(account);
     return BaseResponse.of(200, null);
   }
 }
