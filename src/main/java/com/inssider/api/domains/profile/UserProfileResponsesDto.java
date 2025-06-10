@@ -17,7 +17,8 @@ class UserProfileResponsesDto {
       Boolean followerVisible)
       implements UserProfileDto {}
 
-  sealed interface UserProfileDto permits PrivateUserProfile, PublicUserProfile, OwnerUserProfile {
+  public sealed interface UserProfileDto
+      permits PrivateUserProfile, PublicUserProfile, OwnerUserProfile {
     String nickname();
 
     String profileUrl();
@@ -35,5 +36,5 @@ class UserProfileResponsesDto {
     }
   }
 
-  record UpdateProfileResponse(UserProfileDto data, LocalDateTime updatedAt) {}
+  public record UpdateProfileResponse(UserProfileDto data, LocalDateTime updatedAt) {}
 }

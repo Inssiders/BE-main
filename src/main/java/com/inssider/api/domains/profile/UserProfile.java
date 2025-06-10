@@ -1,6 +1,6 @@
 package com.inssider.api.domains.profile;
 
-import com.inssider.api.common.model.Auditable;
+import com.inssider.api.common.model.SoftDeleteable;
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.profile.UserProfileDataTypes.ProfileContext;
 import com.inssider.api.domains.profile.UserProfileResponsesDto.OwnerUserProfile;
@@ -12,20 +12,20 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_profiles")
 @Getter
-@Setter
+@Setter(AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserProfile extends Auditable {
+@AllArgsConstructor
+@Builder
+public class UserProfile extends SoftDeleteable {
 
   @Id
   @GeneratedValue
@@ -36,53 +36,33 @@ public class UserProfile extends Auditable {
   @JoinColumn(name = "account_id", nullable = false)
   private Account account;
 
-  @NonNull private String nickname;
-
+  private String nickname;
   private String bio;
   private String profileUrl;
-  private boolean accountVisible;
-  private boolean followerVisible;
 
-  @Builder
-  private UserProfile(
-      @NonNull Account account,
-      @NonNull String nickname,
-      String bio,
-      String profileUrl,
-      boolean accountVisible,
-      boolean followerVisible) {
-    this.account = account;
-    this.nickname = nickname;
-    this.bio = bio;
-    this.profileUrl = profileUrl;
-    this.accountVisible = accountVisible;
-    this.followerVisible = followerVisible;
-  }
+  @Builder.Default private boolean accountVisible = true;
+
+  @Builder.Default private boolean followerVisible = true;
 
   /**
-   * UserProfile 엔티티를 접근 수준에 따라 적절한 UserProfileDto로 변환합니다.
+   * UserProfile 엔티티를 접근 수준에 따라 적절한 UserProfileDto로 변환합니다. 명시적으로 SELF 컨텍스트를 지정하지 않으면 엔티티의 기본 접근 수준에
+   * 따라 변환됩니다.
    *
-   * @param accessLevel 프로필에 대한 접근 수준 (PRIVATE, PUBLIC, SELF)
    * @return 변환된 UserProfileDto 객체
    */
-  public UserProfileDto convertToDto() {
-    var accessLevel = determineAccessLevel(this);
-    return switch (accessLevel) {
-      case PRIVATE -> new PrivateUserProfile(this.nickname, this.profileUrl);
-      case PUBLIC -> new PublicUserProfile(this.nickname, this.profileUrl, this.bio);
-      case SELF ->
-          new OwnerUserProfile(
-              this.nickname, this.profileUrl, this.bio, this.accountVisible, this.followerVisible);
+  UserProfileDto convertToDto(ProfileContext context) {
+    return switch (context) {
+      case SELF -> new OwnerUserProfile(nickname, profileUrl, bio, accountVisible, followerVisible);
+      default -> convertToDto();
     };
   }
 
-  /**
-   * 현재 UserProfile의 접근 수준을 결정합니다.
-   *
-   * @return ProfileContext 열거형 값 (PUBLIC, PRIVATE, SELF)
-   */
-  private ProfileContext determineAccessLevel(UserProfile profile) {
-    // [ ] 인증 로직 추가 & PUBLIC, PRIVATE, SELF 구분 로직 구현
-    return profile.isAccountVisible() ? ProfileContext.SELF : ProfileContext.PRIVATE;
+  UserProfileDto convertToDto() {
+    var accessLevel = isAccountVisible() ? ProfileContext.PUBLIC : ProfileContext.PRIVATE;
+    return switch (accessLevel) {
+      case PRIVATE -> new PrivateUserProfile(nickname, profileUrl);
+      case PUBLIC -> new PublicUserProfile(nickname, profileUrl, bio);
+      case SELF -> new OwnerUserProfile(nickname, profileUrl, bio, accountVisible, followerVisible);
+    };
   }
 }

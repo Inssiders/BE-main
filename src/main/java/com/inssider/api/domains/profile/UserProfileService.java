@@ -5,6 +5,7 @@ import com.inssider.api.domains.profile.UserProfileResponsesDto.UpdateProfileRes
 import com.inssider.api.domains.profile.UserProfileResponsesDto.UserProfileDto;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 
 public interface UserProfileService {
 
@@ -22,6 +23,5 @@ public interface UserProfileService {
       Optional<Boolean> accountVisible,
       Optional<Boolean> followerVisible);
 
-  QueryResponse<UserProfileDto> findUserProfilesByNickname(
-      String nickname, String sort, int limit, int page);
+  QueryResponse<UserProfileDto> findUserProfilesByNickname(String nickname, Pageable pageable);
 }
