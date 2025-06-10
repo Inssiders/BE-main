@@ -1,24 +1,36 @@
-package com.inssider.api.domains.auth.code;
+package com.inssider.api.domains.auth.code.email;
 
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
+import com.inssider.api.domains.auth.code.AuthorizationCode;
+import com.inssider.api.domains.auth.code.AuthorizationCodeService;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Service
-@RequiredArgsConstructor
-class AuthCodeServiceImpl implements AuthCodeService {
+public class EmailAuthServiceImpl implements EmailAuthService {
 
-  private final EmailAuthenticationCodeRepository emailCodeRepository;
-  private final AuthorizationCodeRepository authorizationCodeRepository;
+  private final EmailAuthCodeRepository emailCodeRepository;
+  private final AuthorizationCodeService authorizationCodeService;
+
+  public EmailAuthServiceImpl(
+      EmailAuthCodeRepository emailCodeRepository,
+      AuthorizationCodeService authorizationCodeService) {
+    this.emailCodeRepository = emailCodeRepository;
+    this.authorizationCodeService = authorizationCodeService;
+  }
+
+  @Override
+  public Long countEmailCodes() {
+    return emailCodeRepository.count();
+  }
 
   @Override
   public EmailCodeResponse challengeEmail(String email) {
     emailCodeRepository.findById(email).ifPresent(emailCodeRepository::delete);
-    Assert.notNull(emailCodeRepository.save(email).getCode(), "Email code should not be null");
+    assert emailCodeRepository.save(email).getCode() != null;
     return new EmailCodeResponse(email, 300);
   }
 
@@ -37,16 +49,14 @@ class AuthCodeServiceImpl implements AuthCodeService {
 
     // Create and save AuthorizationCode entity
     var authCode = new AuthorizationCode(email);
-    var savedAuthCode = authorizationCodeRepository.save(authCode);
+    var savedAuthCode = authorizationCodeService.save(authCode);
     UUID authCodeId = savedAuthCode.getId();
 
     return new EmailVerificationResponse(true, authCodeId);
   }
 
   @Override
-  public AuthorizationCode consume(UUID authorizationCode) {
-    var entity = authorizationCodeRepository.findById(authorizationCode).orElseThrow();
-    authorizationCodeRepository.delete(entity);
-    return entity;
+  public Optional<EmailAuthCode> findById(String email) {
+    return emailCodeRepository.findById(email);
   }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.annotation.CreatedDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "tags")
 public class Tag {
 
   @Id @GeneratedValue private Long id;

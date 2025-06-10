@@ -5,11 +5,8 @@ import com.inssider.api.common.response.BaseResponse.ResponseWrapper;
 import com.inssider.api.domains.account.AccountRequestsDto.ChangePasswordRequestDto;
 import com.inssider.api.domains.account.AccountRequestsDto.RegisterRequestDto;
 import com.inssider.api.domains.account.AccountResponsesDto.AccountCreated;
-import com.inssider.api.domains.auth.AuthService;
 import java.util.Date;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,32 +15,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/accounts")
 class AccountController {
 
   private final AccountService service;
-  private final AuthService authService;
+
+  AccountController(AccountService service) {
+    this.service = service;
+  }
 
   @PostMapping
-  ResponseEntity<ResponseWrapper<AccountCreated>> register(
-      @RequestBody RegisterRequestDto reqBody) {
+  ResponseEntity<ResponseWrapper<AccountCreated>> register(RegisterRequestDto reqBody) {
     var data = service.register(reqBody.registerType(), reqBody.email(), reqBody.password());
     return BaseResponse.of(201, new AccountCreated(data.getEmail(), new Date()));
   }
 
-  // 회원 탈퇴
   @DeleteMapping("/me")
-  ResponseEntity<ResponseWrapper<Void>> deleteAccount(@AuthenticationPrincipal Account account) {
-    service.softDelete(account.getId());
-    return BaseResponse.of(200, null);
+  ResponseEntity<ResponseWrapper<String>> signOut() {
+    // TODO: Implement security context to get current user's ID
+    // For now, returning a placeholder response
+    return BaseResponse.of(200, "Sign out successful");
   }
 
   @PatchMapping("/me/password")
   ResponseEntity<ResponseWrapper<Account>> changePassword(
-      @AuthenticationPrincipal Account account, @RequestBody ChangePasswordRequestDto reqBody) {
-    var response = service.patchAccountPassword(account.getId(), reqBody.password());
-    authService.revokeRefreshToken(account);
-    return BaseResponse.of(200, response);
+      @RequestBody ChangePasswordRequestDto reqBody) {
+    // [ ] `id` will be removed after implementing security context
+    return BaseResponse.of(200, service.patchAccountPassword(reqBody.id(), reqBody.password()));
   }
 }

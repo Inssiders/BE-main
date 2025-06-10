@@ -1,6 +1,5 @@
-package com.inssider.api.common.config.security;
+package com.inssider.api.domains.auth.config;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -15,35 +14,34 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 @Configuration
-class JwtCodecConfig {
+public class JwtConfig {
 
-  private final RSAKey rsaKey = generateRSAKey();
+  private RSAKey rsaKey;
 
   @Bean
   public JwtDecoder jwtDecoder() {
-    NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withPublicKey(getRSAPublicKey()).build();
-    jwtDecoder.setJwtValidator(
-        JwtValidators.createDefault()); // [ ] implement DelegatingOAuth2TokenValidator
-    return jwtDecoder;
+    try {
+      return NimbusJwtDecoder.withPublicKey(getRsaKey().toRSAPublicKey()).build();
+    } catch (com.nimbusds.jose.JOSEException e) {
+      throw new IllegalStateException("Failed to get RSA public key for JWT decoder", e);
+    }
   }
 
   @Bean
   public JwtEncoder jwtEncoder() {
-    JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(rsaKey));
+    JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(getRsaKey()));
     return new NimbusJwtEncoder(jwkSource);
   }
 
-  private RSAPublicKey getRSAPublicKey() {
-    try {
-      return rsaKey.toRSAPublicKey();
-    } catch (JOSEException e) {
-      throw new IllegalStateException("Failed to get RSA public key", e);
+  private RSAKey getRsaKey() {
+    if (rsaKey == null) {
+      rsaKey = generateRSAKey();
     }
+    return rsaKey;
   }
 
   private RSAKey generateRSAKey() {
