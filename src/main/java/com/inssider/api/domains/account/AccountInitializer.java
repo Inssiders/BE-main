@@ -3,20 +3,24 @@ package com.inssider.api.domains.account;
 import com.inssider.api.common.Util;
 import jakarta.annotation.PostConstruct;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@RequiredArgsConstructor
 @Profile("load")
 class AccountInitializer {
-  // reference to repository and add some entities to the database
 
-  private AccountRepository accountRepository;
+  @Autowired private AccountRepository accountRepository;
+  @Autowired private PasswordEncoder passwordEncoder;
 
   private Supplier<Account> accountSupplier =
-      () -> accountRepository.save(Util.accountGenerator().get());
+      () -> {
+        Account account = Util.accountGenerator().get();
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
+        return accountRepository.save(account);
+      };
 
   @PostConstruct
   public void init() {
