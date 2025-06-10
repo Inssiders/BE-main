@@ -23,11 +23,11 @@ public class AuthRequestsDto {
       visible = true)
   @JsonSubTypes({
     @JsonSubTypes.Type(value = PasswordLoginRequest.class, name = "PASSWORD"),
-    @JsonSubTypes.Type(value = RefreshTokenLoginRequest.class, name = "REFRESH_TOKEN"),
+    @JsonSubTypes.Type(value = TokenRefreshLoginRequest.class, name = "REFRESH_TOKEN"),
     @JsonSubTypes.Type(value = AuthorizationCodeLoginRequest.class, name = "EMAIL")
   })
   public sealed interface LoginRequest
-      permits PasswordLoginRequest, RefreshTokenLoginRequest, AuthorizationCodeLoginRequest {
+      permits PasswordLoginRequest, TokenRefreshLoginRequest, AuthorizationCodeLoginRequest {
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     GrantType grantType();
@@ -39,7 +39,7 @@ public class AuthRequestsDto {
       String password)
       implements LoginRequest {}
 
-  public record RefreshTokenLoginRequest(
+  public record TokenRefreshLoginRequest(
       @Schema(allowableValues = GRANT_TYPE_REFRESH_TOKEN) GrantType grantType,
       String refreshToken,
       String clientId)

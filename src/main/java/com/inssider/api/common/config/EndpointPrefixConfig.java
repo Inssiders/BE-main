@@ -1,6 +1,5 @@
 package com.inssider.api.common.config;
 
-import lombok.NonNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -9,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 class EndpointPrefixConfig implements WebMvcConfigurer {
 
   @Override
-  public void configurePathMatch(@NonNull PathMatchConfigurer configurer) {
+  public void configurePathMatch(PathMatchConfigurer configurer) {
     configurer.addPathPrefix(
         "/api", c -> c.getPackageName().startsWith("com.inssider.api.domains"));
   }

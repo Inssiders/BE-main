@@ -80,19 +80,13 @@ class AccountServiceImpl implements AccountService {
 
   @Override
   public Account patchAccountPassword(Long id, String newPassword) throws NoSuchElementException {
-
+    // PATCH /api/accounts/me/password
     if (!Util.isValidPassword(newPassword)) {
       throw new IllegalArgumentException("Invalid password format");
     }
-
-    return repository
-        .findById(id)
-        .map(
-            account -> {
-              account.setPassword(passwordEncoder.encode(newPassword));
-              return repository.save(account);
-            })
-        .orElseThrow();
+    var entity = repository.findById(id).orElseThrow();
+    entity.setPassword(passwordEncoder.encode(newPassword));
+    return repository.save(entity);
   }
 
   @Override
@@ -122,16 +116,5 @@ class AccountServiceImpl implements AccountService {
     }
 
     return account;
-  }
-
-  @Override
-  public Long verifyPassword(String email, String rawPassword)
-      throws IllegalArgumentException, NoSuchElementException {
-    var entity = repository.findByEmail(email).orElseThrow();
-    if (!passwordEncoder.matches(rawPassword, entity.getPassword())) {
-      throw new IllegalArgumentException(
-          rawPassword + " is not matched with " + entity.getPassword());
-    }
-    return entity.getId();
   }
 }

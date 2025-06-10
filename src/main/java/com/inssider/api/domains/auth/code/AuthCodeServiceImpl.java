@@ -1,10 +1,7 @@
-package com.inssider.api.domains.auth.code.email;
+package com.inssider.api.domains.auth.code;
 
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
-import com.inssider.api.domains.auth.code.AuthorizationCode;
-import com.inssider.api.domains.auth.code.AuthorizationCodeService;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +10,10 @@ import org.springframework.util.Assert;
 
 @Service
 @RequiredArgsConstructor
-class EmailAuthServiceImpl implements EmailAuthService {
+class AuthCodeServiceImpl implements AuthCodeService {
 
-  private final EmailAuthCodeRepository emailCodeRepository;
-  private final AuthorizationCodeService authorizationCodeService;
-
-  @Override
-  public Long countEmailCodes() {
-    return emailCodeRepository.count();
-  }
+  private final EmailAuthenticationCodeRepository emailCodeRepository;
+  private final AuthorizationCodeRepository authorizationCodeRepository;
 
   @Override
   public EmailCodeResponse challengeEmail(String email) {
@@ -45,14 +37,16 @@ class EmailAuthServiceImpl implements EmailAuthService {
 
     // Create and save AuthorizationCode entity
     var authCode = new AuthorizationCode(email);
-    var savedAuthCode = authorizationCodeService.save(authCode);
+    var savedAuthCode = authorizationCodeRepository.save(authCode);
     UUID authCodeId = savedAuthCode.getId();
 
     return new EmailVerificationResponse(true, authCodeId);
   }
 
   @Override
-  public Optional<EmailAuthCode> findById(String email) {
-    return emailCodeRepository.findById(email);
+  public AuthorizationCode consume(UUID authorizationCode) {
+    var entity = authorizationCodeRepository.findById(authorizationCode).orElseThrow();
+    authorizationCodeRepository.delete(entity);
+    return entity;
   }
 }

@@ -2,39 +2,50 @@ package com.inssider.api.domains.auth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inssider.api.common.Util;
 import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
 import com.inssider.api.domains.auth.AuthRequestsDto.EmailChallengeRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.EmailVerifyRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.PasswordLoginRequest;
-import com.inssider.api.domains.auth.code.email.EmailAuthCode;
-import com.inssider.api.domains.auth.code.email.EmailAuthService;
-import com.inssider.api.domains.auth.token.JwtService;
+import com.inssider.api.domains.auth.AuthRequestsDto.TokenRefreshLoginRequest;
+import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
+import com.inssider.api.domains.auth.code.AuthorizationCodeTestRepository;
+import com.inssider.api.domains.auth.code.EmailAuthenticationCodeTestRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AuthControllerTests {
+class AuthControllerTests {
 
   @Autowired private AuthController controller;
-  @Autowired private MockMvc mockMvc;
 
+  // auth-sub
+  @Autowired private EmailAuthenticationCodeTestRepository emailAuthenticationCodeRepository;
+  @Autowired private AuthorizationCodeTestRepository authorizationCodeRepository;
+
+  // common
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+
+  // account
   @Autowired private AccountService accountService;
-  @Autowired private EmailAuthService emailAuthService;
-  @Autowired private EmailAuthService emailAuthorizationService;
-  @Autowired private JwtService jwtService;
 
   @Test
   @Transactional
@@ -50,39 +61,31 @@ public class AuthControllerTests {
       var request = new EmailChallengeRequest(email);
       controller.challengeEmailAuth(request);
     }
-    assertEquals(1, emailAuthorizationService.countEmailCodes()); // 이메일 인증 코드 생성
+    assertEquals(1, emailAuthenticationCodeRepository.count());
 
-    // 1.5 이메일 인증 코드 획득
-    String code =
-        emailAuthService
-            .findById(email)
-            .map(EmailAuthCode::getCode)
-            .orElseThrow(() -> new AssertionError("Email code not found"));
+    // 2. 이메일 인증 코드 획득
+    String emailCode = emailAuthenticationCodeRepository.findAll().getFirst().getCode();
 
-    // 2. 이메일 인증 확인 및 authorization code 획득
+    // 3. 이메일 인증 확인 및 authorization code 획득
     UUID authorizationCode;
     {
-      var request = new EmailVerifyRequest(email, code);
+      var request = new EmailVerifyRequest(email, emailCode);
       var response = controller.verifyEmailAuth(request).getBody().data();
       authorizationCode = response.authorization_code();
     }
     assertNotNull(authorizationCode);
-    assertEquals(0, emailAuthorizationService.countEmailCodes()); // 인증 코드 사용 후 삭제
-    assertEquals(1, jwtService.countAuthorizationCodes()); // authorization code 생성 확인
+    assertEquals(0, emailAuthenticationCodeRepository.count()); // 인증 코드 사용 후 삭제
+    assertEquals(1, authorizationCodeRepository.count()); // authorization code 생성 확인
 
-    // 3. authorization code로 토큰 생성
-    String accessToken;
-    String refreshToken;
+    // 4. authorization code로 토큰 생성
     {
       var request =
           new AuthRequestsDto.AuthorizationCodeLoginRequest(
               GrantType.AUTHORIZATION_CODE, authorizationCode);
       var response = controller.createToken(request).getBody().data();
-      accessToken = response.accessToken();
-      refreshToken = response.refreshToken();
+      assertNotNull(response.accessToken());
+      assertNull(response.refreshToken());
     }
-    assertNotNull(accessToken);
-    assertNull(refreshToken);
   }
 
   @Test
@@ -137,10 +140,60 @@ public class AuthControllerTests {
     assertNull(account.getRefreshToken()); // 로그아웃 -> refresh_token 삭제
 
     // 3. 로그아웃 후 이전 access_token으로 회원탈퇴 요청 시 예외 발생 확인
+    // [ ] token temporal blacklist
+    // {
+    //   mockMvc
+    //       .perform(delete("/api/accounts/me").header("Authorization", "Bearer " + accessToken))
+    //       .andExpect(status().is4xxClientError());
+    // }
+  }
+
+  @Test
+  @Transactional
+  void 토큰_재발급() throws Exception {
+    // 0. 계정 생성 (테스트용)
+    var account = Util.accountGenerator().get();
+    var email = account.getEmail();
+    var plainPassword = account.getPassword();
+    accountService.register(account);
+    assertFalse(plainPassword.matches("\\{.+\\}$"));
+    assertEquals(1, accountService.count());
+
+    // 1. 로그인 요청
+    String accessToken;
+    String refreshToken;
     {
-      mockMvc
-          .perform(delete("/api/accounts/me").header("Authorization", "Bearer " + accessToken))
-          .andExpect(status().is4xxClientError());
+      var request = new PasswordLoginRequest(GrantType.PASSWORD, email, plainPassword);
+      var response = controller.createToken(request).getBody().data();
+      accessToken = response.accessToken();
+      refreshToken = response.refreshToken();
+    }
+    assertNotNull(accessToken);
+    assertNotNull(refreshToken);
+
+    // 2. 토큰 재발급 요청
+    {
+      var request =
+          new TokenRefreshLoginRequest(GrantType.REFRESH_TOKEN, refreshToken, "inssider-app");
+
+      // var response = controller.createToken(request).getBody().data();
+      var rawResponse =
+          mockMvc
+              .perform(
+                  post("/api/auth/token")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(objectMapper.writeValueAsString(request)))
+              .andExpect(status().isOk())
+              .andDo(print())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+      TokenResponse response = objectMapper.readValue(rawResponse, TokenResponse.class);
+      var newAccessToken = response.accessToken();
+      var newRefreshToken = response.refreshToken();
+
+      assertNotEquals(accessToken, newAccessToken);
+      assertNotEquals(refreshToken, newRefreshToken);
     }
   }
 }

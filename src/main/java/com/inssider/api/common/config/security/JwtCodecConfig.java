@@ -1,4 +1,4 @@
-package com.inssider.api.domains.auth.config;
+package com.inssider.api.common.config.security;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;

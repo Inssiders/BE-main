@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,7 +65,7 @@ class AccountControllerTest {
     String accessToken;
     {
       var request = new PasswordLoginRequest(GrantType.PASSWORD, email, rawPassword);
-      var response = authService.createToken(request);
+      var response = authService.createTokens(request);
       accessToken = response.accessToken();
     }
     assertNotNull(accessToken);
@@ -103,7 +104,7 @@ class AccountControllerTest {
 
   @Test
   @Transactional
-  void 비밀번호_변경() {
+  void 비밀번호_변경() throws Exception {
     // 0. 회원가입 요청 given
     String email;
     String rawPassword;
@@ -119,7 +120,7 @@ class AccountControllerTest {
     String accessToken;
     {
       var request = new PasswordLoginRequest(GrantType.PASSWORD, email, rawPassword);
-      var response = authService.createToken(request);
+      var response = authService.createTokens(request);
       accessToken = response.accessToken();
     }
     assertNotNull(accessToken);
@@ -127,30 +128,21 @@ class AccountControllerTest {
     // 2. 비밀번호 변경 요청 when
     String newPassword = Util.passwordGenerator().get();
     {
-      var response =
-          accountController.changePassword(
-              account, new AccountRequestsDto.ChangePasswordRequestDto(newPassword));
-      assertEquals(200, response.getStatusCode().value());
-    }
-
-    try {
+      var request = new AccountRequestsDto.ChangePasswordRequestDto(newPassword);
       mockMvc
           .perform(
               patch("/api/accounts/me/password")
                   .header("Authorization", "Bearer " + accessToken)
                   .contentType("application/json")
-                  .content(
-                      objectMapper.writeValueAsString(
-                          new AccountRequestsDto.ChangePasswordRequestDto(newPassword))))
-          .andExpect(status().isOk());
-    } catch (Exception e) {
-      throw new AssertionError("회원 비밀번호 변경 요청 실패", e);
+                  .content(objectMapper.writeValueAsString(request)))
+          .andExpect(status().isOk())
+          .andDo(print());
     }
 
     // 3. 변경된 비밀번호로 로그인 시도 then
     {
       var request = new PasswordLoginRequest(GrantType.PASSWORD, email, newPassword);
-      var response = authService.createToken(request);
+      var response = authService.createTokens(request);
       assertNotNull(response.accessToken());
     }
   }

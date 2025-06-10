@@ -1,4 +1,4 @@
-package com.inssider.api.domains.auth.token.refresh;
+package com.inssider.api.domains.auth.token;
 
 import com.inssider.api.domains.account.Account;
 import jakarta.persistence.Column;
@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,12 +31,13 @@ public class RefreshToken {
 
   @NonNull
   @Getter
+  @Setter
   @Column(length = 1000)
   private String token;
 
   @PrePersist
   private void prePersist() {
-    if (account != null) {
+    if (account != null && account.getRefreshToken() == null) {
       account.setRefreshToken(this);
     }
   }
