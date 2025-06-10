@@ -9,6 +9,7 @@ public class PostCursorRequestDTO {
     private Long lastId;
     @Builder.Default
     private int size = 10;
+    private String profileFilter;
     private String keyword;
     private Long categoryId;
     private String sort;

@@ -23,25 +23,62 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public PostCursorResponseDTO findPostsWithCursor(PostCursorRequestDTO requestDTO) {
+    public PostCursorResponseDTO findPostsByAccount(PostCursorRequestDTO requestDTO, Long accountId) {
+        BooleanBuilder postFilter = new BooleanBuilder();
+        postFilter.and(QPost.post.account.id.eq(accountId));
+
+        return findPostsWithCursor(requestDTO, postFilter);
+    }
+
+    @Override
+    public PostCursorResponseDTO findLikedPostsByAccount(PostCursorRequestDTO requestDTO, Long accountId) {
         QPost post = QPost.post;
-        QUserProfile profile = QUserProfile.userProfile;
         QLike like = QLike.like;
-        QComment comment = QComment.comment;
 
-        BooleanBuilder whereClause = new BooleanBuilder();
+        List<Long> likedPostIds = queryFactory
+                .select(like.targetId)
+                .from(like)
+                .where(like.account.id.eq(accountId))
+                .fetch();
 
-        if (requestDTO.getLastId() != null) {
-            whereClause.and(post.id.lt(requestDTO.getLastId()));
+        if (likedPostIds.isEmpty()) {
+            return PostCursorResponseDTO.builder()
+                    .content(List.of())
+                    .hasNext(false)
+                    .nextCursor(null)
+                    .build();
         }
 
-        if (requestDTO.getKeyword() != null && !requestDTO.getKeyword().trim().isEmpty()) {
-            whereClause.and(post.title.containsIgnoreCase(requestDTO.getKeyword()));
-        }
+        BooleanBuilder likedFilter = new BooleanBuilder();
+        likedFilter.and(post.id.in(likedPostIds));
 
-        if (requestDTO.getCategoryId() != null) {
-            whereClause.and(post.category.id.eq(requestDTO.getCategoryId()));
-        }
+        return findPostsWithCursor(requestDTO, likedFilter);
+    }
+
+    @Override
+    public PostCursorResponseDTO findPostsWithCursor(PostCursorRequestDTO requestDTO, BooleanBuilder filter) {
+            QPost post = QPost.post;
+            QUserProfile profile = QUserProfile.userProfile;
+            QLike like = QLike.like;
+            QComment comment = QComment.comment;
+
+            BooleanBuilder where = new BooleanBuilder();
+
+            if (requestDTO.getLastId() != null) {
+                where.and(post.id.lt(requestDTO.getLastId()));
+            }
+
+            if (requestDTO.getKeyword() != null && !requestDTO.getKeyword().trim().isEmpty()) {
+                where.and(post.title.containsIgnoreCase(requestDTO.getKeyword()));
+            }
+
+            if (requestDTO.getCategoryId() != null) {
+                where.and(post.category.id.eq(requestDTO.getCategoryId()));
+            }
+
+            if (filter != null) {
+                where.and(filter);
+            }
 
         List<PostDTO> posts = queryFactory
                 .select(
@@ -53,7 +90,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 )
                 .from(post)
                 .leftJoin(profile).on(profile.account.id.eq(post.account.id))
-                .where(whereClause)
+                .where(where)
                 .orderBy(post.createdAt.desc(), post.id.desc())
                 .limit(requestDTO.getSize() + 1)
                 .fetch()

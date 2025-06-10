@@ -58,12 +58,13 @@ public class PostController {
 
   @GetMapping
   public ResponseEntity<BaseResponse.ResponseWrapper<PostCursorResponseDTO>> get(
-          @RequestParam(required = false) Long lastId,
+          @RequestParam(name = "last_id", required = false) Long lastId,
           @RequestParam(defaultValue = "10") int size,
+          @RequestParam(name = "profile_filter",required = false) String profileFilter,
           @RequestParam(required = false) String keyword,
           @RequestParam(name = "category_id", required = false) Long categoryId) {
 
-    PostCursorResponseDTO data = postService.get(lastId, size, keyword, categoryId);
+    PostCursorResponseDTO data = postService.get(lastId, size, profileFilter, keyword, categoryId);
     return BaseResponse.of(200, data);
   }
 }

@@ -127,7 +127,11 @@ public class PostService {
             .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
   }
 
-  public PostCursorResponseDTO get(Long lastId, int size, String keyword, Long categoryId) {
+
+  public PostCursorResponseDTO get(Long lastId, int size, String profileFilter, String keyword, Long categoryId) {
+    // 인증 적용 후 삭제 예정
+    Account account = accountService.findById(2L).get();
+
     PostCursorRequestDTO request = PostCursorRequestDTO.builder()
             .lastId(lastId)
             .size(size)
@@ -135,6 +139,24 @@ public class PostService {
             .categoryId(categoryId)
             .build();
 
-    return postRepository.findPostsWithCursor(request);
+    if ("post".equals(profileFilter)) {
+      return getPostsByAccount(request, account.getId());
+    } else if ("like".equals(profileFilter)) {
+      return getLikedPostsByAccount(request, account.getId());
+    } else {
+      return getAllPosts(request);
+    }
+  }
+
+  public PostCursorResponseDTO getAllPosts(PostCursorRequestDTO request) {
+    return postRepository.findPostsWithCursor(request, null);
+  }
+
+  public PostCursorResponseDTO getPostsByAccount(PostCursorRequestDTO request, Long accountId) {
+    return postRepository.findPostsByAccount(request, accountId);
+  }
+
+  public PostCursorResponseDTO getLikedPostsByAccount(PostCursorRequestDTO request, Long accountId) {
+    return postRepository.findLikedPostsByAccount(request, accountId);
   }
 }
