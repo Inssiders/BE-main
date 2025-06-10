@@ -63,7 +63,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-val querydslDir = "src/main/generated"
+val querydslDir = "${layout.buildDirectory.get().asFile}/generated/querydsl"
+
 sourceSets {
     main {
         java {
@@ -91,7 +92,14 @@ tasks {
     withType<JavaCompile> {
         options.generatedSourceOutputDirectory = file(querydslDir)
     }
+    
+    clean {
+        doLast {
+            file(querydslDir).deleteRecursively()
+        }
+    }
 }
+
 
 spotless {
     setEnforceCheck(false)
