@@ -2,10 +2,12 @@ package com.inssider.api.common;
 
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountDataTypes.AccountType;
+import com.inssider.api.domains.account.AccountDataTypes.RoleType;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Random;
 import java.util.function.Supplier;
+import lombok.NonNull;
 
 public class Util {
 
@@ -13,8 +15,15 @@ public class Util {
     // Prevent instantiation
   }
 
+  private static final Random random = new SecureRandom();
+
+  private static final String EMAIL_REGEX =
+      "^(?!.*\\.\\.)[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?@(?:(?!-)[a-z0-9-]{2,}(?<!-)\\.)+[a-z]{2,}$";
+  private static final String PASSWORD_REGEX =
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s])\\S{8,64}$";
+
   public static URI buildAbsoluteUri(String path) {
-    final String BASE_URL = "https://inssider.oomia.click";
+    final String BASE_URL = "https://api.inssider.com";
 
     if (path == null || path.isBlank()) {
       path = "/";
@@ -25,38 +34,13 @@ public class Util {
     return URI.create(BASE_URL + path);
   }
 
-  public static String argon2Hash(String password) {
-    // var encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-    // return encoder.encode(password);
-
-    // simple mock implementation for demonstration
-    if (password == null || password.isBlank()) {
-      throw new IllegalArgumentException("Password cannot be null or blank");
-    }
-    return "argon2id$" + password; // Mock hash for demonstration purposes
-  }
-
-  private static final String EMAIL_REGEX =
-      "^(?!.*\\.\\.)[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?@(?:(?!-)[a-z0-9-]{2,}(?<!-)\\.)+[a-z]{2,}$";
-
-  public static boolean isValidEmail(String email) {
-    if (email == null || email.isBlank()) {
-      return false;
-    }
+  public static boolean isValidEmail(@NonNull String email) {
     return email.matches(EMAIL_REGEX);
   }
 
-  private static final String PASSWORD_REGEX =
-      "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s])\\S{8,64}$";
-
-  public static boolean isValidPassword(String password) {
-    if (password == null || password.isBlank()) {
-      return false;
-    }
+  public static boolean isValidPassword(@NonNull String password) {
     return password.matches(PASSWORD_REGEX);
   }
-
-  private static final Random random = new SecureRandom();
 
   private static String generateRandomString(String charset, int length) {
     return random
@@ -91,7 +75,8 @@ public class Util {
       return Account.builder()
           .accountType(AccountType.PASSWORD)
           .email(email)
-          .password(argon2Hash(password))
+          .role(RoleType.USER)
+          .password(password)
           .build();
     };
   }

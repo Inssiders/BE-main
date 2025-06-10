@@ -1,5 +1,9 @@
 package com.inssider.api.domains.profile;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.inssider.api.common.repository.SoftDeleteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-interface UserProfileRepository extends JpaRepository<UserProfile, Long> {}
+interface UserProfileRepository extends SoftDeleteRepository<UserProfile, Long> {
+  Page<UserProfile> findByNicknameContainingIgnoreCase(String nickname, Pageable pageable);
+}

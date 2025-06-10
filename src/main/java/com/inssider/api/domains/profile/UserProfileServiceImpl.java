@@ -3,25 +3,18 @@ package com.inssider.api.domains.profile;
 import com.inssider.api.common.response.StandardResponse.QueryResponse;
 import com.inssider.api.domains.profile.UserProfileResponsesDto.UpdateProfileResponse;
 import com.inssider.api.domains.profile.UserProfileResponsesDto.UserProfileDto;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserProfileServiceImpl implements UserProfileService {
+@RequiredArgsConstructor
+class UserProfileServiceImpl implements UserProfileService {
   private final UserProfileRepository repository;
-
-  UserProfileServiceImpl(UserProfileRepository repository) {
-    this.repository = repository;
-  }
 
   @Override
   public List<Long> getAllUserProfileIds() {
@@ -63,82 +56,18 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   @Override
   public QueryResponse<UserProfileDto> findUserProfilesByNickname(
-      String nickname, String sort, int limit, int page) {
+      String nickname, Pageable pageable) {
+    Page<UserProfile> userProfilePage;
 
-    // [ ] 리팩토링 필요 - 복잡도 낮추기
-
-    Example<UserProfile> example = createNicknameSearchExample(nickname);
-    PageRequest pageRequest = PageRequest.of(page, limit, parseSort(sort));
-    Page<UserProfile> userProfilePage = repository.findAll(example, pageRequest);
-
-    Page<UserProfileDto> userProfileDtoPage =
-        userProfilePage.map(
-            profile -> {
-              return profile.convertToDto();
-            });
-
-    List<UserProfileDto> items = userProfileDtoPage.getContent();
-    return QueryResponse.of(items, userProfileDtoPage, limit);
-  }
-
-  /**
-   * 닉네임으로 UserProfile을 검색하기 위한 Example 객체를 생성합니다. 검색은 대소문자를 구분하지 않으며 닉네임의 일부만 일치해도 됩니다. 다른 필드는 검색에서
-   * 무시됩니다.
-   *
-   * @param nickname 검색할 닉네임
-   * @return 검색을 위한 Example 객체
-   */
-  private Example<UserProfile> createNicknameSearchExample(String nickname) {
-    UserProfile probe = new UserProfile();
-    probe.setNickname(nickname);
-
-    // [ ] 리팩토링 필요 - 복잡도 낮추기 - JPQL로 변경 고려
-    ExampleMatcher matcher =
-        ExampleMatcher.matching()
-            .withMatcher("nickname", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
-            .withIgnorePaths("accountVisible", "followerVisible", "bio", "profileUrl", "account")
-            .withIgnoreNullValues();
-
-    return Example.of(probe, matcher);
-  }
-
-  /**
-   * 정렬 문자열을 Sort 객체로 파싱합니다. 정렬 문자열은 쉼표로 구분된 속성 목록이며, 각 속성 뒤에는 선택적으로 ":asc" 또는 ":desc"가 올 수 있습니다. 정렬
-   * 문자열이 제공되지 않으면 기본적으로 "nickname"을 기준으로 오름차순 정렬합니다.
-   *
-   * @param sortStr 정렬 문자열
-   * @return Sort 객체
-   */
-  private Sort parseSort(String sortStr) {
-    if (sortStr == null || sortStr.trim().isEmpty()) {
-      return Sort.by(Sort.Direction.ASC, "nickname");
+    if (nickname != null && !nickname.trim().isEmpty()) {
+      userProfilePage = repository.findByNicknameContainingIgnoreCase(nickname, pageable);
+    } else {
+      userProfilePage = repository.findAll(pageable);
     }
 
-    List<Sort.Order> orders =
-        Arrays.stream(sortStr.split(","))
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .map(this::parseOrderToken)
-            .collect(Collectors.toList());
+    Page<UserProfileDto> userProfileDtoPage = userProfilePage.map(UserProfile::convertToDto);
 
-    return Sort.by(orders);
-  }
-
-  /**
-   * 단일 정렬 토큰을 Sort.Order 객체로 파싱합니다. 토큰은 "속성:방향" 또는 "속성" 형식이 될 수 있습니다. 방향이 지정되지 않으면 기본적으로 오름차순으로
-   * 정렬됩니다.
-   *
-   * @param token 정렬 토큰
-   * @return Sort.Order 객체
-   */
-  private Sort.Order parseOrderToken(String token) {
-    if (token.contains(":")) {
-      String[] parts = token.split(":");
-      String property = parts[0].trim();
-      String direction = parts[1].trim().toLowerCase();
-
-      return direction.equals("desc") ? Sort.Order.desc(property) : Sort.Order.asc(property);
-    }
-    return Sort.Order.asc(token.trim());
+    return QueryResponse.of(
+        userProfileDtoPage.getContent(), userProfileDtoPage, pageable.getPageSize());
   }
 }

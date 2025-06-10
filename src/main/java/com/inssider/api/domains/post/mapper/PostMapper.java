@@ -2,7 +2,11 @@ package com.inssider.api.domains.post.mapper;
 
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.category.entity.Category;
-import com.inssider.api.domains.post.dto.*;
+import com.inssider.api.domains.post.dto.PostCreateRequestDTO;
+import com.inssider.api.domains.post.dto.PostDeleteResponseDTO;
+import com.inssider.api.domains.post.dto.PostGetDetailResponseDTO;
+import com.inssider.api.domains.post.dto.PostResponseDTO;
+import com.inssider.api.domains.post.dto.PostUpdateResponseDTO;
 import com.inssider.api.domains.post.entity.Post;
 import java.util.List;
 

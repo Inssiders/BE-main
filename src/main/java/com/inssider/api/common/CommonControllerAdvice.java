@@ -36,8 +36,18 @@ class CommonControllerAdvice {
   public ProblemDetail generalExceptionHandler(Exception ex) {
     ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     problemDetail.setType(Util.buildAbsoluteUri("/error/internal-server-error"));
-    problemDetail.setTitle("Internal Server Error");
-    problemDetail.setDetail("An unexpected error occurred");
+    problemDetail.setTitle(ex.getClass().getSimpleName());
+    problemDetail.setDetail(ex.getMessage());
+    return problemDetail;
+  }
+
+  @ExceptionHandler(IllegalStateException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ProblemDetail conflictHandler(IllegalStateException ex) {
+    ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+    problemDetail.setType(Util.buildAbsoluteUri("/error/conflict"));
+    problemDetail.setTitle("Conflict");
+    problemDetail.setDetail(ex.getMessage());
     return problemDetail;
   }
 }

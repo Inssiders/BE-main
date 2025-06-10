@@ -2,6 +2,7 @@ package com.inssider.api.domains.auth;
 
 import com.inssider.api.common.response.BaseResponse;
 import com.inssider.api.common.response.BaseResponse.ResponseWrapper;
+import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.auth.AuthRequestsDto.EmailChallengeRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.EmailVerifyRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.LoginRequest;
@@ -11,23 +12,21 @@ import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
 import com.inssider.api.domains.auth.AuthSwaggerExamples.LoginExamples;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/auth")
 class AuthController {
 
   private final AuthService authService;
-
-  public AuthController(AuthService authService) {
-    this.authService = authService;
-  }
 
   // 이메일 인증코드 발송
   @PostMapping("/email/challenge")
@@ -68,14 +67,14 @@ class AuthController {
                       }))
           @RequestBody
           LoginRequest request) {
-    return BaseResponse.of(200, authService.createToken(request));
+    return BaseResponse.of(200, authService.createTokens(request));
   }
 
   // 로그아웃
   @DeleteMapping("/token")
   public ResponseEntity<ResponseWrapper<Void>> revokeToken(
-      @RequestHeader("Authorization") String authorization) {
-    authService.revokeToken(authorization);
+      @AuthenticationPrincipal Account account) {
+    authService.revokeRefreshToken(account);
     return BaseResponse.of(200, null);
   }
 }

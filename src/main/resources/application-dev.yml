@@ -17,4 +17,3 @@ logging.level:
   "[org.hibernate.tool.hbm2ddl]": debug
   "[org.springframework.web]": debug
   "[com.inssider]": debug
-
