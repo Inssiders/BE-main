@@ -1,4 +1,4 @@
-package com.inssider.api.domains.auth.config;
+package com.inssider.api.common.config.security;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 @Configuration
-public class JwtCodecConfig {
+class JwtCodecConfig {
 
   private final RSAKey rsaKey = generateRSAKey();
 

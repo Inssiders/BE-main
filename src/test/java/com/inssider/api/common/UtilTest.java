@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.inssider.api.domains.account.Account;
+import com.inssider.api.domains.account.AccountAuthenticator;
 import com.inssider.api.domains.account.AccountService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ class UtilTest {
   @Autowired private PasswordEncoder passwordEncoder;
 
   @Autowired private AccountService accountService;
+
+  @Autowired private AccountAuthenticator authenticator;
 
   @Test
   void password_equals() {
@@ -44,8 +47,7 @@ class UtilTest {
       plainPassword = account.getPassword();
       accountService.register(account);
     }
-    Long id = accountService.verifyPassword(email, plainPassword);
-    assertNotNull(id);
+    assertNotNull(authenticator.authenticate(email, plainPassword));
   }
 
   @Test

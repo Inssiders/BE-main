@@ -45,28 +45,24 @@ public class UserProfile extends SoftDeleteable {
   @Builder.Default private boolean followerVisible = true;
 
   /**
-   * UserProfile 엔티티를 접근 수준에 따라 적절한 UserProfileDto로 변환합니다.
+   * UserProfile 엔티티를 접근 수준에 따라 적절한 UserProfileDto로 변환합니다. 명시적으로 SELF 컨텍스트를 지정하지 않으면 엔티티의 기본 접근 수준에
+   * 따라 변환됩니다.
    *
    * @return 변환된 UserProfileDto 객체
    */
-  UserProfileDto convertToDto() {
-    var accessLevel = determineAccessLevel(this);
-    return switch (accessLevel) {
-      case PRIVATE -> new PrivateUserProfile(this.nickname, this.profileUrl);
-      case PUBLIC -> new PublicUserProfile(this.nickname, this.profileUrl, this.bio);
-      case SELF ->
-          new OwnerUserProfile(
-              this.nickname, this.profileUrl, this.bio, this.accountVisible, this.followerVisible);
+  UserProfileDto convertToDto(ProfileContext context) {
+    return switch (context) {
+      case SELF -> new OwnerUserProfile(nickname, profileUrl, bio, accountVisible, followerVisible);
+      default -> convertToDto();
     };
   }
 
-  /**
-   * 현재 UserProfile의 접근 수준을 결정합니다.
-   *
-   * @return ProfileContext 열거형 값 (PUBLIC, PRIVATE, SELF)
-   */
-  private ProfileContext determineAccessLevel(UserProfile profile) {
-    // [ ] 인증 로직 추가 & PUBLIC, PRIVATE, SELF 구분 로직 구현
-    return profile.isAccountVisible() ? ProfileContext.SELF : ProfileContext.PRIVATE;
+  UserProfileDto convertToDto() {
+    var accessLevel = isAccountVisible() ? ProfileContext.PUBLIC : ProfileContext.PRIVATE;
+    return switch (accessLevel) {
+      case PRIVATE -> new PrivateUserProfile(nickname, profileUrl);
+      case PUBLIC -> new PublicUserProfile(nickname, profileUrl, bio);
+      case SELF -> new OwnerUserProfile(nickname, profileUrl, bio, accountVisible, followerVisible);
+    };
   }
 }

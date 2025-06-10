@@ -12,6 +12,10 @@ import com.inssider.api.domains.profile.UserProfileResponsesDto.PublicUserProfil
 import com.inssider.api.domains.profile.UserProfileResponsesDto.UpdateProfileResponse;
 import com.inssider.api.domains.profile.UserProfileResponsesDto.UserProfileDto;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,11 +35,15 @@ class UserProfileController {
 
   @GetMapping
   public QueryResponse<UserProfileDto> query(
-      @RequestParam("nickname") String nickname,
-      @RequestParam("sort") String sort,
-      @RequestParam("limit") int limit,
-      @RequestParam("page") int page) {
-    return service.findUserProfilesByNickname(nickname, sort, limit, page);
+      @ParameterObject
+          @PageableDefault(
+              size = 10,
+              page = 0,
+              sort = {"nickname", "createdAt"},
+              direction = Sort.Direction.ASC)
+          Pageable pageable,
+      @RequestParam(required = false) String nickname) {
+    return service.findUserProfilesByNickname(nickname, pageable);
   }
 
   @GetMapping("/{id}")
