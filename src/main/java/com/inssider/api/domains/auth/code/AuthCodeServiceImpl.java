@@ -2,11 +2,11 @@ package com.inssider.api.domains.auth.code;
 
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +20,6 @@ class AuthCodeServiceImpl implements AuthCodeService {
   public EmailCodeResponse challengeEmail(String email) {
     emailCodeRepository.findById(email).ifPresent(emailCodeRepository::delete);
     var code = emailCodeRepository.save(email).getCode();
-    Assert.notNull(code, "Email code should not be null");
 
     emailService.sendSimpleMessage(
         email, "Email Verification Code", "Your verification code is: " + code);
@@ -29,13 +28,18 @@ class AuthCodeServiceImpl implements AuthCodeService {
 
   @Override
   public EmailVerificationResponse verifyEmail(@NonNull String email, @NonNull String code) {
-    // [ ] check if the code is valid and not expired
-    // var actualCode = emailCodeRepository.findById(email).orElseThrow().getCode();
-    // boolean verified = code.equals(actualCode);
+    var entity =
+        emailCodeRepository
+            .findById(email)
+            .orElseThrow(
+                () -> new IllegalArgumentException("해당 이메일에 대한 인증 코드를 찾을 수 없습니다: " + email));
 
-    boolean verified = true; // Assume verification is always successful
-    if (!verified) {
-      throw new IllegalArgumentException("Invalid or expired email verification code");
+    if (LocalDateTime.now().isAfter(entity.getExpiredAt())) {
+      throw new IllegalArgumentException("이메일 인증 코드가 만료되었습니다.");
+    }
+
+    if (!entity.getCode().equals(code)) {
+      throw new IllegalArgumentException("유효하지 않은 이메일 인증 코드입니다.");
     }
 
     emailCodeRepository.deleteById(email);
