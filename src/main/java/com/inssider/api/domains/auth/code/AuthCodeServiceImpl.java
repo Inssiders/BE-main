@@ -14,11 +14,16 @@ class AuthCodeServiceImpl implements AuthCodeService {
 
   private final EmailAuthenticationCodeRepository emailCodeRepository;
   private final AuthorizationCodeRepository authorizationCodeRepository;
+  private final EmailService emailService;
 
   @Override
   public EmailCodeResponse challengeEmail(String email) {
     emailCodeRepository.findById(email).ifPresent(emailCodeRepository::delete);
-    Assert.notNull(emailCodeRepository.save(email).getCode(), "Email code should not be null");
+    var code = emailCodeRepository.save(email).getCode();
+    Assert.notNull(code, "Email code should not be null");
+
+    emailService.sendSimpleMessage(
+        email, "Email Verification Code", "Your verification code is: " + code);
     return new EmailCodeResponse(email, 300);
   }
 
