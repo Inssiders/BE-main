@@ -1,8 +1,4 @@
 spring:
-  # 서버 실행 시 'schema.sql'이 실행될 수 있도록 하는 설정(임시)
-  sql:
-    init:
-      mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
