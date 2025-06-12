@@ -45,9 +45,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
-    implementation ("org.springframework.boot:spring-boot-starter-hateoas")
-
-    implementation ("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
 
     compileOnly("org.projectlombok:lombok")
 
@@ -92,14 +90,13 @@ tasks {
     withType<JavaCompile> {
         options.generatedSourceOutputDirectory = file(querydslDir)
     }
-    
+
     clean {
         doLast {
             file(querydslDir).deleteRecursively()
         }
     }
 }
-
 
 spotless {
     setEnforceCheck(false)

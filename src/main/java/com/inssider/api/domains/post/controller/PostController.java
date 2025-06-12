@@ -2,14 +2,13 @@ package com.inssider.api.domains.post.controller;
 
 import com.inssider.api.common.response.BaseResponse;
 import com.inssider.api.domains.post.dto.*;
-
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,13 +57,8 @@ public class PostController {
 
   @GetMapping
   public ResponseEntity<BaseResponse.ResponseWrapper<PostCursorResponseDTO>> get(
-          @RequestParam(name = "last_id", required = false) Long lastId,
-          @RequestParam(defaultValue = "10") int size,
-          @RequestParam(name = "profile_filter",required = false) String profileFilter,
-          @RequestParam(required = false) String keyword,
-          @RequestParam(name = "category_id", required = false) Long categoryId) {
-
-    PostCursorResponseDTO data = postService.get(lastId, size, profileFilter, keyword, categoryId);
+      @ParameterObject PostCursorRequestDTO request) {
+    PostCursorResponseDTO data = postService.get(request);
     return BaseResponse.of(200, data);
   }
 }

@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CommentUpdateRequestDTO {
-    @NotBlank(message = "내용을 입력해주세요.")
-    private String content;
+  @NotBlank(message = "내용을 입력해주세요.")
+  private String content;
 }

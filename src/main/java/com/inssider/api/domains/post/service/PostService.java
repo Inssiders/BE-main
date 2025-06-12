@@ -15,9 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 
 @Service
@@ -123,25 +121,18 @@ public class PostService {
   }
 
   public Post get(Long postId) {
-    return postRepository.findById(postId)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
+    return postRepository
+        .findById(postId)
+        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
   }
 
-
-  public PostCursorResponseDTO get(Long lastId, int size, String profileFilter, String keyword, Long categoryId) {
+  public PostCursorResponseDTO get(PostCursorRequestDTO request) {
     // 인증 적용 후 삭제 예정
-    Account account = accountService.findById(2L).get();
+    Account account = accountService.findById(1L).get();
 
-    PostCursorRequestDTO request = PostCursorRequestDTO.builder()
-            .lastId(lastId)
-            .size(size)
-            .keyword(keyword)
-            .categoryId(categoryId)
-            .build();
-
-    if ("post".equals(profileFilter)) {
+    if ("post".equals(request.getProfile_filter())) {
       return getPostsByAccount(request, account.getId());
-    } else if ("like".equals(profileFilter)) {
+    } else if ("like".equals(request.getProfile_filter())) {
       return getLikedPostsByAccount(request, account.getId());
     } else {
       return getAllPosts(request);
@@ -156,7 +147,8 @@ public class PostService {
     return postRepository.findPostsByAccount(request, accountId);
   }
 
-  public PostCursorResponseDTO getLikedPostsByAccount(PostCursorRequestDTO request, Long accountId) {
+  public PostCursorResponseDTO getLikedPostsByAccount(
+      PostCursorRequestDTO request, Long accountId) {
     return postRepository.findLikedPostsByAccount(request, accountId);
   }
 }

@@ -10,21 +10,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostDTO {
-    private Long id;
-    private Long accountId;
-    private String title;
-    private String nickname;
-    private String profileUrl;
-    @Builder.Default
-    private Long likeCount = 0L;
-    @Builder.Default
-    private Long commentCount = 0L;
+  private Long id;
+  private Long accountId;
+  private String title;
+  private String nickname;
+  private String profileUrl;
+  @Builder.Default private Long likeCount = 0L;
+  @Builder.Default private Long commentCount = 0L;
 
-    public void updateLikeCount(Long likeCount) {
-        this.likeCount = likeCount;
-    }
+  public void updateLikeCount(Long likeCount) {
+    this.likeCount = likeCount;
+  }
 
-    public void updateCommentCount(Long commentCount) {
-        this.commentCount = commentCount;
-    }
+  public void updateCommentCount(Long commentCount) {
+    this.commentCount = commentCount;
+  }
 }
