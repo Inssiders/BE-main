@@ -1,30 +1,35 @@
 version: "3.8"
 
-# === TEMPLATES ===
-x-postgres-template: &postgres-template
-  image: postgres:latest
-#  env_file: [.env.dev]
-  healthcheck:
-    test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
-    interval: 3s
-    timeout: 3s
-    retries: 3
-
-x-app-template: &app-template
-  env_file: [.env.dev]
-  ports:
-    - "${APP_PORT}:${APP_PORT}"
-
-# === SERVICES ===
 services:
   postgres:
-    <<: *postgres-template
+    image: postgres:latest
+    env_file: [ .env ]
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:?error}
-      POSTGRES_USER: ${POSTGRES_USER:?error}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?error}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
 
   app:
-    <<: *app-template
+    build:
+      context: .
+    env_file: [ .env ]
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      POSTGRES_HOST: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${APP_PORT}/actuator/health"]
+      interval: 3s
+      timeout: 3s
+      retries: 5

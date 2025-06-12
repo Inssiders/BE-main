@@ -1,12 +1,13 @@
 server.port: 8080
 
-spring:
-  datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/dev
-    username: user
-    password: user
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/dev
+#    username: user
+#    password: user
 
-spring.jpa.hibernate.ddl-auto: create-drop
+#spring.jpa.hibernate.ddl-auto: create-drop
+spring.jpa.hibernate.ddl-auto: validate
 
 management.endpoints.web.exposure.include: "*"
 

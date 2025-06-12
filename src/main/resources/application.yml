@@ -1,5 +1,5 @@
 # https://docs.spring.io/spring-boot/appendix/application-properties
-server.port: ${APP_PORT}
+server.port: ${APP_PORT:8080}
 
 spring:
   application:

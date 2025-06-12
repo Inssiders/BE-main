@@ -35,7 +35,7 @@ out/
 
 ### environment ###
 *.env
-.env.dev
+.env
 .env.prod
 logs/
 *.log
