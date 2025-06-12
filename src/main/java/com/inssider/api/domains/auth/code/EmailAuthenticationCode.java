@@ -1,4 +1,4 @@
-package com.inssider.api.domains.auth.code.email;
+package com.inssider.api.domains.auth.code;
 
 import com.inssider.api.common.Util;
 import jakarta.persistence.Column;
@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class EmailAuthCode {
+public class EmailAuthenticationCode {
 
   @Id private String email;
 
@@ -31,7 +31,7 @@ public class EmailAuthCode {
   @Column(updatable = false)
   private LocalDateTime expiredAt;
 
-  public EmailAuthCode(String email) {
+  public EmailAuthenticationCode(String email) {
     this.email = email;
     this.code = Util.codeGenerator().get();
   }

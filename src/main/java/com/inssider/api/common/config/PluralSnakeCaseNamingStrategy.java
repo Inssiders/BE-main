@@ -42,6 +42,7 @@ public class PluralSnakeCaseNamingStrategy implements PhysicalNamingStrategy {
 
   @Override
   public Identifier toPhysicalColumnName(Identifier name, JdbcEnvironment context) {
-    return name;
+    String snakeCase = toSnakeCase(name.getText());
+    return Identifier.toIdentifier(snakeCase);
   }
 }

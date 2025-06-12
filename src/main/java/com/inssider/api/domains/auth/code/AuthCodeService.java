@@ -1,16 +1,14 @@
-package com.inssider.api.domains.auth.code.email;
+package com.inssider.api.domains.auth.code;
 
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
 import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
-import java.util.Optional;
+import java.util.UUID;
 
-public interface EmailAuthService {
-
-  Long countEmailCodes();
+public interface AuthCodeService {
 
   EmailCodeResponse challengeEmail(String email);
 
   EmailVerificationResponse verifyEmail(String email, String code);
 
-  Optional<EmailAuthCode> findById(String email);
+  AuthorizationCode consume(UUID authorizationCode);
 }
