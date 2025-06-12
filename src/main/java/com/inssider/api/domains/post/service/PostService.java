@@ -4,13 +4,7 @@ import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.category.entity.Category;
 import com.inssider.api.domains.category.service.CategoryService;
-import com.inssider.api.domains.post.dto.PostCreateRequestDTO;
-import com.inssider.api.domains.post.dto.PostDeleteResponseDTO;
-import com.inssider.api.domains.post.dto.PostGetDetailResponseDTO;
-import com.inssider.api.domains.post.dto.PostGetIdResponseDTO;
-import com.inssider.api.domains.post.dto.PostResponseDTO;
-import com.inssider.api.domains.post.dto.PostUpdateRequestDTO;
-import com.inssider.api.domains.post.dto.PostUpdateResponseDTO;
+import com.inssider.api.domains.post.dto.*;
 import com.inssider.api.domains.post.entity.Post;
 import com.inssider.api.domains.post.mapper.PostMapper;
 import com.inssider.api.domains.post.repository.PostRepository;
@@ -130,5 +124,31 @@ public class PostService {
     return postRepository
         .findById(postId)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
+  }
+
+  public PostCursorResponseDTO get(PostCursorRequestDTO request) {
+    // 인증 적용 후 삭제 예정
+    Account account = accountService.findById(1L).get();
+
+    if ("post".equals(request.getProfile_filter())) {
+      return getPostsByAccount(request, account.getId());
+    } else if ("like".equals(request.getProfile_filter())) {
+      return getLikedPostsByAccount(request, account.getId());
+    } else {
+      return getAllPosts(request);
+    }
+  }
+
+  public PostCursorResponseDTO getAllPosts(PostCursorRequestDTO request) {
+    return postRepository.findPostsWithCursor(request, null);
+  }
+
+  public PostCursorResponseDTO getPostsByAccount(PostCursorRequestDTO request, Long accountId) {
+    return postRepository.findPostsByAccount(request, accountId);
+  }
+
+  public PostCursorResponseDTO getLikedPostsByAccount(
+      PostCursorRequestDTO request, Long accountId) {
+    return postRepository.findLikedPostsByAccount(request, accountId);
   }
 }
