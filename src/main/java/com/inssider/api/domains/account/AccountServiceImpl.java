@@ -18,8 +18,7 @@ class AccountServiceImpl implements AccountService {
   private final AccountRepository repository;
   private final JwtDecoder jwtDecoder;
 
-  @Override
-  public Account register(Account account) throws IllegalArgumentException {
+  Account register(Account account) throws IllegalArgumentException {
     if (!isValidLocalUserAccount(account)) {
       throw new IllegalArgumentException("Invalid request: " + account);
     }

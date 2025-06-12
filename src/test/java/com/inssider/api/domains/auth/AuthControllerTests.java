@@ -12,7 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inssider.api.common.Util;
+import com.inssider.api.domains.account.Account;
+import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountService;
+import com.inssider.api.domains.account.AccountTestRepository;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
 import com.inssider.api.domains.auth.AuthRequestsDto.EmailChallengeRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.EmailVerifyRequest;
@@ -46,6 +49,7 @@ class AuthControllerTests {
 
   // account
   @Autowired private AccountService accountService;
+  @Autowired AccountTestRepository accountRepository;
 
   @Test
   @Transactional
@@ -53,7 +57,7 @@ class AuthControllerTests {
     // 0. 계정 생성 (테스트용)
     var account = Util.accountGenerator().get();
     var email = account.getEmail();
-    accountService.register(account);
+    register(account);
     assertEquals(1, accountService.count());
 
     // 1. 이메일 인증 요청
@@ -95,7 +99,7 @@ class AuthControllerTests {
     var account = Util.accountGenerator().get();
     var email = account.getEmail();
     var plainPassword = account.getPassword();
-    accountService.register(account);
+    register(account);
     assertFalse(plainPassword.matches("\\{.+\\}$"));
     assertEquals(1, accountService.count());
 
@@ -108,7 +112,10 @@ class AuthControllerTests {
     }
 
     // 2. 로그인 성공 후, refresh_token 저장 여부
-    assertNotNull(account.getRefreshToken());
+    {
+      account = accountRepository.findByEmail(email).orElseThrow();
+      assertNotNull(account.getRefreshToken());
+    }
   }
 
   @Test
@@ -118,7 +125,7 @@ class AuthControllerTests {
     var account = Util.accountGenerator().get();
     var email = account.getEmail();
     var plainPassword = account.getPassword();
-    accountService.register(account);
+    register(account);
     assertFalse(plainPassword.matches("\\{.+\\}$"));
     assertEquals(1, accountService.count());
 
@@ -155,7 +162,7 @@ class AuthControllerTests {
     var account = Util.accountGenerator().get();
     var email = account.getEmail();
     var plainPassword = account.getPassword();
-    accountService.register(account);
+    register(account);
     assertFalse(plainPassword.matches("\\{.+\\}$"));
     assertEquals(1, accountService.count());
 
@@ -195,5 +202,10 @@ class AuthControllerTests {
       assertNotEquals(accessToken, newAccessToken);
       assertNotEquals(refreshToken, newRefreshToken);
     }
+  }
+
+  private Account register(Account account) {
+    return accountService.register(
+        RegisterType.PASSWORD, account.getEmail(), account.getPassword());
   }
 }

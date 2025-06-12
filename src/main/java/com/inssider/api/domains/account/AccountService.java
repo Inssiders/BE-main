@@ -13,8 +13,6 @@ public interface AccountService
   Account register(RegisterType registerType, String email, String password)
       throws IllegalArgumentException;
 
-  Account register(Account account) throws IllegalArgumentException;
-
   Account patchAccountPassword(Long id, String newPassword) throws NoSuchElementException;
 
   LocalDateTime softDelete(Long id) throws NoSuchElementException;

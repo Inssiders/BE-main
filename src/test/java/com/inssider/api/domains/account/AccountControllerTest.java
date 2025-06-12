@@ -38,13 +38,30 @@ class AccountControllerTest {
 
   @Test
   @Transactional
-  void 회원가입_요청() {
+  void 회원가입() {
     Account account = Util.accountGenerator().get();
     RegisterRequestDto request =
         new RegisterRequestDto(RegisterType.PASSWORD, account.getEmail(), account.getPassword());
     var res = accountController.register(request);
     assertEquals(201, res.getStatusCode().value());
     assertEquals(account.getEmail(), res.getBody().data().email());
+  }
+
+  @Test
+  @Transactional
+  void 중복_회원가입_실패() throws Exception {
+    Account account = Util.accountGenerator().get();
+    RegisterRequestDto request =
+        new RegisterRequestDto(RegisterType.PASSWORD, account.getEmail(), account.getPassword());
+    var res = accountController.register(request);
+    assertEquals(201, res.getStatusCode().value());
+
+    mockMvc
+        .perform(
+            post("/api/accounts")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isConflict());
   }
 
   @Test
@@ -57,7 +74,7 @@ class AccountControllerTest {
     {
       email = account.getEmail();
       rawPassword = account.getPassword();
-      accountService.register(account);
+      register(account);
     }
     assertEquals(1, accountService.count());
 
@@ -112,7 +129,7 @@ class AccountControllerTest {
     {
       email = account.getEmail();
       rawPassword = account.getPassword();
-      accountService.register(account);
+      register(account);
     }
     assertEquals(1, accountService.count());
 
@@ -145,5 +162,10 @@ class AccountControllerTest {
       var response = authService.createTokens(request);
       assertNotNull(response.accessToken());
     }
+  }
+
+  private Account register(Account account) {
+    return accountService.register(
+        RegisterType.PASSWORD, account.getEmail(), account.getPassword());
   }
 }
