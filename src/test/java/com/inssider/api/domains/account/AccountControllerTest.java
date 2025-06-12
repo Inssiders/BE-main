@@ -61,7 +61,7 @@ class AccountControllerTest {
             post("/api/accounts")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isConflict());
+        .andExpect(status().isBadRequest());
   }
 
   @Test
