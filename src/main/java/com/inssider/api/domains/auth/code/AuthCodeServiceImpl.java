@@ -1,7 +1,7 @@
 package com.inssider.api.domains.auth.code;
 
-import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
-import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailChallengeResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailVerifyResponse;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.NonNull;
@@ -17,17 +17,17 @@ class AuthCodeServiceImpl implements AuthCodeService {
   private final EmailService emailService;
 
   @Override
-  public EmailCodeResponse challengeEmail(String email) {
+  public AuthEmailChallengeResponse challengeEmail(String email) {
     emailCodeRepository.findById(email).ifPresent(emailCodeRepository::delete);
     var code = emailCodeRepository.save(email).getCode();
 
     emailService.sendSimpleMessage(
         email, "Email Verification Code", "Your verification code is: " + code);
-    return new EmailCodeResponse(email, 300);
+    return new AuthEmailChallengeResponse(email, 300);
   }
 
   @Override
-  public EmailVerificationResponse verifyEmail(@NonNull String email, @NonNull String code) {
+  public AuthEmailVerifyResponse verifyEmail(@NonNull String email, @NonNull String code) {
     var entity =
         emailCodeRepository
             .findById(email)
@@ -49,12 +49,16 @@ class AuthCodeServiceImpl implements AuthCodeService {
     var savedAuthCode = authorizationCodeRepository.save(authCode);
     UUID authCodeId = savedAuthCode.getId();
 
-    return new EmailVerificationResponse(true, authCodeId);
+    return new AuthEmailVerifyResponse(true, authCodeId);
   }
 
   @Override
   public AuthorizationCode consume(UUID authorizationCode) {
-    var entity = authorizationCodeRepository.findById(authorizationCode).orElseThrow();
+    var entity =
+        authorizationCodeRepository
+            .findById(authorizationCode)
+            .orElseThrow(
+                () -> new IllegalArgumentException("해당 인증 코드를 찾을 수 없습니다: " + authorizationCode));
     authorizationCodeRepository.delete(entity);
     return entity;
   }

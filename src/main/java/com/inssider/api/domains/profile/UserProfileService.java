@@ -1,8 +1,8 @@
 package com.inssider.api.domains.profile;
 
 import com.inssider.api.common.response.StandardResponse.QueryResponse;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.UpdateProfileResponse;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.UserProfileDto;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetProfileResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.PatchProfileMeResponse;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -13,9 +13,9 @@ public interface UserProfileService {
 
   long count();
 
-  UserProfileDto findUserProfileById(Long id);
+  GetProfileResponse findUserProfileById(Long id);
 
-  UpdateProfileResponse updateUserProfile(
+  PatchProfileMeResponse updateUserProfile(
       Long id,
       Optional<String> nickname,
       Optional<String> profileUrl,
@@ -23,5 +23,5 @@ public interface UserProfileService {
       Optional<Boolean> accountVisible,
       Optional<Boolean> followerVisible);
 
-  QueryResponse<UserProfileDto> findUserProfilesByNickname(String nickname, Pageable pageable);
+  QueryResponse<GetProfileResponse> findUserProfilesByNickname(String nickname, Pageable pageable);
 }

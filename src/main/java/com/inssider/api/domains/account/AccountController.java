@@ -2,11 +2,11 @@ package com.inssider.api.domains.account;
 
 import com.inssider.api.common.response.BaseResponse;
 import com.inssider.api.common.response.BaseResponse.ResponseWrapper;
-import com.inssider.api.domains.account.AccountRequestsDto.ChangePasswordRequestDto;
-import com.inssider.api.domains.account.AccountRequestsDto.RegisterRequestDto;
-import com.inssider.api.domains.account.AccountResponsesDto.AccountCreated;
+import com.inssider.api.domains.account.AccountRequestsDto.PatchAccountPasswordRequest;
+import com.inssider.api.domains.account.AccountRequestsDto.PostAccountRequest;
+import com.inssider.api.domains.account.AccountResponsesDto.PatchAccountMePasswordResponse;
+import com.inssider.api.domains.account.AccountResponsesDto.PostAccountResponse;
 import com.inssider.api.domains.auth.AuthService;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,10 +26,10 @@ class AccountController {
   private final AuthService authService;
 
   @PostMapping
-  ResponseEntity<ResponseWrapper<AccountCreated>> register(
-      @RequestBody RegisterRequestDto reqBody) {
+  ResponseEntity<ResponseWrapper<PostAccountResponse>> register(
+      @RequestBody PostAccountRequest reqBody) {
     var data = service.register(reqBody.registerType(), reqBody.email(), reqBody.password());
-    return BaseResponse.of(201, new AccountCreated(data.getEmail(), new Date()));
+    return BaseResponse.of(201, new PostAccountResponse(data.getEmail(), data.getCreatedAt()));
   }
 
   // 회원 탈퇴
@@ -40,10 +40,10 @@ class AccountController {
   }
 
   @PatchMapping("/me/password")
-  ResponseEntity<ResponseWrapper<Account>> changePassword(
-      @AuthenticationPrincipal Account account, @RequestBody ChangePasswordRequestDto reqBody) {
+  ResponseEntity<ResponseWrapper<PatchAccountMePasswordResponse>> changePassword(
+      @AuthenticationPrincipal Account account, @RequestBody PatchAccountPasswordRequest reqBody) {
     var response = service.patchAccountPassword(account.getId(), reqBody.password());
     authService.revokeRefreshToken(account);
-    return BaseResponse.of(200, response);
+    return BaseResponse.of(200, new PatchAccountMePasswordResponse(response.getUpdatedAt()));
   }
 }

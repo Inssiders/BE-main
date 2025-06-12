@@ -1,18 +1,18 @@
 package com.inssider.api.domains.auth;
 
 import com.inssider.api.domains.account.Account;
-import com.inssider.api.domains.auth.AuthRequestsDto.LoginRequest;
-import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
-import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
-import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenRequest;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailChallengeResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailVerifyResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 
 public interface AuthService {
 
-  EmailCodeResponse challengeEmail(String email);
+  AuthEmailChallengeResponse challengeEmail(String email);
 
-  EmailVerificationResponse verifyEmail(String email, String otp);
+  AuthEmailVerifyResponse verifyEmail(String email, String otp);
 
-  TokenResponse createTokens(LoginRequest request);
+  AuthTokenResponse createTokens(AuthTokenRequest request);
 
   void revokeRefreshToken(Account account);
 }

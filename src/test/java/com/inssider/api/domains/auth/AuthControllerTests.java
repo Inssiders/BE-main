@@ -17,11 +17,11 @@ import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.account.AccountTestRepository;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
-import com.inssider.api.domains.auth.AuthRequestsDto.EmailChallengeRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.EmailVerifyRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.PasswordLoginRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.TokenRefreshLoginRequest;
-import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthEmailChallengeRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthEmailVerifyRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithPasswordRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithRefreshTokenRequest;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 import com.inssider.api.domains.auth.code.AuthorizationCodeTestRepository;
 import com.inssider.api.domains.auth.code.EmailAuthenticationCodeTestRepository;
 import java.util.UUID;
@@ -62,7 +62,7 @@ class AuthControllerTests {
 
     // 1. 이메일 인증 요청
     {
-      var request = new EmailChallengeRequest(email);
+      var request = new AuthEmailChallengeRequest(email);
       controller.challengeEmailAuth(request);
     }
     assertEquals(1, emailAuthenticationCodeRepository.count());
@@ -73,7 +73,7 @@ class AuthControllerTests {
     // 3. 이메일 인증 확인 및 authorization code 획득
     UUID authorizationCode;
     {
-      var request = new EmailVerifyRequest(email, emailCode);
+      var request = new AuthEmailVerifyRequest(email, emailCode);
       var response = controller.verifyEmailAuth(request).getBody().data();
       authorizationCode = response.authorization_code();
     }
@@ -84,7 +84,7 @@ class AuthControllerTests {
     // 4. authorization code로 토큰 생성
     {
       var request =
-          new AuthRequestsDto.AuthorizationCodeLoginRequest(
+          new AuthRequestsDto.AuthTokenWithAuthorizationCodeRequest(
               GrantType.AUTHORIZATION_CODE, authorizationCode);
       var response = controller.createToken(request).getBody().data();
       assertNotNull(response.accessToken());
@@ -105,7 +105,7 @@ class AuthControllerTests {
 
     // 1. 로그인 요청
     {
-      var request = new PasswordLoginRequest(GrantType.PASSWORD, email, plainPassword);
+      var request = new AuthTokenWithPasswordRequest(GrantType.PASSWORD, email, plainPassword);
       var response = controller.createToken(request).getBody().data();
       assertNotNull(response.accessToken());
       assertNotNull(response.refreshToken());
@@ -132,7 +132,7 @@ class AuthControllerTests {
     // 1. 로그인 요청
     String accessToken;
     {
-      var request = new PasswordLoginRequest(GrantType.PASSWORD, email, plainPassword);
+      var request = new AuthTokenWithPasswordRequest(GrantType.PASSWORD, email, plainPassword);
       var response = controller.createToken(request).getBody().data();
       accessToken = response.accessToken();
     }
@@ -149,9 +149,10 @@ class AuthControllerTests {
     // 3. 로그아웃 후 이전 access_token으로 회원탈퇴 요청 시 예외 발생 확인
     // [ ] token temporal blacklist
     // {
-    //   mockMvc
-    //       .perform(delete("/api/accounts/me").header("Authorization", "Bearer " + accessToken))
-    //       .andExpect(status().is4xxClientError());
+    // mockMvc
+    // .perform(delete("/api/accounts/me").header("Authorization", "Bearer " +
+    // accessToken))
+    // .andExpect(status().is4xxClientError());
     // }
   }
 
@@ -170,7 +171,7 @@ class AuthControllerTests {
     String accessToken;
     String refreshToken;
     {
-      var request = new PasswordLoginRequest(GrantType.PASSWORD, email, plainPassword);
+      var request = new AuthTokenWithPasswordRequest(GrantType.PASSWORD, email, plainPassword);
       var response = controller.createToken(request).getBody().data();
       accessToken = response.accessToken();
       refreshToken = response.refreshToken();
@@ -181,7 +182,8 @@ class AuthControllerTests {
     // 2. 토큰 재발급 요청
     {
       var request =
-          new TokenRefreshLoginRequest(GrantType.REFRESH_TOKEN, refreshToken, "inssider-app");
+          new AuthTokenWithRefreshTokenRequest(
+              GrantType.REFRESH_TOKEN, refreshToken, "inssider-app");
 
       // var response = controller.createToken(request).getBody().data();
       var rawResponse =
@@ -195,7 +197,7 @@ class AuthControllerTests {
               .andReturn()
               .getResponse()
               .getContentAsString();
-      TokenResponse response = objectMapper.readValue(rawResponse, TokenResponse.class);
+      AuthTokenResponse response = objectMapper.readValue(rawResponse, AuthTokenResponse.class);
       var newAccessToken = response.accessToken();
       var newRefreshToken = response.refreshToken();
 

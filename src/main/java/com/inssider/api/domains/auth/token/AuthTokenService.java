@@ -1,17 +1,17 @@
 package com.inssider.api.domains.auth.token;
 
 import com.inssider.api.domains.account.Account;
-import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.NonNull;
 
 public interface AuthTokenService {
-  TokenResponse permitTokensByPassword(String email, String rawPassword);
+  AuthTokenResponse permitTokensByPassword(String email, String rawPassword);
 
-  TokenResponse permitTokensByRefreshToken(String refreshToken);
+  AuthTokenResponse permitTokensByRefreshToken(String refreshToken);
 
-  TokenResponse permitTokensByAuthorizationCode(UUID uuid);
+  AuthTokenResponse permitTokensByAuthorizationCode(UUID uuid);
 
   /**
    * 계정의 Refresh Token을 무효화합니다.

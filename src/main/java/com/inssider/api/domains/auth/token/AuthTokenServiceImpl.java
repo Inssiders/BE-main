@@ -7,7 +7,7 @@ import static com.inssider.api.domains.auth.AuthDataTypes.GrantType.REFRESH_TOKE
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountAuthenticator;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
-import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -52,7 +52,8 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws NoSuchElementException 사용자를 찾을 수 없는 경우
    */
   @Override
-  public TokenResponse permitTokensByPassword(@NonNull String email, @NonNull String rawPassword) {
+  public AuthTokenResponse permitTokensByPassword(
+      @NonNull String email, @NonNull String rawPassword) {
     var account = authenticator.authenticate(email, rawPassword);
     return generateTokenResponse(PASSWORD, account);
   }
@@ -66,7 +67,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws NoSuchElementException 토큰과 연관된 계정을 찾을 수 없는 경우
    */
   @Override
-  public TokenResponse permitTokensByRefreshToken(@NonNull String refreshToken) {
+  public AuthTokenResponse permitTokensByRefreshToken(@NonNull String refreshToken) {
     Account account = authenticator.getAccountFromToken(refreshToken);
 
     // 저장된 토큰과 일치하는지 검증
@@ -87,8 +88,8 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws IllegalArgumentException 인증 코드가 유효하지 않은 경우
    */
   @Override
-  public TokenResponse permitTokensByAuthorizationCode(UUID authorizationCode) {
-    Account account = authenticator.redeemAuthorizationCode(authorizationCode);
+  public AuthTokenResponse permitTokensByAuthorizationCode(UUID authorizationCode) {
+    Account account = authenticator.redeemAuthorizationCode(authorizationCode).orElse(null);
     return generateTokenResponse(AUTHORIZATION_CODE, account);
   }
 
@@ -126,11 +127,11 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @param account 토큰을 발급받을 계정
    * @return Grant Type에 맞는 토큰 응답
    */
-  TokenResponse generateTokenResponse(GrantType grantType, Account account) {
+  AuthTokenResponse generateTokenResponse(GrantType grantType, Account account) {
     return switch (grantType) {
       case AUTHORIZATION_CODE -> {
         String accessToken = generateToken(account, accessTokenExpiration, "single_access");
-        yield new TokenResponse(accessToken, null, "Bearer", accessTokenExpiration);
+        yield new AuthTokenResponse(accessToken, null, "Bearer", accessTokenExpiration);
       }
       case PASSWORD, REFRESH_TOKEN -> {
         // 1. generate new tokens
@@ -140,7 +141,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
         // 2. create or update refresh token
         createOrUpdateRefreshToken(account, refreshToken);
 
-        yield new TokenResponse(accessToken, refreshToken, "Bearer", accessTokenExpiration);
+        yield new AuthTokenResponse(accessToken, refreshToken, "Bearer", accessTokenExpiration);
       }
     };
   }
@@ -184,7 +185,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    */
   String generateToken(Account account, long expiration, String tokenType) {
     Instant now = Instant.now();
-    Long accountId = account.getId();
+    Long accountId = account == null ? 0 : account.getId();
 
     JwtClaimsSet claims =
         JwtClaimsSet.builder()

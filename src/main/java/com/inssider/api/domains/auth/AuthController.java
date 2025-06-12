@@ -3,12 +3,12 @@ package com.inssider.api.domains.auth;
 import com.inssider.api.common.response.BaseResponse;
 import com.inssider.api.common.response.BaseResponse.ResponseWrapper;
 import com.inssider.api.domains.account.Account;
-import com.inssider.api.domains.auth.AuthRequestsDto.EmailChallengeRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.EmailVerifyRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.LoginRequest;
-import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
-import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
-import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthEmailChallengeRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthEmailVerifyRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenRequest;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailChallengeResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailVerifyResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 import com.inssider.api.domains.auth.AuthSwaggerExamples.LoginExamples;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -30,23 +30,23 @@ class AuthController {
 
   // 이메일 인증코드 발송
   @PostMapping("/email/challenge")
-  public ResponseEntity<ResponseWrapper<EmailCodeResponse>> challengeEmailAuth(
-      @RequestBody EmailChallengeRequest request) {
+  public ResponseEntity<ResponseWrapper<AuthEmailChallengeResponse>> challengeEmailAuth(
+      @RequestBody AuthEmailChallengeRequest request) {
     var body = authService.challengeEmail(request.email());
     return BaseResponse.of(200, body);
   }
 
   // 이메일 인증코드 검증
   @PostMapping("/email/verify")
-  public ResponseEntity<ResponseWrapper<EmailVerificationResponse>> verifyEmailAuth(
-      @RequestBody EmailVerifyRequest request) {
+  public ResponseEntity<ResponseWrapper<AuthEmailVerifyResponse>> verifyEmailAuth(
+      @RequestBody AuthEmailVerifyRequest request) {
     var body = authService.verifyEmail(request.email(), request.otp());
     return BaseResponse.of(200, body);
   }
 
   // 일회용 로그인 / 토큰 발급 / 토큰 재발급
   @PostMapping("/token")
-  public ResponseEntity<ResponseWrapper<TokenResponse>> createToken(
+  public ResponseEntity<ResponseWrapper<AuthTokenResponse>> createToken(
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
               content =
                   @Content(
@@ -66,7 +66,7 @@ class AuthController {
                             value = LoginExamples.AUTHORIZATION_CODE_VALUE),
                       }))
           @RequestBody
-          LoginRequest request) {
+          AuthTokenRequest request) {
     return BaseResponse.of(200, authService.createTokens(request));
   }
 

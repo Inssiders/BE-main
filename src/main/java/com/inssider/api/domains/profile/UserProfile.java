@@ -3,10 +3,10 @@ package com.inssider.api.domains.profile;
 import com.inssider.api.common.model.SoftDeleteable;
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.profile.UserProfileDataTypes.ProfileContext;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.OwnerUserProfile;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.PrivateUserProfile;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.PublicUserProfile;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.UserProfileDto;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetPrivateProfileResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetProfileMeResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetProfileResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetPublicProfileResponse;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -50,19 +50,21 @@ public class UserProfile extends SoftDeleteable {
    *
    * @return 변환된 UserProfileDto 객체
    */
-  UserProfileDto convertToDto(ProfileContext context) {
+  GetProfileResponse convertToDto(ProfileContext context) {
     return switch (context) {
-      case SELF -> new OwnerUserProfile(nickname, profileUrl, bio, accountVisible, followerVisible);
+      case SELF ->
+          new GetProfileMeResponse(nickname, profileUrl, bio, accountVisible, followerVisible);
       default -> convertToDto();
     };
   }
 
-  UserProfileDto convertToDto() {
+  GetProfileResponse convertToDto() {
     var accessLevel = isAccountVisible() ? ProfileContext.PUBLIC : ProfileContext.PRIVATE;
     return switch (accessLevel) {
-      case PRIVATE -> new PrivateUserProfile(nickname, profileUrl);
-      case PUBLIC -> new PublicUserProfile(nickname, profileUrl, bio);
-      case SELF -> new OwnerUserProfile(nickname, profileUrl, bio, accountVisible, followerVisible);
+      case PRIVATE -> new GetPrivateProfileResponse(nickname, profileUrl);
+      case PUBLIC -> new GetPublicProfileResponse(nickname, profileUrl, bio);
+      case SELF ->
+          new GetProfileMeResponse(nickname, profileUrl, bio, accountVisible, followerVisible);
     };
   }
 }

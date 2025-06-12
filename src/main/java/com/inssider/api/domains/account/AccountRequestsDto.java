@@ -6,10 +6,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 
 public class AccountRequestsDto {
-  public record RegisterRequestDto(
+  public record PostAccountRequest(
       RegisterType registerType,
       @Email(regexp = Util.EMAIL_REGEX) String email,
       @Pattern(regexp = Util.PASSWORD_REGEX) String password) {}
 
-  public record ChangePasswordRequestDto(@Pattern(regexp = Util.PASSWORD_REGEX) String password) {}
+  public record PatchAccountPasswordRequest(
+      @Pattern(regexp = Util.PASSWORD_REGEX) String password) {}
 }

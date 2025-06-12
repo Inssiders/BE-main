@@ -12,9 +12,9 @@ import java.util.UUID;
 
 public class AuthRequestsDto {
 
-  public record EmailChallengeRequest(String email) {}
+  public record AuthEmailChallengeRequest(String email) {}
 
-  public record EmailVerifyRequest(String email, String otp) {}
+  public record AuthEmailVerifyRequest(String email, String otp) {}
 
   @JsonTypeInfo(
       use = JsonTypeInfo.Id.NAME,
@@ -22,30 +22,32 @@ public class AuthRequestsDto {
       property = "grantType",
       visible = true)
   @JsonSubTypes({
-    @JsonSubTypes.Type(value = PasswordLoginRequest.class, name = "PASSWORD"),
-    @JsonSubTypes.Type(value = TokenRefreshLoginRequest.class, name = "REFRESH_TOKEN"),
-    @JsonSubTypes.Type(value = AuthorizationCodeLoginRequest.class, name = "EMAIL")
+    @JsonSubTypes.Type(value = AuthTokenWithPasswordRequest.class, name = "PASSWORD"),
+    @JsonSubTypes.Type(value = AuthTokenWithRefreshTokenRequest.class, name = "REFRESH_TOKEN"),
+    @JsonSubTypes.Type(value = AuthTokenWithAuthorizationCodeRequest.class, name = "EMAIL")
   })
-  public sealed interface LoginRequest
-      permits PasswordLoginRequest, TokenRefreshLoginRequest, AuthorizationCodeLoginRequest {
+  public sealed interface AuthTokenRequest
+      permits AuthTokenWithPasswordRequest,
+          AuthTokenWithRefreshTokenRequest,
+          AuthTokenWithAuthorizationCodeRequest {
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     GrantType grantType();
   }
 
-  public record PasswordLoginRequest(
+  public record AuthTokenWithPasswordRequest(
       @Schema(allowableValues = GRANT_TYPE_PASSWORD) GrantType grantType,
       String email,
       String password)
-      implements LoginRequest {}
+      implements AuthTokenRequest {}
 
-  public record TokenRefreshLoginRequest(
+  public record AuthTokenWithRefreshTokenRequest(
       @Schema(allowableValues = GRANT_TYPE_REFRESH_TOKEN) GrantType grantType,
       String refreshToken,
       String clientId)
-      implements LoginRequest {}
+      implements AuthTokenRequest {}
 
-  public record AuthorizationCodeLoginRequest(
+  public record AuthTokenWithAuthorizationCodeRequest(
       @Schema(allowableValues = GRANT_TYPE_AUTHORIZATION_CODE) GrantType grantType, UUID uuid)
-      implements LoginRequest {}
+      implements AuthTokenRequest {}
 }
