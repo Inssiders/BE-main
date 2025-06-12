@@ -1,28 +1,16 @@
 package com.inssider.api.domains.post.controller;
 
 import com.inssider.api.common.response.BaseResponse;
-import com.inssider.api.domains.post.dto.PostCreateRequestDTO;
-import com.inssider.api.domains.post.dto.PostDeleteResponseDTO;
-import com.inssider.api.domains.post.dto.PostGetDetailResponseDTO;
-import com.inssider.api.domains.post.dto.PostGetIdResponseDTO;
-import com.inssider.api.domains.post.dto.PostResponseDTO;
-import com.inssider.api.domains.post.dto.PostUpdateRequestDTO;
-import com.inssider.api.domains.post.dto.PostUpdateResponseDTO;
+import com.inssider.api.domains.post.dto.*;
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RestController
@@ -64,6 +52,13 @@ public class PostController {
   ResponseEntity<BaseResponse.ResponseWrapper<List<PostGetIdResponseDTO>>> getIds(
       @RequestParam(value = "since", required = false) LocalDate since) {
     List<PostGetIdResponseDTO> data = postService.getIds(since);
+    return BaseResponse.of(200, data);
+  }
+
+  @GetMapping
+  public ResponseEntity<BaseResponse.ResponseWrapper<PostCursorResponseDTO>> get(
+      @ParameterObject PostCursorRequestDTO request) {
+    PostCursorResponseDTO data = postService.get(request);
     return BaseResponse.of(200, data);
   }
 }
