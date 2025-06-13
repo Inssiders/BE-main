@@ -16,15 +16,15 @@ public class AuthRequestsDto {
 
   public record AuthEmailVerifyRequest(String email, String otp) {}
 
-  @JsonTypeInfo(
-      use = JsonTypeInfo.Id.NAME,
-      include = JsonTypeInfo.As.PROPERTY,
-      property = "grantType",
-      visible = true)
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, visible = true)
   @JsonSubTypes({
-    @JsonSubTypes.Type(value = AuthTokenWithPasswordRequest.class, name = "PASSWORD"),
-    @JsonSubTypes.Type(value = AuthTokenWithRefreshTokenRequest.class, name = "REFRESH_TOKEN"),
-    @JsonSubTypes.Type(value = AuthTokenWithAuthorizationCodeRequest.class, name = "EMAIL")
+    @JsonSubTypes.Type(value = AuthTokenWithPasswordRequest.class, name = GRANT_TYPE_PASSWORD),
+    @JsonSubTypes.Type(
+        value = AuthTokenWithRefreshTokenRequest.class,
+        name = GRANT_TYPE_REFRESH_TOKEN),
+    @JsonSubTypes.Type(
+        value = AuthTokenWithAuthorizationCodeRequest.class,
+        name = GRANT_TYPE_AUTHORIZATION_CODE)
   })
   public sealed interface AuthTokenRequest
       permits AuthTokenWithPasswordRequest,
@@ -35,19 +35,12 @@ public class AuthRequestsDto {
     GrantType grantType();
   }
 
-  public record AuthTokenWithPasswordRequest(
-      @Schema(allowableValues = GRANT_TYPE_PASSWORD) GrantType grantType,
-      String email,
-      String password)
+  public record AuthTokenWithPasswordRequest(GrantType grantType, String email, String password)
       implements AuthTokenRequest {}
 
   public record AuthTokenWithRefreshTokenRequest(
-      @Schema(allowableValues = GRANT_TYPE_REFRESH_TOKEN) GrantType grantType,
-      String refreshToken,
-      String clientId)
-      implements AuthTokenRequest {}
+      GrantType grantType, String refreshToken, String clientId) implements AuthTokenRequest {}
 
-  public record AuthTokenWithAuthorizationCodeRequest(
-      @Schema(allowableValues = GRANT_TYPE_AUTHORIZATION_CODE) GrantType grantType, UUID uuid)
+  public record AuthTokenWithAuthorizationCodeRequest(GrantType grantType, UUID uuid)
       implements AuthTokenRequest {}
 }
