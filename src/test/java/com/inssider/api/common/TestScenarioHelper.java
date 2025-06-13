@@ -169,13 +169,14 @@ public class TestScenarioHelper {
     return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
   }
 
-  public String getSingleAccessToken() {
+  public String getSingleAccessToken(String email) {
     Instant now = Instant.now();
     JwtClaimsSet claims =
         JwtClaimsSet.builder()
             .issuer("api.inssider.com")
             .issuedAt(now)
             .audience(List.of("inssider-app"))
+            .subject(email)
             .expiresAt(now.plus(600, ChronoUnit.SECONDS))
             .claim("type", "single_access")
             .id(UUID.randomUUID().toString())

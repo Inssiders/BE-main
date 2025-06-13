@@ -44,7 +44,7 @@ class AccountControllerTest {
   void 회원가입() throws Exception {
     // given
     Account account = Util.accountGenerator().get();
-    String accessToken = helper.getSingleAccessToken();
+    String accessToken = helper.getSingleAccessToken(account.getEmail());
 
     // when
     assertDoesNotThrow(
