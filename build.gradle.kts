@@ -5,8 +5,27 @@ plugins {
     id("com.diffplug.spotless") version "7.0.4"
 }
 
+val gitTag: String? =
+    try {
+        "git describe --tags".runCommand()?.trim()
+    } catch (e: Exception) {
+        null
+    }
+
+// git 명령어 실행 함수
+fun String.runCommand(): String? =
+    ProcessBuilder(*split(" ").toTypedArray())
+        .directory(rootDir)
+        .redirectErrorStream(true)
+        .start()
+        .inputStream
+        .bufferedReader()
+        .readText()
+
+val versionTag = gitTag?.takeIf { it.startsWith("v") }?.removePrefix("v") ?: "0.0.10-SNAPSHOT"
+
 group = "com.inssider"
-version = "0.0.10-SNAPSHOT"
+version = versionTag
 
 springBoot {
     buildInfo()
@@ -45,6 +64,8 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
 
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
 

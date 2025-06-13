@@ -17,9 +17,9 @@ public class Util {
 
   private static final Random random = new SecureRandom();
 
-  private static final String EMAIL_REGEX =
+  public static final String EMAIL_REGEX =
       "^(?!.*\\.\\.)[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?@(?:(?!-)[a-z0-9-]{2,}(?<!-)\\.)+[a-z]{2,}$";
-  private static final String PASSWORD_REGEX =
+  public static final String PASSWORD_REGEX =
       "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s])\\S{8,64}$";
 
   public static URI buildAbsoluteUri(String path) {

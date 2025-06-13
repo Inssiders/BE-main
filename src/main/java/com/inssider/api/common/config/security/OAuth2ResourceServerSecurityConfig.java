@@ -28,8 +28,8 @@ class OAuth2ResourceServerSecurityConfig {
             matchers ->
                 matchers
                     .requestMatchers(getSystemPublicPaths())
-                    .requestMatchers(HttpMethod.POST, getAuthPublicPaths())
-                    .requestMatchers(HttpMethod.GET, getReadOnlyPublicPaths()))
+                    .requestMatchers(HttpMethod.POST, publicPostPaths())
+                    .requestMatchers(HttpMethod.GET, publicGetPaths()))
         .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
         .httpBasic(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
@@ -59,15 +59,14 @@ class OAuth2ResourceServerSecurityConfig {
     return new String[] {"/", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health"};
   }
 
-  /** 인증 관련 공개 API 경로 반환 (POST 메서드) */
-  private String[] getAuthPublicPaths() {
+  private String[] publicPostPaths() {
     return new String[] {"/api/auth/email/challenge", "/api/auth/email/verify", "/api/auth/token"};
   }
 
-  /** 읽기 전용 공개 API 경로 반환 (GET 메서드) */
-  private String[] getReadOnlyPublicPaths() {
+  private String[] publicGetPaths() {
     return new String[] {
       "/api/accounts",
+      "/api/accounts/{email}",
       "/api/profiles",
       "/api/profiles/index",
       "/api/profiles/{id}",

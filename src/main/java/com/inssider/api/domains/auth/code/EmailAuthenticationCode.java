@@ -5,7 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
-import jakarta.persistence.PostPersist;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class EmailAuthenticationCode {
   @Column(nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
-  @Column(updatable = false)
+  @Column(nullable = false, updatable = false)
   private LocalDateTime expiredAt;
 
   public EmailAuthenticationCode(String email) {
@@ -36,7 +36,7 @@ public class EmailAuthenticationCode {
     this.code = Util.codeGenerator().get();
   }
 
-  @PostPersist
+  @PrePersist
   private void setExpiredAt() {
     this.expiredAt = this.createdAt.plusMinutes(5);
   }

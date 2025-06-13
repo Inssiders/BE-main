@@ -10,10 +10,7 @@ import java.util.Optional;
 public interface AccountService
     extends BaseCRUDService<Account, Long, @lombok.NonNull AccountRepository> {
 
-  Account register(RegisterType registerType, String email, String password)
-      throws IllegalArgumentException;
-
-  Account register(Account account) throws IllegalArgumentException;
+  Account register(RegisterType registerType, String email, String password);
 
   Account patchAccountPassword(Long id, String newPassword) throws NoSuchElementException;
 

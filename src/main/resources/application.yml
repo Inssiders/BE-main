@@ -1,9 +1,16 @@
 # https://docs.spring.io/spring-boot/appendix/application-properties
 server.port: ${APP_PORT}
 
+management:
+  info:
+    build:
+      enabled: true
+
 spring:
   application:
     name: inssider-main
+  config:
+    import: optional:classpath:META-INF/build-info.properties
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -12,6 +19,17 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
     time-zone: Asia/Seoul
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${APP_EMAIL}
+    password: ${APP_EMAIL_PASSWORD}
+    properties:
+      "[mail.smtp.auth]": true
+      "[mail.smtp.starttls.enable]": true
+      "[mail.smtp.connectiontimeout]": 10000
+      "[mail.smtp.timeout]": 10000
+      "[mail.smtp.writetimeout]": 10000
 
 spring.jpa:
   open-in-view: false

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountAuthenticator;
+import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ class UtilTest {
     {
       Account account = Util.accountGenerator().get();
       expected = account.getPassword();
-      var entity = accountService.register(account);
+      var entity = register(account);
       actual = entity.getPassword();
     }
     assertTrue(passwordEncoder.matches(expected, actual));
@@ -45,7 +46,7 @@ class UtilTest {
       Account account = Util.accountGenerator().get();
       email = account.getEmail();
       plainPassword = account.getPassword();
-      accountService.register(account);
+      register(account);
     }
     assertNotNull(authenticator.authenticate(email, plainPassword));
   }
@@ -69,5 +70,10 @@ class UtilTest {
 
     String rehashedPassword = passwordEncoder.encode(plainPassword);
     assertTrue(passwordEncoder.matches(plainPassword, rehashedPassword));
+  }
+
+  private Account register(Account account) {
+    return accountService.register(
+        RegisterType.PASSWORD, account.getEmail(), account.getPassword());
   }
 }

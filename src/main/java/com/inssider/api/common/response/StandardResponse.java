@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 
 public class StandardResponse {
 
-  public record IndexResponse(List<Long> index) {}
+  public record GetIndexResponse(List<Long> index) {}
 
   public record Pagination(
       int limit,
