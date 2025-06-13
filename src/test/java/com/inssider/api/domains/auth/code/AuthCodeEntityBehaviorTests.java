@@ -2,6 +2,8 @@ package com.inssider.api.domains.auth.code;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.inssider.api.common.Util;
 import org.junit.jupiter.api.Test;
@@ -10,11 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-class EmailCodeEntityBehaviorTests {
+class AuthCodeEntityBehaviorTests {
 
   @Autowired private AuthCodeService service;
 
   @Autowired private EmailAuthenticationCodeTestRepository emailAuthenticationCodeRepository;
+  @Autowired private AuthorizationCodeTestRepository authorizationCodeRepository;
 
   @Test
   @Transactional
@@ -40,5 +43,13 @@ class EmailCodeEntityBehaviorTests {
 
     service.verifyEmail(email, newCode);
     assertEquals(0, emailAuthenticationCodeRepository.count());
+  }
+
+  @Test
+  @Transactional
+  void 인가_코드_자동_속성() {
+    var entity = authorizationCodeRepository.save(new AuthorizationCode());
+    assertNotNull(entity.getId());
+    assertTrue(entity.getExpiredAt().isAfter(entity.getCreatedAt()));
   }
 }
