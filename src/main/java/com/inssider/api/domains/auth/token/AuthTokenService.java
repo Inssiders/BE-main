@@ -4,7 +4,6 @@ import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import lombok.NonNull;
 
 public interface AuthTokenService {
   AuthTokenResponse permitTokensByPassword(String email, String rawPassword);
@@ -20,8 +19,7 @@ public interface AuthTokenService {
    * @throws NullPointerException account가 null인 경우
    * @throws IllegalArgumentException 계정에 Refresh Token이 없는 경우
    */
-  void revokeRefreshToken(@NonNull Account account)
-      throws NullPointerException, IllegalArgumentException;
+  void revokeRefreshToken(Account account) throws NullPointerException, IllegalArgumentException;
 
   /**
    * 토큰 문자열을 사용하여 해당 Refresh Token을 무효화합니다.

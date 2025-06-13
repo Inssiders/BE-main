@@ -60,14 +60,13 @@ class OAuth2ResourceServerSecurityConfig {
   }
 
   private String[] publicPostPaths() {
-    return new String[] {
-      "/api/auth/email/challenge", "/api/auth/email/verify", "/api/auth/token", "/api/accounts"
-    };
+    return new String[] {"/api/auth/email/challenge", "/api/auth/email/verify", "/api/auth/token"};
   }
 
   private String[] publicGetPaths() {
     return new String[] {
       "/api/accounts",
+      // email 중복 확인 엔드포인트
       "/api/profiles",
       "/api/profiles/index",
       "/api/profiles/{id}",

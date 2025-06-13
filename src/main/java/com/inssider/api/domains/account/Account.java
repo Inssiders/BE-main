@@ -49,6 +49,7 @@ public class Account extends SoftDeleteable {
 
   @NonNull
   @Column(unique = true)
+  // [ ] index
   private String email;
 
   @NonNull

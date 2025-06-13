@@ -1,8 +1,8 @@
 package com.inssider.api.domains.account;
 
 import com.inssider.api.domains.auth.code.AuthCodeService;
-import com.inssider.api.domains.auth.code.AuthorizationCode;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,9 +34,9 @@ public class AccountAuthenticator {
     return account;
   }
 
-  public Account redeemAuthorizationCode(UUID authCodeId) throws NoSuchElementException {
-    AuthorizationCode code = authCodeService.consume(authCodeId);
-    return repository.findByEmail(code.getEmail()).orElseThrow();
+  public Optional<Account> redeemAuthorizationCode(UUID authCodeId) {
+    var entity = authCodeService.redeem(authCodeId);
+    return repository.findByEmail(entity.getEmail());
   }
 
   public Account getAccountFromToken(String token) throws NoSuchElementException {

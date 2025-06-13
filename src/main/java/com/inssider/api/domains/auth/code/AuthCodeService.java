@@ -8,7 +8,7 @@ public interface AuthCodeService {
 
   AuthEmailChallengeResponse challengeEmail(String email);
 
-  AuthEmailVerifyResponse verifyEmail(String email, String code);
+  AuthEmailVerifyResponse verifyEmail(String email, String otp);
 
-  AuthorizationCode consume(UUID authorizationCode);
+  AuthorizationCode redeem(UUID authCodeId);
 }

@@ -30,8 +30,7 @@ public interface SoftDeleteRepository<T extends SoftDeleteable, ID> extends JpaR
   @Transactional
   @Modifying
   @Query(
-      "UPDATE #{#entityName} e SET e.isDeleted = true, e.deletedAt = CURRENT_TIMESTAMP WHERE"
-          + " e.id = ?1")
+      "UPDATE #{#entityName} e SET e.isDeleted = true, e.deletedAt = CURRENT_TIMESTAMP WHERE e.id = ?1")
   void softDelete(ID id);
 
   @Query("SELECT e FROM #{#entityName} e")
