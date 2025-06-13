@@ -2,6 +2,8 @@
 server.port: ${APP_PORT}
 
 management:
+  server:
+    base-path: /actuator
   info:
     build:
       enabled: true
@@ -36,10 +38,6 @@ spring.jpa:
   hibernate:
     ddl-auto: none
     naming.physical-strategy: com.inssider.api.common.config.PluralSnakeCaseNamingStrategy
-
-management:
-  server:
-    base-path: /actuator
 
 # https://springdoc.org/properties.html#_swagger_ui_properties
 springdoc:
