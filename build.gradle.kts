@@ -5,8 +5,22 @@ plugins {
     id("com.diffplug.spotless") version "7.0.4"
 }
 
+val envFile = file(".env.prod")
+val envProps = mutableMapOf<String, String>()
+
+if (envFile.exists()) {
+    envFile.readLines()
+        .filter { it.contains("=") && !it.trim().startsWith("#") }
+        .forEach {
+            val (key, value) = it.split("=", limit = 2)
+            envProps[key.trim()] = value.trim()
+        }
+}
+
+val imageTagVersion = envProps["IMAGE_TAG"] ?: "0.0.10-SNAPSHOT"
+
 group = "com.inssider"
-version = "0.0.10-SNAPSHOT"
+version = imageTagVersion
 
 springBoot {
     buildInfo()

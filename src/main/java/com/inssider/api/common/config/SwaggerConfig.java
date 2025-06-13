@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,6 +25,9 @@ import org.springframework.web.method.HandlerMethod;
 
 @Configuration
 class SwaggerConfig {
+
+  @Value("${build.version:unknown}")
+  private String buildVersion;
 
   @Bean
   @Primary
@@ -39,7 +43,7 @@ class SwaggerConfig {
         .info(
             new Info()
                 .title("Inssider API")
-                .version("0.0.10-SNAPSHOT")
+                .version(buildVersion)
                 .description("Inssider API Documentation"))
         .components(components());
   }
