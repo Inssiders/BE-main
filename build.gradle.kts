@@ -22,8 +22,10 @@ fun String.runCommand(): String? =
         .bufferedReader()
         .readText()
 
+val versionTag = gitTag?.takeIf { it.startsWith("v") }?.removePrefix("v") ?: "0.0.10-SNAPSHOT"
+
 group = "com.inssider"
-version = gitTag?.removePrefix("v") ?: "0.0.1-SNAPSHOT"
+version = versionTag
 
 springBoot {
     buildInfo()
