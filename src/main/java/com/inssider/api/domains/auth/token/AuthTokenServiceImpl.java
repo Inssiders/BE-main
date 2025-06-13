@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -52,8 +51,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws NoSuchElementException 사용자를 찾을 수 없는 경우
    */
   @Override
-  public AuthTokenResponse permitTokensByPassword(
-      @NonNull String email, @NonNull String rawPassword) {
+  public AuthTokenResponse permitTokensByPassword(String email, String rawPassword) {
     var account = authenticator.authenticate(email, rawPassword);
     return generateTokenResponse(PASSWORD, account);
   }
@@ -67,7 +65,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws NoSuchElementException 토큰과 연관된 계정을 찾을 수 없는 경우
    */
   @Override
-  public AuthTokenResponse permitTokensByRefreshToken(@NonNull String refreshToken) {
+  public AuthTokenResponse permitTokensByRefreshToken(String refreshToken) {
     Account account = authenticator.getAccountFromToken(refreshToken);
 
     // 저장된 토큰과 일치하는지 검증
@@ -89,6 +87,8 @@ class AuthTokenServiceImpl implements AuthTokenService {
    */
   @Override
   public AuthTokenResponse permitTokensByAuthorizationCode(UUID authorizationCode) {
+    // 비밀번호 찾기를 위해 인증 코드가 사용되었다면 계정 정보를 찾을 수 있지만
+    // 초기에 회원가입을 진행을 위해 사용되었다면 계정 정보가 없을 수 있습니다.
     Account account = authenticator.redeemAuthorizationCode(authorizationCode).orElse(null);
     return generateTokenResponse(AUTHORIZATION_CODE, account);
   }
@@ -101,7 +101,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws IllegalArgumentException 계정에 Refresh Token이 없는 경우
    */
   @Override
-  public void revokeRefreshToken(@NonNull Account account)
+  public void revokeRefreshToken(Account account)
       throws NullPointerException, IllegalArgumentException {
     RefreshToken refreshToken = account.getRefreshToken();
     refreshTokenRepository.delete(refreshToken);
@@ -130,7 +130,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
   AuthTokenResponse generateTokenResponse(GrantType grantType, Account account) {
     return switch (grantType) {
       case AUTHORIZATION_CODE -> {
-        String accessToken = generateToken(account, accessTokenExpiration, "single_access");
+        String accessToken = generateSingleAccessToken(accessTokenExpiration);
         yield new AuthTokenResponse(accessToken, null, "Bearer", accessTokenExpiration);
       }
       case PASSWORD, REFRESH_TOKEN -> {
@@ -154,7 +154,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @param account Refresh Token을 연결할 계정
    * @param refreshToken 새로 생성된 Refresh Token 문자열
    */
-  void createOrUpdateRefreshToken(@NonNull Account account, @NonNull String refreshToken) {
+  void createOrUpdateRefreshToken(Account account, String refreshToken) {
     RefreshToken entity =
         Optional.ofNullable(account.getRefreshToken())
             .map(
@@ -185,7 +185,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    */
   String generateToken(Account account, long expiration, String tokenType) {
     Instant now = Instant.now();
-    Long accountId = account == null ? 0 : account.getId();
+    Long accountId = account.getId();
 
     JwtClaimsSet claims =
         JwtClaimsSet.builder()
@@ -195,6 +195,23 @@ class AuthTokenServiceImpl implements AuthTokenService {
             .subject(String.valueOf(accountId))
             .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
             .claim("type", tokenType)
+            .id(UUID.randomUUID().toString())
+            .build();
+
+    var token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    return token;
+  }
+
+  String generateSingleAccessToken(long expiration) {
+    Instant now = Instant.now();
+
+    JwtClaimsSet claims =
+        JwtClaimsSet.builder()
+            .issuer("api.inssider.com")
+            .issuedAt(now)
+            .audience(List.of("inssider-app"))
+            .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
+            .claim("type", "single_access")
             .id(UUID.randomUUID().toString())
             .build();
 

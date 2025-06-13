@@ -4,7 +4,6 @@ import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailChallengeResponse
 import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailVerifyResponse;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ class AuthCodeServiceImpl implements AuthCodeService {
   }
 
   @Override
-  public AuthEmailVerifyResponse verifyEmail(@NonNull String email, @NonNull String code) {
+  public AuthEmailVerifyResponse verifyEmail(String email, String otp) {
     var entity =
         emailCodeRepository
             .findById(email)
@@ -38,28 +37,37 @@ class AuthCodeServiceImpl implements AuthCodeService {
       throw new IllegalArgumentException("이메일 인증 코드가 만료되었습니다.");
     }
 
-    if (!entity.getCode().equals(code)) {
+    if (!entity.getCode().equals(otp)) {
       throw new IllegalArgumentException("유효하지 않은 이메일 인증 코드입니다.");
     }
 
     emailCodeRepository.deleteById(email);
 
     // Create and save AuthorizationCode entity
-    var authCode = new AuthorizationCode(email);
-    var savedAuthCode = authorizationCodeRepository.save(authCode);
-    UUID authCodeId = savedAuthCode.getId();
-
-    return new AuthEmailVerifyResponse(true, authCodeId);
+    UUID authCode = authorizationCodeRepository.save(new AuthorizationCode(email)).getId();
+    return new AuthEmailVerifyResponse(true, authCode);
   }
 
-  @Override
-  public AuthorizationCode consume(UUID authorizationCode) {
-    var entity =
+  public String consume(UUID authorizationCode) {
+    AuthorizationCode entity =
         authorizationCodeRepository
             .findById(authorizationCode)
             .orElseThrow(
                 () -> new IllegalArgumentException("해당 인증 코드를 찾을 수 없습니다: " + authorizationCode));
-    authorizationCodeRepository.delete(entity);
-    return entity;
+    String email = entity.getEmail();
+    authorizationCodeRepository.deleteById(authorizationCode);
+    return email;
+  }
+
+  @Override
+  public AuthorizationCode redeem(UUID authCodeId) {
+    return authorizationCodeRepository
+        .findById(authCodeId)
+        .map(
+            entity -> {
+              authorizationCodeRepository.delete(entity);
+              return entity;
+            })
+        .orElseThrow(() -> new IllegalArgumentException("해당 인증 코드를 찾을 수 없습니다: " + authCodeId));
   }
 }

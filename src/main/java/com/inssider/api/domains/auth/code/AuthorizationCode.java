@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.PostPersist;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -36,7 +36,7 @@ public class AuthorizationCode {
   @Column(name = "expired_at")
   private LocalDateTime expiredAt;
 
-  @PostPersist
+  @PrePersist
   private void setExpiredAt() {
     this.expiredAt = this.createdAt.plusMinutes(5);
   }
