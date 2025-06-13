@@ -14,16 +14,19 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account extends SoftDeleteable {
 
@@ -38,21 +41,22 @@ public class Account extends SoftDeleteable {
   @Setter
   private RefreshToken refreshToken;
 
-  @NonNull
+  @Column(nullable = false)
   @ToString.Exclude
   @Enumerated(EnumType.STRING)
-  private AccountType accountType;
+  @Builder.Default
+  private final AccountType accountType = AccountType.PASSWORD;
 
-  @NonNull
+  @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private RoleType role;
+  @Builder.Default
+  private final RoleType role = RoleType.USER;
 
-  @NonNull
-  @Column(unique = true)
+  @Column(unique = true, nullable = false)
   // [ ] index
   private String email;
 
-  @NonNull
+  @Column(nullable = false)
   @ToString.Exclude
   @Setter(AccessLevel.PACKAGE)
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -60,17 +64,8 @@ public class Account extends SoftDeleteable {
 
   @ToString.Exclude private String providerUserId;
 
-  @Builder
-  private Account(
-      @NonNull AccountType accountType,
-      @NonNull RoleType role,
-      @NonNull String email,
-      @NonNull String password) {
-    this.accountType = accountType;
-    this.role = role;
-    this.email = email;
-    this.password = password;
-
+  @PrePersist
+  public void prePersist() {
     this.profile = UserProfile.builder().account(this).nickname(email).build();
   }
 

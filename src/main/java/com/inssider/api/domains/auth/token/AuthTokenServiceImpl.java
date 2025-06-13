@@ -88,8 +88,8 @@ class AuthTokenServiceImpl implements AuthTokenService {
   @Override
   public AuthTokenResponse permitTokensByAuthorizationCode(UUID authorizationCode) {
     // 비밀번호 찾기를 위해 인증 코드가 사용되었다면 계정 정보를 찾을 수 있지만
-    // 초기에 회원가입을 진행을 위해 사용되었다면 계정 정보가 없을 수 있습니다.
-    Account account = authenticator.redeemAuthorizationCode(authorizationCode).orElse(null);
+    // 초기에 회원가입을 진행을 위해 사용되었다면 이메일만 존재하는 임시 계정이 반환됩니다.
+    Account account = authenticator.redeemAuthorizationCode(authorizationCode);
     return generateTokenResponse(AUTHORIZATION_CODE, account);
   }
 
@@ -130,7 +130,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
   AuthTokenResponse generateTokenResponse(GrantType grantType, Account account) {
     return switch (grantType) {
       case AUTHORIZATION_CODE -> {
-        String accessToken = generateSingleAccessToken(accessTokenExpiration);
+        String accessToken = generateSingleAccessToken(account.getEmail(), accessTokenExpiration);
         yield new AuthTokenResponse(accessToken, null, "Bearer", accessTokenExpiration);
       }
       case PASSWORD, REFRESH_TOKEN -> {
@@ -202,7 +202,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
     return token;
   }
 
-  String generateSingleAccessToken(long expiration) {
+  String generateSingleAccessToken(String email, long expiration) {
     Instant now = Instant.now();
 
     JwtClaimsSet claims =
@@ -210,6 +210,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
             .issuer("api.inssider.com")
             .issuedAt(now)
             .audience(List.of("inssider-app"))
+            .subject(email) // 이메일을 subject로 사용
             .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
             .claim("type", "single_access")
             .id(UUID.randomUUID().toString())

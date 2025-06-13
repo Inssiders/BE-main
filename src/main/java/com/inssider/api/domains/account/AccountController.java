@@ -7,10 +7,10 @@ import com.inssider.api.domains.account.AccountRequestsDto.PostAccountRequest;
 import com.inssider.api.domains.account.AccountResponsesDto.PatchAccountMePasswordResponse;
 import com.inssider.api.domains.account.AccountResponsesDto.PostAccountResponse;
 import com.inssider.api.domains.auth.AuthService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,9 +35,14 @@ class AccountController {
   }
 
   @PostMapping
-  @SecurityRequirement(name = "AccessToken")
+  // @SecurityRequirement(name = "AccessToken")
   ResponseEntity<ResponseWrapper<PostAccountResponse>> register(
-      @RequestBody PostAccountRequest reqBody) {
+      // single_access token은 JWT.sub를 직접 활용해야 함
+      @AuthenticationPrincipal Jwt jwt, @RequestBody PostAccountRequest reqBody) {
+    var email = jwt.getSubject();
+    if (!email.equals(reqBody.email())) {
+      throw new IllegalArgumentException("Email in request body must match authenticated email");
+    }
     var data = service.register(reqBody.registerType(), reqBody.email(), reqBody.password());
     return BaseResponse.of(201, new PostAccountResponse(data.getEmail(), data.getCreatedAt()));
   }
