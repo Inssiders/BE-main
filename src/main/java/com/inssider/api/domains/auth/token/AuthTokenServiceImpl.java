@@ -7,14 +7,13 @@ import static com.inssider.api.domains.auth.AuthDataTypes.GrantType.REFRESH_TOKE
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountAuthenticator;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
-import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -52,7 +51,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws NoSuchElementException 사용자를 찾을 수 없는 경우
    */
   @Override
-  public TokenResponse permitTokensByPassword(@NonNull String email, @NonNull String rawPassword) {
+  public AuthTokenResponse permitTokensByPassword(String email, String rawPassword) {
     var account = authenticator.authenticate(email, rawPassword);
     return generateTokenResponse(PASSWORD, account);
   }
@@ -66,7 +65,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws NoSuchElementException 토큰과 연관된 계정을 찾을 수 없는 경우
    */
   @Override
-  public TokenResponse permitTokensByRefreshToken(@NonNull String refreshToken) {
+  public AuthTokenResponse permitTokensByRefreshToken(String refreshToken) {
     Account account = authenticator.getAccountFromToken(refreshToken);
 
     // 저장된 토큰과 일치하는지 검증
@@ -87,7 +86,9 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws IllegalArgumentException 인증 코드가 유효하지 않은 경우
    */
   @Override
-  public TokenResponse permitTokensByAuthorizationCode(UUID authorizationCode) {
+  public AuthTokenResponse permitTokensByAuthorizationCode(UUID authorizationCode) {
+    // 비밀번호 찾기를 위해 인증 코드가 사용되었다면 계정 정보를 찾을 수 있지만
+    // 초기에 회원가입을 진행을 위해 사용되었다면 이메일만 존재하는 임시 계정이 반환됩니다.
     Account account = authenticator.redeemAuthorizationCode(authorizationCode);
     return generateTokenResponse(AUTHORIZATION_CODE, account);
   }
@@ -100,7 +101,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @throws IllegalArgumentException 계정에 Refresh Token이 없는 경우
    */
   @Override
-  public void revokeRefreshToken(@NonNull Account account)
+  public void revokeRefreshToken(Account account)
       throws NullPointerException, IllegalArgumentException {
     RefreshToken refreshToken = account.getRefreshToken();
     refreshTokenRepository.delete(refreshToken);
@@ -126,11 +127,11 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @param account 토큰을 발급받을 계정
    * @return Grant Type에 맞는 토큰 응답
    */
-  TokenResponse generateTokenResponse(GrantType grantType, Account account) {
+  AuthTokenResponse generateTokenResponse(GrantType grantType, Account account) {
     return switch (grantType) {
       case AUTHORIZATION_CODE -> {
-        String accessToken = generateToken(account, accessTokenExpiration, "single_access");
-        yield new TokenResponse(accessToken, null, "Bearer", accessTokenExpiration);
+        String accessToken = generateSingleAccessToken(account.getEmail(), accessTokenExpiration);
+        yield new AuthTokenResponse(accessToken, null, "Bearer", accessTokenExpiration);
       }
       case PASSWORD, REFRESH_TOKEN -> {
         // 1. generate new tokens
@@ -140,7 +141,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
         // 2. create or update refresh token
         createOrUpdateRefreshToken(account, refreshToken);
 
-        yield new TokenResponse(accessToken, refreshToken, "Bearer", accessTokenExpiration);
+        yield new AuthTokenResponse(accessToken, refreshToken, "Bearer", accessTokenExpiration);
       }
     };
   }
@@ -153,7 +154,7 @@ class AuthTokenServiceImpl implements AuthTokenService {
    * @param account Refresh Token을 연결할 계정
    * @param refreshToken 새로 생성된 Refresh Token 문자열
    */
-  void createOrUpdateRefreshToken(@NonNull Account account, @NonNull String refreshToken) {
+  void createOrUpdateRefreshToken(Account account, String refreshToken) {
     RefreshToken entity =
         Optional.ofNullable(account.getRefreshToken())
             .map(
@@ -194,6 +195,24 @@ class AuthTokenServiceImpl implements AuthTokenService {
             .subject(String.valueOf(accountId))
             .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
             .claim("type", tokenType)
+            .id(UUID.randomUUID().toString())
+            .build();
+
+    var token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    return token;
+  }
+
+  String generateSingleAccessToken(String email, long expiration) {
+    Instant now = Instant.now();
+
+    JwtClaimsSet claims =
+        JwtClaimsSet.builder()
+            .issuer("api.inssider.com")
+            .issuedAt(now)
+            .audience(List.of("inssider-app"))
+            .subject(email) // 이메일을 subject로 사용
+            .expiresAt(now.plus(expiration, ChronoUnit.SECONDS))
+            .claim("type", "single_access")
             .id(UUID.randomUUID().toString())
             .build();
 

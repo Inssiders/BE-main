@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
-import com.inssider.api.domains.account.AccountRequestsDto.RegisterRequestDto;
+import com.inssider.api.domains.account.AccountRequestsDto.PostAccountRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,7 +27,7 @@ class RegisterTypeJsonTest {
         }
         """;
 
-    RegisterRequestDto result = objectMapper.readValue(json, RegisterRequestDto.class);
+    PostAccountRequest result = objectMapper.readValue(json, PostAccountRequest.class);
 
     assertEquals(RegisterType.PASSWORD, result.registerType());
     assertEquals("test@gmail.com", result.email());
@@ -45,7 +45,7 @@ class RegisterTypeJsonTest {
         }
         """;
 
-    RegisterRequestDto result = objectMapper.readValue(json, RegisterRequestDto.class);
+    PostAccountRequest result = objectMapper.readValue(json, PostAccountRequest.class);
 
     assertNull(result.registerType()); // camelCase 필드명은 인식되지 않아 null로 처리됨
   }
@@ -65,7 +65,7 @@ class RegisterTypeJsonTest {
         com.fasterxml.jackson.databind.exc.InvalidFormatException.class,
         () ->
             objectMapper.readValue(
-                json, RegisterRequestDto.class) // "password"는 RegisterType enum에 정의된 값이 아니므로 예외 발생
+                json, PostAccountRequest.class) // "password"는 RegisterType enum에 정의된 값이 아니므로 예외 발생
         );
   }
 }

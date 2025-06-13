@@ -19,63 +19,37 @@ class AccountServiceImpl implements AccountService {
   private final JwtDecoder jwtDecoder;
 
   @Override
-  public Account register(Account account) throws IllegalArgumentException {
-    if (!isValidLocalUserAccount(account)) {
-      throw new IllegalArgumentException("Invalid request: " + account);
-    }
-    handleExistingSoftDeletedAccount(account.getEmail());
-    account.setPassword(passwordEncoder.encode(account.getPassword()));
-    return repository.save(account);
-  }
+  public Account register(RegisterType registerType, String email, String password) {
 
-  @Override
-  public Account register(RegisterType registerType, String email, String password)
-      throws IllegalArgumentException {
+    password = passwordEncoder.encode(password);
+
     return switch (registerType) {
       case PASSWORD -> {
-        var newAccount = buildLocalUserAccount(email, password);
-        yield register(newAccount);
+        var newAccount =
+            Account.builder()
+                .accountType(AccountType.PASSWORD)
+                .role(RoleType.USER)
+                .email(email)
+                .password(password)
+                .build();
+
+        repository
+            .findByEmail(email)
+            .ifPresent(
+                existingAccount -> {
+                  if (existingAccount.isDeleted()) {
+                    repository.delete(existingAccount);
+                    repository.flush();
+                  }
+                });
+
+        yield repository.save(newAccount);
       }
 
       case ADMIN -> throw new IllegalArgumentException("Admin registration not permitted");
       default ->
           throw new IllegalArgumentException("Unsupported registration type: " + registerType);
     };
-  }
-
-  /**
-   * 기존에 soft delete된 계정이 있다면 완전 삭제 처리
-   *
-   * @param email 확인할 이메일
-   */
-  private void handleExistingSoftDeletedAccount(String email) {
-    repository
-        .findByEmail(email)
-        .ifPresent(
-            existingAccount -> {
-              if (existingAccount.isDeleted()) {
-                repository.delete(existingAccount);
-                repository.flush();
-              } else {
-                throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + email);
-              }
-            });
-  }
-
-  private boolean isValidLocalUserAccount(Account account) {
-    return account.getRole() == RoleType.USER
-        && account.getAccountType().isLocal()
-        && Util.isValidEmail(account.getEmail())
-        && Util.isValidPassword(account.getPassword());
-  }
-
-  private Account buildLocalUserAccount(String email, String password) {
-    return Account.builder()
-        .accountType(AccountType.PASSWORD)
-        .role(RoleType.USER)
-        .email(email)
-        .password(password)
-        .build();
   }
 
   @Override

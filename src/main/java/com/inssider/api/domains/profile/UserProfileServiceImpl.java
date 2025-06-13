@@ -1,8 +1,8 @@
 package com.inssider.api.domains.profile;
 
 import com.inssider.api.common.response.StandardResponse.QueryResponse;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.UpdateProfileResponse;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.UserProfileDto;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetProfileResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.PatchProfileMeResponse;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,13 +27,13 @@ class UserProfileServiceImpl implements UserProfileService {
   }
 
   @Override
-  public UserProfileDto findUserProfileById(Long id) {
+  public GetProfileResponse findUserProfileById(Long id) {
     UserProfile entity = repository.findById(id).orElseThrow();
     return entity.convertToDto();
   }
 
   @Override
-  public UpdateProfileResponse updateUserProfile(
+  public PatchProfileMeResponse updateUserProfile(
       Long id,
       Optional<String> nickname,
       Optional<String> profileUrl,
@@ -51,11 +51,11 @@ class UserProfileServiceImpl implements UserProfileService {
 
     entity = repository.save(entity);
 
-    return new UpdateProfileResponse(findUserProfileById(id), entity.getUpdatedAt());
+    return new PatchProfileMeResponse(findUserProfileById(id), entity.getUpdatedAt());
   }
 
   @Override
-  public QueryResponse<UserProfileDto> findUserProfilesByNickname(
+  public QueryResponse<GetProfileResponse> findUserProfilesByNickname(
       String nickname, Pageable pageable) {
     Page<UserProfile> userProfilePage;
 
@@ -65,7 +65,7 @@ class UserProfileServiceImpl implements UserProfileService {
       userProfilePage = repository.findAll(pageable);
     }
 
-    Page<UserProfileDto> userProfileDtoPage = userProfilePage.map(UserProfile::convertToDto);
+    Page<GetProfileResponse> userProfileDtoPage = userProfilePage.map(UserProfile::convertToDto);
 
     return QueryResponse.of(
         userProfileDtoPage.getContent(), userProfileDtoPage, pageable.getPageSize());

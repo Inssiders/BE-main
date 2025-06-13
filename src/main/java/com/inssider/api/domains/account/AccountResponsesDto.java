@@ -1,9 +1,10 @@
 package com.inssider.api.domains.account;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class AccountResponsesDto {
-  public record PatchPassword(Date updatedAt) {}
 
-  public record AccountCreated(String email, Date createdAt) {}
+  public record PostAccountResponse(String email, LocalDateTime createdAt) {}
+
+  public record PatchAccountMePasswordResponse(LocalDateTime updatedAt) {}
 }

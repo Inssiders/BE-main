@@ -45,7 +45,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
-
+    implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
 
     compileOnly("org.projectlombok:lombok")

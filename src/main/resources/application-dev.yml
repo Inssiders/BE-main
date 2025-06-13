@@ -5,6 +5,9 @@ spring:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/dev
     username: user
     password: user
+  mail:
+    username: inssider.api@gmail.com
+    password: hxjbodlooqmrrwgi # https://myaccount.google.com/u/3/apppasswords
 
 spring.jpa.hibernate.ddl-auto: create-drop
 

@@ -2,15 +2,15 @@ package com.inssider.api.domains.profile;
 
 import com.inssider.api.common.response.BaseResponse;
 import com.inssider.api.common.response.BaseResponse.ResponseWrapper;
-import com.inssider.api.common.response.StandardResponse.IndexResponse;
+import com.inssider.api.common.response.StandardResponse.GetIndexResponse;
 import com.inssider.api.common.response.StandardResponse.QueryResponse;
 import com.inssider.api.domains.account.Account;
-import com.inssider.api.domains.profile.UserProfileRequestsDto.UpdateProfile;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.OwnerUserProfile;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.PrivateUserProfile;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.PublicUserProfile;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.UpdateProfileResponse;
-import com.inssider.api.domains.profile.UserProfileResponsesDto.UserProfileDto;
+import com.inssider.api.domains.profile.UserProfileRequestsDto.PatchProfileMeRequest;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetPrivateProfileResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetProfileMeResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetProfileResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.GetPublicProfileResponse;
+import com.inssider.api.domains.profile.UserProfileResponsesDto.PatchProfileMeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +34,7 @@ class UserProfileController {
   private final UserProfileService service;
 
   @GetMapping
-  public QueryResponse<UserProfileDto> query(
+  public QueryResponse<GetProfileResponse> query(
       @ParameterObject
           @PageableDefault(
               size = 10,
@@ -47,28 +47,28 @@ class UserProfileController {
   }
 
   @GetMapping("/{id}")
-  ResponseEntity<ResponseWrapper<UserProfileDto>> getProfile(@PathVariable("id") Long id) {
+  ResponseEntity<ResponseWrapper<GetProfileResponse>> getProfile(@PathVariable("id") Long id) {
     var profileData = service.findUserProfileById(id);
     return switch (profileData) {
-      case PublicUserProfile pub -> BaseResponse.of(200, pub);
-      case PrivateUserProfile priv -> BaseResponse.of(200, priv);
+      case GetPublicProfileResponse pub -> BaseResponse.of(200, pub);
+      case GetPrivateProfileResponse priv -> BaseResponse.of(200, priv);
       default -> BaseResponse.of(404, null);
     };
   }
 
   @GetMapping("/me")
-  ResponseEntity<ResponseWrapper<OwnerUserProfile>> getProfile(
+  ResponseEntity<ResponseWrapper<GetProfileMeResponse>> getProfile(
       @AuthenticationPrincipal Account account) {
     var profileData = service.findUserProfileById(account.getId());
     return switch (profileData) {
-      case OwnerUserProfile owner -> BaseResponse.of(200, owner);
+      case GetProfileMeResponse owner -> BaseResponse.of(200, owner);
       default -> BaseResponse.of(403, null);
     };
   }
 
   @PatchMapping("/me")
-  ResponseEntity<ResponseWrapper<UpdateProfileResponse>> updateProfile(
-      @AuthenticationPrincipal Account account, @RequestBody UpdateProfile profile) {
+  ResponseEntity<ResponseWrapper<PatchProfileMeResponse>> updateProfile(
+      @AuthenticationPrincipal Account account, @RequestBody PatchProfileMeRequest profile) {
     var data =
         service.updateUserProfile(
             account.getId(),
@@ -81,9 +81,9 @@ class UserProfileController {
   }
 
   @GetMapping("/index")
-  ResponseEntity<ResponseWrapper<IndexResponse>> accountIndex() {
+  ResponseEntity<ResponseWrapper<GetIndexResponse>> accountIndex() {
     var accountIds = service.getAllUserProfileIds();
-    var data = new IndexResponse(accountIds);
+    var data = new GetIndexResponse(accountIds);
     return BaseResponse.of(200, data);
   }
 }

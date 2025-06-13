@@ -1,13 +1,13 @@
 package com.inssider.api.domains.auth;
 
 import com.inssider.api.domains.account.Account;
-import com.inssider.api.domains.auth.AuthRequestsDto.AuthorizationCodeLoginRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.LoginRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.PasswordLoginRequest;
-import com.inssider.api.domains.auth.AuthRequestsDto.TokenRefreshLoginRequest;
-import com.inssider.api.domains.auth.AuthResponsesDto.EmailCodeResponse;
-import com.inssider.api.domains.auth.AuthResponsesDto.EmailVerificationResponse;
-import com.inssider.api.domains.auth.AuthResponsesDto.TokenResponse;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithAuthorizationCodeRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithPasswordRequest;
+import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithRefreshTokenRequest;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailChallengeResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailVerifyResponse;
+import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 import com.inssider.api.domains.auth.code.AuthCodeService;
 import com.inssider.api.domains.auth.token.AuthTokenService;
 import lombok.RequiredArgsConstructor;
@@ -26,30 +26,30 @@ class AuthServiceImpl implements AuthService {
   // === EmailAuthService 메서드 위임 ===
 
   @Override
-  public EmailCodeResponse challengeEmail(String email) {
+  public AuthEmailChallengeResponse challengeEmail(String email) {
     return codeService.challengeEmail(email);
   }
 
   @Override
-  public EmailVerificationResponse verifyEmail(String email, String code) {
+  public AuthEmailVerifyResponse verifyEmail(String email, String code) {
     return codeService.verifyEmail(email, code);
   }
 
   // === TokenService 메서드 위임 ===
 
   @Override
-  public TokenResponse createTokens(LoginRequest request) {
+  public AuthTokenResponse createTokens(AuthTokenRequest request) {
     return switch (request) {
-      case PasswordLoginRequest req -> {
+      case AuthTokenWithPasswordRequest req -> {
         var email = req.email();
         var rawPassword = req.password();
         yield tokenService.permitTokensByPassword(email, rawPassword);
       }
-      case TokenRefreshLoginRequest req -> {
+      case AuthTokenWithRefreshTokenRequest req -> {
         var refreshToken = req.refreshToken();
         yield tokenService.permitTokensByRefreshToken(refreshToken);
       }
-      case AuthorizationCodeLoginRequest req -> {
+      case AuthTokenWithAuthorizationCodeRequest req -> {
         yield tokenService.permitTokensByAuthorizationCode(req.uuid());
       }
     };

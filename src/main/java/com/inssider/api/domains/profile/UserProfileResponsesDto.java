@@ -4,21 +4,22 @@ import java.time.LocalDateTime;
 
 class UserProfileResponsesDto {
 
-  record PrivateUserProfile(String nickname, String profileUrl) implements UserProfileDto {}
+  record GetPrivateProfileResponse(String nickname, String profileUrl)
+      implements GetProfileResponse {}
 
-  record PublicUserProfile(String nickname, String profileUrl, String bio)
-      implements UserProfileDto {}
+  record GetPublicProfileResponse(String nickname, String profileUrl, String bio)
+      implements GetProfileResponse {}
 
-  record OwnerUserProfile(
+  record GetProfileMeResponse(
       String nickname,
       String profileUrl,
       String bio,
       Boolean accountVisible,
       Boolean followerVisible)
-      implements UserProfileDto {}
+      implements GetProfileResponse {}
 
-  public sealed interface UserProfileDto
-      permits PrivateUserProfile, PublicUserProfile, OwnerUserProfile {
+  public sealed interface GetProfileResponse
+      permits GetPrivateProfileResponse, GetPublicProfileResponse, GetProfileMeResponse {
     String nickname();
 
     String profileUrl();
@@ -36,5 +37,5 @@ class UserProfileResponsesDto {
     }
   }
 
-  public record UpdateProfileResponse(UserProfileDto data, LocalDateTime updatedAt) {}
+  public record PatchProfileMeResponse(GetProfileResponse data, LocalDateTime updatedAt) {}
 }
