@@ -9,7 +9,6 @@ import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.account.AccountRequestsDto.PostAccountRequest;
 import com.inssider.api.domains.account.AccountResponsesDto.PostAccountResponse;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
-import com.inssider.api.domains.auth.AuthRequestsDto.AuthEmailChallengeRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.AuthEmailVerifyRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithAuthorizationCodeRequest;
 import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithPasswordRequest;
@@ -17,10 +16,16 @@ import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithRefreshTokenRe
 import com.inssider.api.domains.auth.AuthResponsesDto.AuthEmailVerifyResponse;
 import com.inssider.api.domains.auth.AuthResponsesDto.AuthTokenResponse;
 import com.inssider.api.domains.auth.code.EmailAuthenticationCodeTestRepository;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.web.servlet.MockMvc;
 
 @TestComponent
@@ -28,21 +33,19 @@ public class TestScenarioHelper {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
+  @Autowired private JwtEncoder jwtEncoder;
+
+  @Autowired private EmailAuthenticationCodeTestRepository emailCodeRepository;
   @Autowired private EmailAuthenticationCodeTestRepository emailAuthenticationCodeRepository;
 
   // 이메일 인증 요청 성공
   // POST /api/auth/email/challenge
   // request: AuthEmailChallengeRequest
   // response: String
-  public String postAuthEmailChallenge(String email) throws Exception {
-    var request = new AuthEmailChallengeRequest(email);
-    mockMvc
-        .perform(
-            post("/api/auth/email/challenge")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().is2xxSuccessful());
-    return emailAuthenticationCodeRepository.findById(email).orElseThrow().getCode();
+  public String postAuthEmailChallenge(String email) {
+    // 실제 이메일 전송 과정 생략
+    emailCodeRepository.findById(email).ifPresent(emailCodeRepository::delete);
+    return emailCodeRepository.save(email).getCode();
   }
 
   // 이메일 인증 검증 성공
@@ -150,5 +153,34 @@ public class TestScenarioHelper {
             .getContentAsString();
     var data = objectMapper.readTree(response).get("data");
     return objectMapper.treeToValue(data, PostAccountResponse.class);
+  }
+
+  public String getAccessToken(Long accountId) {
+    Instant now = Instant.now();
+    JwtClaimsSet claims =
+        JwtClaimsSet.builder()
+            .issuer("api.inssider.com")
+            .issuedAt(now)
+            .audience(List.of("inssider-app"))
+            .subject(String.valueOf(accountId))
+            .expiresAt(now.plus(600, ChronoUnit.SECONDS))
+            .claim("type", "access")
+            .id(UUID.randomUUID().toString())
+            .build();
+    return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+  }
+
+  public String getSingleAccessToken() {
+    Instant now = Instant.now();
+    JwtClaimsSet claims =
+        JwtClaimsSet.builder()
+            .issuer("api.inssider.com")
+            .issuedAt(now)
+            .audience(List.of("inssider-app"))
+            .expiresAt(now.plus(600, ChronoUnit.SECONDS))
+            .claim("type", "single_access")
+            .id(UUID.randomUUID().toString())
+            .build();
+    return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
   }
 }

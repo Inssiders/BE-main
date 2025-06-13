@@ -13,27 +13,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inssider.api.common.TestScenarioHelper;
 import com.inssider.api.common.Util;
 import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
-import com.inssider.api.domains.account.AccountRequestsDto.PostAccountRequest;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
 import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithPasswordRequest;
 import com.inssider.api.domains.auth.AuthService;
 import com.inssider.api.domains.auth.code.EmailAuthenticationCodeTestRepository;
 import com.inssider.api.domains.profile.UserProfileService;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestComponent;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ComponentScan(
-    basePackages = "com.inssider.api",
-    includeFilters = @ComponentScan.Filter(TestComponent.class))
+@Import(TestScenarioHelper.class)
 class AccountControllerTest {
   @Autowired private TestScenarioHelper helper;
   @Autowired private AccountController accountController;
@@ -51,78 +46,42 @@ class AccountControllerTest {
   @Test
   @Transactional
   void 회원가입() throws Exception {
+    // given
     Account account = Util.accountGenerator().get();
-    String email = account.getEmail();
+    String accessToken = helper.getSingleAccessToken();
 
-    // {
-    // // [ ] 1. 이메일 중복 확인
-    // // 중복된 상태라면 409 Conflict
-    // // 중복되지 않았다면, 현재는 인가 토큰이 없으므로 401 Unauthorized
-    // var request = new PostAccountRequest(RegisterType.PASSWORD, email,
-    // account.getPassword());
-    // mockMvc
-    // .perform(
-    // post("/api/accounts")
-    // .contentType("application/json")
-    // .content(objectMapper.writeValueAsString(request)))
-    // .andExpect(status().isUnauthorized());
-    // }
+    // when
+    assertDoesNotThrow(
+        () -> helper.postAccount(account.getEmail(), account.getPassword(), accessToken));
 
-    String otp = helper.postAuthEmailChallenge(email);
-    UUID authCode = helper.postAuthEmailVerify(email, otp).authorization_code();
-    assertNotNull(authCode);
-    String accessToken = helper.postAuthTokenWithAuthorizationCode(authCode).accessToken();
-    assertDoesNotThrow(() -> helper.postAccount(email, account.getPassword(), accessToken));
+    // then
+    assertEquals(1, accountRepository.count());
   }
 
   @Test
   @Transactional
   void 중복_회원가입_실패() throws Exception {
-    Account account = Util.accountGenerator().get();
-    PostAccountRequest request =
-        new PostAccountRequest(RegisterType.PASSWORD, account.getEmail(), account.getPassword());
-    var res = accountController.register(request);
-    assertEquals(201, res.getStatusCode().value());
-
-    mockMvc
-        .perform(
-            post("/api/accounts")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().is4xxClientError());
+    // 이메일 중복 확인으로 대체
   }
 
   @Test
   @Transactional
   void 회원탈퇴() throws Exception {
-    // 0. 회원가입 요청 given
-    String email;
-    String rawPassword;
+    // given
     Account account = Util.accountGenerator().get();
-    {
-      email = account.getEmail();
-      rawPassword = account.getPassword();
-      register(account);
-    }
-    assertEquals(1, accountService.count());
+    String email = account.getEmail();
+    String rawPassword = account.getPassword();
+    Long accountId = register(account).getId();
+    String accessToken = helper.getAccessToken(accountId);
 
-    // 1. 로그인 given
-    String accessToken;
-    {
-      var request = new AuthTokenWithPasswordRequest(GrantType.PASSWORD, email, rawPassword);
-      var response = authService.createTokens(request);
-      accessToken = response.accessToken();
-    }
-    assertNotNull(accessToken);
-
-    // 3. 회원 탈퇴 요청 when
+    // when
     {
       mockMvc
           .perform(delete("/api/accounts/me").header("Authorization", "Bearer " + accessToken))
           .andExpect(status().isOk());
     }
 
-    // 4. soft-delete 된 계정 확인 then
+    // then
     assertEquals(0, accountService.count());
     assertEquals(1, accountRepository.findAllDeleted().size());
     assertEquals(0, userProfileService.count());

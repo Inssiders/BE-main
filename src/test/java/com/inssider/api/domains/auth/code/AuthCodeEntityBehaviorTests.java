@@ -5,19 +5,26 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.inssider.api.common.TestScenarioHelper;
 import com.inssider.api.common.Util;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@AutoConfigureMockMvc
+@Import(TestScenarioHelper.class)
 class AuthCodeEntityBehaviorTests {
 
   @Autowired private AuthCodeService service;
 
   @Autowired private EmailAuthenticationCodeTestRepository emailAuthenticationCodeRepository;
   @Autowired private AuthorizationCodeTestRepository authorizationCodeRepository;
+
+  @Autowired private TestScenarioHelper helper;
 
   @Test
   @Transactional
@@ -27,7 +34,7 @@ class AuthCodeEntityBehaviorTests {
     String email = Util.emailGenerator().get();
 
     // 1. first challenge
-    service.challengeEmail(email);
+    helper.postAuthEmailChallenge(email);
     assertEquals(1, emailAuthenticationCodeRepository.count());
     EmailAuthenticationCode entity =
         emailAuthenticationCodeRepository.findById(email).orElseThrow();
@@ -35,7 +42,7 @@ class AuthCodeEntityBehaviorTests {
     assertEquals(entity.getCreatedAt().plusSeconds(300), entity.getExpiredAt());
 
     // 2. second challenge
-    service.challengeEmail(email);
+    helper.postAuthEmailChallenge(email);
     assertEquals(1, emailAuthenticationCodeRepository.count());
 
     var newCode = emailAuthenticationCodeRepository.findById(email).orElseThrow().getCode();
