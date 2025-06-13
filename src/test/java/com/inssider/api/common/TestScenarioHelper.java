@@ -36,7 +36,6 @@ public class TestScenarioHelper {
   @Autowired private JwtEncoder jwtEncoder;
 
   @Autowired private EmailAuthenticationCodeTestRepository emailCodeRepository;
-  @Autowired private EmailAuthenticationCodeTestRepository emailAuthenticationCodeRepository;
 
   // 이메일 인증 요청 성공
   // POST /api/auth/email/challenge

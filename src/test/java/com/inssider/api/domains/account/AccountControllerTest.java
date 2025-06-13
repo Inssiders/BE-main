@@ -16,7 +16,6 @@ import com.inssider.api.domains.account.AccountDataTypes.RegisterType;
 import com.inssider.api.domains.auth.AuthDataTypes.GrantType;
 import com.inssider.api.domains.auth.AuthRequestsDto.AuthTokenWithPasswordRequest;
 import com.inssider.api.domains.auth.AuthService;
-import com.inssider.api.domains.auth.code.EmailAuthenticationCodeTestRepository;
 import com.inssider.api.domains.profile.UserProfileService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Import(TestScenarioHelper.class)
 class AccountControllerTest {
   @Autowired private TestScenarioHelper helper;
-  @Autowired private AccountController accountController;
   @Autowired private AccountService accountService;
   @Autowired private AccountRepository accountRepository;
 
@@ -40,8 +38,6 @@ class AccountControllerTest {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
-
-  @Autowired private EmailAuthenticationCodeTestRepository emailAuthenticationCodeRepository;
 
   @Test
   @Transactional

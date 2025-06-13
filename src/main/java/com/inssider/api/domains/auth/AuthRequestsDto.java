@@ -16,7 +16,11 @@ public class AuthRequestsDto {
 
   public record AuthEmailVerifyRequest(String email, String otp) {}
 
-  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, visible = true)
+  @JsonTypeInfo(
+      use = JsonTypeInfo.Id.NAME,
+      property = "grant_type",
+      include = JsonTypeInfo.As.PROPERTY,
+      visible = true)
   @JsonSubTypes({
     @JsonSubTypes.Type(value = AuthTokenWithPasswordRequest.class, name = GRANT_TYPE_PASSWORD),
     @JsonSubTypes.Type(

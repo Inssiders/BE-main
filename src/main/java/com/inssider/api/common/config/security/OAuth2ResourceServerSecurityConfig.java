@@ -66,7 +66,7 @@ class OAuth2ResourceServerSecurityConfig {
   private String[] publicGetPaths() {
     return new String[] {
       "/api/accounts",
-      // email 중복 확인 엔드포인트
+      "/api/accounts/{email}",
       "/api/profiles",
       "/api/profiles/index",
       "/api/profiles/{id}",
