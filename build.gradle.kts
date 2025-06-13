@@ -5,22 +5,25 @@ plugins {
     id("com.diffplug.spotless") version "7.0.4"
 }
 
-val envFile = file(".env.prod")
-val envProps = mutableMapOf<String, String>()
+val gitTag: String? =
+    try {
+        "git describe --tags".runCommand()?.trim()
+    } catch (e: Exception) {
+        null
+    }
 
-if (envFile.exists()) {
-    envFile.readLines()
-        .filter { it.contains("=") && !it.trim().startsWith("#") }
-        .forEach {
-            val (key, value) = it.split("=", limit = 2)
-            envProps[key.trim()] = value.trim()
-        }
-}
-
-val imageTagVersion = envProps["IMAGE_TAG"] ?: "0.0.10-SNAPSHOT"
+// git 명령어 실행 함수
+fun String.runCommand(): String? =
+    ProcessBuilder(*split(" ").toTypedArray())
+        .directory(rootDir)
+        .redirectErrorStream(true)
+        .start()
+        .inputStream
+        .bufferedReader()
+        .readText()
 
 group = "com.inssider"
-version = imageTagVersion
+version = gitTag?.removePrefix("v") ?: "0.0.1-SNAPSHOT"
 
 springBoot {
     buildInfo()
