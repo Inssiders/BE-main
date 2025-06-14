@@ -97,4 +97,8 @@ public class CommentService implements VerifyService {
         .findById(commentId)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 댓글입니다."));
   }
+
+  public boolean isComment(Long commentId) {
+    return commentRepository.existsById(commentId);
+  }
 }
