@@ -56,7 +56,7 @@ public class PostService implements VerifyService {
     Post currentPost =
         postRepository
             .findByIdWithTag(memeId)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시물입니다."));
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
 
     if(!validateId(currentPost.getAccount().getId(), reqAccount.getId())){
       throw new AccessDeniedException("수정 권한이 없습니다.");
@@ -96,11 +96,16 @@ public class PostService implements VerifyService {
     return PostMapper.postToUpdateDTO(updatedPost);
   }
 
-  public PostDeleteResponseDTO delete(Long memeId) {
+  public PostDeleteResponseDTO delete(Account reqAccount, Long memeId) {
     Post currentPost =
         postRepository
             .findByIdWithTag(memeId)
-            .orElseThrow(() -> new IllegalArgumentException("게시글 오류 발생"));
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
+
+    if(!validateId(currentPost.getAccount().getId(), reqAccount.getId())){
+      throw new AccessDeniedException("삭제 권한이 없습니다.");
+    }
+
     currentPost.updateIsDeleted();
     currentPost.updateDeletedAt();
     Post updatedPost = postRepository.save(currentPost);

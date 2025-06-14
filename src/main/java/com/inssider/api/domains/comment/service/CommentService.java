@@ -55,8 +55,12 @@ public class CommentService implements VerifyService {
     return CommentMapper.toDTO(createdComment);
   }
 
-  public CommentDeleteResponseDTO delete(Long commentId) {
+  public CommentDeleteResponseDTO delete(Account reqAccount, Long commentId) {
     Comment currentComment = findById(commentId);
+
+    if(!validateId(currentComment.getAccount().getId(), reqAccount.getId())){
+      throw new AccessDeniedException("삭제 권한이 없습니다.");
+    }
 
     if (!currentComment.getChildComments().isEmpty())
       throw new IllegalStateException("하위 댓글이 존재하여 삭제가 불가능합니다.");

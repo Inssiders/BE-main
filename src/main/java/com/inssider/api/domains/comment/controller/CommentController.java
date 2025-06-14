@@ -32,8 +32,8 @@ public class CommentController {
 
   @PatchMapping("/delete/{commentId}")
   ResponseEntity<BaseResponse.ResponseWrapper<CommentDeleteResponseDTO>> delete(
-      @PathVariable Long commentId) {
-    CommentDeleteResponseDTO data = commentService.delete(commentId);
+          @AuthenticationPrincipal Account reqAccount, @PathVariable Long commentId) {
+    CommentDeleteResponseDTO data = commentService.delete(reqAccount, commentId);
     return BaseResponse.of(200, data);
   }
 

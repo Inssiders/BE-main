@@ -40,8 +40,8 @@ public class PostController {
 
   @PatchMapping("/delete/{memeId}")
   ResponseEntity<BaseResponse.ResponseWrapper<PostDeleteResponseDTO>> delete(
-      @PathVariable Long memeId) {
-    PostDeleteResponseDTO data = postService.delete(memeId);
+          @AuthenticationPrincipal Account reqAccount, @PathVariable Long memeId) {
+    PostDeleteResponseDTO data = postService.delete(reqAccount, memeId);
     return BaseResponse.of(200, data);
   }
 
