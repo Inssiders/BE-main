@@ -27,12 +27,10 @@ public class PostService {
   private final CategoryService categoryService;
   private final TagService tagService;
 
-  // 인증 적용 후 삭제 예정
   private final AccountService accountService;
 
-  public PostResponseDTO create(PostCreateRequestDTO reqBody) {
-    // 인증 적용 후 삭제 예정
-    Account account = accountService.findById(1L).get();
+  public PostResponseDTO create(Account reqAccount, PostCreateRequestDTO reqBody) {
+    Account account = accountService.findById(reqAccount.getId()).orElseThrow(NoSuchElementException::new);
     Category category =
         categoryService
             .getCategory(reqBody.getCategoryType())
