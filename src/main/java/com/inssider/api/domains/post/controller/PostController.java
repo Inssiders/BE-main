@@ -24,7 +24,8 @@ public class PostController {
 
   @PostMapping
   ResponseEntity<BaseResponse.ResponseWrapper<PostResponseDTO>> register(
-          @AuthenticationPrincipal Account reqAccount, @Valid @RequestBody PostCreateRequestDTO reqBody) {
+      @AuthenticationPrincipal Account reqAccount,
+      @Valid @RequestBody PostCreateRequestDTO reqBody) {
     PostResponseDTO data = postService.create(reqAccount, reqBody);
     return BaseResponse.of(201, data);
   }

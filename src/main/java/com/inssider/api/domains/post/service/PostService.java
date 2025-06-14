@@ -30,7 +30,8 @@ public class PostService {
   private final AccountService accountService;
 
   public PostResponseDTO create(Account reqAccount, PostCreateRequestDTO reqBody) {
-    Account account = accountService.findById(reqAccount.getId()).orElseThrow(NoSuchElementException::new);
+    Account account =
+        accountService.findById(reqAccount.getId()).orElseThrow(NoSuchElementException::new);
     Category category =
         categoryService
             .getCategory(reqBody.getCategoryType())

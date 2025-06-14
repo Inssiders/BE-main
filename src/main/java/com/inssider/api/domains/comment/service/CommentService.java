@@ -24,9 +24,11 @@ public class CommentService {
   // 인증 적용 후 삭제 예정
   private final AccountService accountService;
 
-  public CommentCreateResponseDTO create(Long memeId, CommentCreateRequestDTO requestDTO) {
-    // 인증 적용 후 삭제 예정
-    Account account = accountService.findById(2L).get();
+  public CommentCreateResponseDTO create(
+      Account reqAccount, Long memeId, CommentCreateRequestDTO requestDTO) {
+
+    Account account =
+        accountService.findById(reqAccount.getId()).orElseThrow(NoSuchElementException::new);
     Post post = postService.get(memeId);
 
     Comment parentComment = null;
