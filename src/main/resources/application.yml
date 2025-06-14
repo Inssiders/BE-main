@@ -1,9 +1,18 @@
 # https://docs.spring.io/spring-boot/appendix/application-properties
 server.port: ${APP_PORT}
 
+management:
+  server:
+    base-path: /actuator
+  info:
+    build:
+      enabled: true
+
 spring:
   application:
     name: inssider-main
+  config:
+    import: optional:classpath:META-INF/build-info.properties
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -29,8 +38,6 @@ spring.jpa:
   hibernate:
     ddl-auto: none
     naming.physical-strategy: com.inssider.api.common.config.PluralSnakeCaseNamingStrategy
-
-management.endpoints.web.exposure.include: health
 
 # https://springdoc.org/properties.html#_swagger_ui_properties
 springdoc:

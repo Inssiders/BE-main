@@ -6,6 +6,25 @@ plugins {
     id("com.palantir.git-version") version "3.3.0"
 }
 
+val gitTag: String? =
+    try {
+        "git describe --tags".runCommand()?.trim()
+    } catch (e: Exception) {
+        null
+    }
+
+// git 명령어 실행 함수
+fun String.runCommand(): String? =
+    ProcessBuilder(*split(" ").toTypedArray())
+        .directory(rootDir)
+        .redirectErrorStream(true)
+        .start()
+        .inputStream
+        .bufferedReader()
+        .readText()
+
+val versionTag = gitTag?.takeIf { it.startsWith("v") }?.removePrefix("v") ?: "0.0.10-SNAPSHOT"
+
 group = "com.inssider"
 
 // https://github.com/palantir/gradle-git-version
@@ -51,6 +70,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
 
     compileOnly("org.projectlombok:lombok")
