@@ -1,5 +1,6 @@
 package com.inssider.api.domains.comment.service;
 
+import com.inssider.api.common.service.VerifyService;
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.comment.dto.*;
@@ -9,6 +10,8 @@ import com.inssider.api.domains.comment.repository.CommentRepository;
 import com.inssider.api.domains.post.entity.Post;
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.transaction.Transactional;
+
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CommentService {
+public class CommentService implements VerifyService {
 
   private final CommentRepository commentRepository;
   private final PostService postService;
@@ -73,11 +76,16 @@ public class CommentService {
     throw new NoSuchElementException("존재하지 않는 콘텐츠입니다.");
   }
 
-  public CommentUpdateResponseDTO update(Long commentId, CommentUpdateRequestDTO reqBody) {
-    Comment comment = findById(commentId);
-    comment.updateContent(reqBody.getContent());
+  public CommentUpdateResponseDTO update(Account reqAccount, Long commentId, CommentUpdateRequestDTO reqBody) throws AccessDeniedException {
+    Comment currentComment = findById(commentId);
+
+    if(!validateId(currentComment.getAccount().getId(), reqAccount.getId())){
+      throw new AccessDeniedException("수정 권한이 없습니다.");
+    }
+
+    currentComment.updateContent(reqBody.getContent());
     commentRepository.flush();
-    return CommentMapper.toUpdateDTO(comment);
+    return CommentMapper.toUpdateDTO(currentComment);
   }
 
   public Comment findById(Long commentId) {

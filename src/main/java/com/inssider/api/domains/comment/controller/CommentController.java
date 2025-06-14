@@ -5,6 +5,8 @@ import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.comment.dto.*;
 import com.inssider.api.domains.comment.service.CommentService;
 import jakarta.validation.Valid;
+
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -38,8 +40,8 @@ public class CommentController {
 
   @PatchMapping("/{commentId}")
   ResponseEntity<BaseResponse.ResponseWrapper<CommentUpdateResponseDTO>> update(
-      @PathVariable Long commentId, @RequestBody CommentUpdateRequestDTO reqBody) {
-    CommentUpdateResponseDTO data = commentService.update(commentId, reqBody);
+          @AuthenticationPrincipal Account reqAccount, @PathVariable Long commentId, @RequestBody CommentUpdateRequestDTO reqBody) throws AccessDeniedException {
+    CommentUpdateResponseDTO data = commentService.update(reqAccount, commentId, reqBody);
     return BaseResponse.of(200, data);
   }
 
