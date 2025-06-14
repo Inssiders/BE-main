@@ -3,29 +3,15 @@ plugins {
     id("org.springframework.boot") version "4.0.0-SNAPSHOT"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.0.4"
+    id("com.palantir.git-version") version "3.3.0"
 }
 
-val gitTag: String? =
-    try {
-        "git describe --tags".runCommand()?.trim()
-    } catch (e: Exception) {
-        null
-    }
-
-// git 명령어 실행 함수
-fun String.runCommand(): String? =
-    ProcessBuilder(*split(" ").toTypedArray())
-        .directory(rootDir)
-        .redirectErrorStream(true)
-        .start()
-        .inputStream
-        .bufferedReader()
-        .readText()
-
-val versionTag = gitTag?.takeIf { it.startsWith("v") }?.removePrefix("v") ?: "0.0.10-SNAPSHOT"
-
 group = "com.inssider"
-version = versionTag
+
+// https://github.com/palantir/gradle-git-version
+val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+val details = versionDetails()
+version = details.lastTag
 
 springBoot {
     buildInfo()
