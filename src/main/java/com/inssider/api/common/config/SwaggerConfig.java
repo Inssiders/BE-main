@@ -16,7 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.springdoc.core.customizers.OperationCustomizer;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -26,8 +27,8 @@ import org.springframework.web.method.HandlerMethod;
 @Configuration
 class SwaggerConfig {
 
-  @Value("${build.version:unknown}")
-  private String buildVersion;
+  @Autowired(required = false)
+  private BuildProperties buildProperties;
 
   @Bean
   @Primary
@@ -39,11 +40,14 @@ class SwaggerConfig {
 
   @Bean
   public OpenAPI customOpenAPI() {
+    String version =
+        Optional.ofNullable(buildProperties).map(BuildProperties::getVersion).orElse("DEVELOPMENT");
+
     return new OpenAPI()
         .info(
             new Info()
                 .title("Inssider API")
-                .version(buildVersion)
+                .version(version)
                 .description("Inssider API Documentation"))
         .components(components());
   }
