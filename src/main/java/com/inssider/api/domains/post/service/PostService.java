@@ -13,7 +13,7 @@ import com.inssider.api.domains.tag.entity.Tag;
 import com.inssider.api.domains.tag.service.TagService;
 import jakarta.transaction.Transactional;
 
-import java.nio.file.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,7 +51,7 @@ public class PostService implements VerifyService {
     return PostMapper.postToDTO(post);
   }
 
-  public PostUpdateResponseDTO update(Account reqAccount, Long memeId, PostUpdateRequestDTO reqBody) throws AccessDeniedException {
+  public PostUpdateResponseDTO update(Account reqAccount, Long memeId, PostUpdateRequestDTO reqBody){
 
     Post currentPost =
         postRepository

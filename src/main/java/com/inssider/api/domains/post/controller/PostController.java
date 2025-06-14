@@ -6,7 +6,6 @@ import com.inssider.api.domains.post.dto.*;
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.validation.Valid;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class PostController {
 
   @PatchMapping("/{memeId}")
   ResponseEntity<BaseResponse.ResponseWrapper<PostUpdateResponseDTO>> update(
-      @AuthenticationPrincipal Account reqAccount, @PathVariable Long memeId, @RequestBody PostUpdateRequestDTO reqBody) throws AccessDeniedException {
+      @AuthenticationPrincipal Account reqAccount, @PathVariable Long memeId, @RequestBody PostUpdateRequestDTO reqBody){
     PostUpdateResponseDTO data = postService.update(reqAccount, memeId, reqBody);
     return BaseResponse.of(200, data);
   }

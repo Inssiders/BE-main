@@ -11,7 +11,7 @@ import com.inssider.api.domains.post.entity.Post;
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.transaction.Transactional;
 
-import java.nio.file.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +76,7 @@ public class CommentService implements VerifyService {
     throw new NoSuchElementException("존재하지 않는 콘텐츠입니다.");
   }
 
-  public CommentUpdateResponseDTO update(Account reqAccount, Long commentId, CommentUpdateRequestDTO reqBody) throws AccessDeniedException {
+  public CommentUpdateResponseDTO update(Account reqAccount, Long commentId, CommentUpdateRequestDTO reqBody){
     Comment currentComment = findById(commentId);
 
     if(!validateId(currentComment.getAccount().getId(), reqAccount.getId())){
