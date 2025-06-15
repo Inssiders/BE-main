@@ -27,7 +27,9 @@ public class LikeService {
 
   public LikeResponseDTO post(Account reqAccount, Long targetId, LikeRequestDTO requestDTO) {
     boolean liked = true;
-    Account account = accountService.findById(reqAccount.getId())
+    Account account =
+        accountService
+            .findById(reqAccount.getId())
             .orElseThrow(() -> new IllegalStateException("인증 절차 완료 후 접근해주세요."));
     validateTarget(targetId, requestDTO.getTargetType());
     boolean currentLiked =
@@ -38,7 +40,7 @@ public class LikeService {
 
     if (currentLiked) {
       likeRepository.deleteByAccountIdAndTargetTypeAndTargetId(
-              account.getId(), requestDTO.getTargetType(), targetId);
+          account.getId(), requestDTO.getTargetType(), targetId);
       liked = false;
       return LikeMapper.toUnLikedDTO(
           requestDTO.getTargetType().name(), targetId, liked, totalLikeCount - 1);
