@@ -20,7 +20,7 @@ ENV GRADLE_USER_HOME=/gradle-cache
 RUN dos2unix gradlew
 
 COPY . .
-RUN ./gradlew bootJar -x test --no-daemon
+RUN ./gradlew clean bootBuildInfo bootJar -x test --no-daemon
 
 # runner 실행용 경량 이미지 생성
 FROM bellsoft/liberica-openjre-alpine:21 AS runner
