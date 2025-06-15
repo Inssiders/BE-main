@@ -5,7 +5,6 @@ import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.post.dto.*;
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.validation.Valid;
-
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +32,16 @@ public class PostController {
 
   @PatchMapping("/{memeId}")
   ResponseEntity<BaseResponse.ResponseWrapper<PostUpdateResponseDTO>> update(
-      @AuthenticationPrincipal Account reqAccount, @PathVariable Long memeId, @RequestBody PostUpdateRequestDTO reqBody){
+      @AuthenticationPrincipal Account reqAccount,
+      @PathVariable Long memeId,
+      @RequestBody PostUpdateRequestDTO reqBody) {
     PostUpdateResponseDTO data = postService.update(reqAccount, memeId, reqBody);
     return BaseResponse.of(200, data);
   }
 
   @PatchMapping("/delete/{memeId}")
   ResponseEntity<BaseResponse.ResponseWrapper<PostDeleteResponseDTO>> delete(
-          @AuthenticationPrincipal Account reqAccount, @PathVariable Long memeId) {
+      @AuthenticationPrincipal Account reqAccount, @PathVariable Long memeId) {
     PostDeleteResponseDTO data = postService.delete(reqAccount, memeId);
     return BaseResponse.of(200, data);
   }

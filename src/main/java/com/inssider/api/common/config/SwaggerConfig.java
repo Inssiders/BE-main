@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.springdoc.core.customizers.OperationCustomizer;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -26,8 +26,12 @@ import org.springframework.web.method.HandlerMethod;
 @Configuration
 class SwaggerConfig {
 
-  @Value("${build.version:unknown}")
-  private String buildVersion;
+  // BuildProperties 주입하여 META-INF/build-info.properties의 version 정보 가져오기
+  private final BuildProperties buildProperties;
+
+  public SwaggerConfig(BuildProperties buildProperties) {
+    this.buildProperties = buildProperties;
+  }
 
   @Bean
   @Primary
@@ -43,7 +47,7 @@ class SwaggerConfig {
         .info(
             new Info()
                 .title("Inssider API")
-                .version(buildVersion)
+                .version(buildProperties.getVersion())
                 .description("Inssider API Documentation"))
         .components(components());
   }

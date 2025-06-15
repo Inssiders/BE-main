@@ -10,11 +10,10 @@ import com.inssider.api.domains.comment.repository.CommentRepository;
 import com.inssider.api.domains.post.entity.Post;
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.transaction.Transactional;
-
-import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,7 +57,7 @@ public class CommentService implements VerifyService {
   public CommentDeleteResponseDTO delete(Account reqAccount, Long commentId) {
     Comment currentComment = findById(commentId);
 
-    if(!validateId(currentComment.getAccount().getId(), reqAccount.getId())){
+    if (!validateId(currentComment.getAccount().getId(), reqAccount.getId())) {
       throw new AccessDeniedException("삭제 권한이 없습니다.");
     }
 
@@ -80,10 +79,11 @@ public class CommentService implements VerifyService {
     throw new NoSuchElementException("존재하지 않는 콘텐츠입니다.");
   }
 
-  public CommentUpdateResponseDTO update(Account reqAccount, Long commentId, CommentUpdateRequestDTO reqBody){
+  public CommentUpdateResponseDTO update(
+      Account reqAccount, Long commentId, CommentUpdateRequestDTO reqBody) {
     Comment currentComment = findById(commentId);
 
-    if(!validateId(currentComment.getAccount().getId(), reqAccount.getId())){
+    if (!validateId(currentComment.getAccount().getId(), reqAccount.getId())) {
       throw new AccessDeniedException("수정 권한이 없습니다.");
     }
 

@@ -24,7 +24,9 @@ public class LikeController {
 
   @PostMapping("{typeId}/like")
   ResponseEntity<BaseResponse.ResponseWrapper<LikeResponseDTO>> register(
-          @AuthenticationPrincipal Account reqAccount, @PathVariable Long typeId, @Valid @RequestBody LikeRequestDTO reqBody) {
+      @AuthenticationPrincipal Account reqAccount,
+      @PathVariable Long typeId,
+      @Valid @RequestBody LikeRequestDTO reqBody) {
     LikeResponseDTO data = likeService.post(reqAccount, typeId, reqBody);
     return BaseResponse.of(200, data);
   }

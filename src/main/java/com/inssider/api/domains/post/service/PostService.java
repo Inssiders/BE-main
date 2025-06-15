@@ -12,14 +12,12 @@ import com.inssider.api.domains.post.repository.PostRepository;
 import com.inssider.api.domains.tag.entity.Tag;
 import com.inssider.api.domains.tag.service.TagService;
 import jakarta.transaction.Transactional;
-
-import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -51,14 +49,15 @@ public class PostService implements VerifyService {
     return PostMapper.postToDTO(post);
   }
 
-  public PostUpdateResponseDTO update(Account reqAccount, Long memeId, PostUpdateRequestDTO reqBody){
+  public PostUpdateResponseDTO update(
+      Account reqAccount, Long memeId, PostUpdateRequestDTO reqBody) {
 
     Post currentPost =
         postRepository
             .findByIdWithTag(memeId)
             .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
 
-    if(!validateId(currentPost.getAccount().getId(), reqAccount.getId())){
+    if (!validateId(currentPost.getAccount().getId(), reqAccount.getId())) {
       throw new AccessDeniedException("수정 권한이 없습니다.");
     }
 
@@ -102,7 +101,7 @@ public class PostService implements VerifyService {
             .findByIdWithTag(memeId)
             .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
 
-    if(!validateId(currentPost.getAccount().getId(), reqAccount.getId())){
+    if (!validateId(currentPost.getAccount().getId(), reqAccount.getId())) {
       throw new AccessDeniedException("삭제 권한이 없습니다.");
     }
 
