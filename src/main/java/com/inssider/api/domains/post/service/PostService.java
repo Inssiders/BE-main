@@ -1,5 +1,6 @@
 package com.inssider.api.domains.post.service;
 
+import com.inssider.api.common.service.VerifyService;
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.category.entity.Category;
@@ -11,28 +12,30 @@ import com.inssider.api.domains.post.repository.PostRepository;
 import com.inssider.api.domains.tag.entity.Tag;
 import com.inssider.api.domains.tag.service.TagService;
 import jakarta.transaction.Transactional;
+
+import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PostService {
+public class PostService implements VerifyService {
 
   private final PostRepository postRepository;
   private final CategoryService categoryService;
   private final TagService tagService;
 
-  // 인증 적용 후 삭제 예정
   private final AccountService accountService;
 
-  public PostResponseDTO create(PostCreateRequestDTO reqBody) {
-    // 인증 적용 후 삭제 예정
-    Account account = accountService.findById(1L).get();
+  public PostResponseDTO create(Account reqAccount, PostCreateRequestDTO reqBody) {
+    Account account =
+        accountService.findById(reqAccount.getId()).orElseThrow(NoSuchElementException::new);
     Category category =
         categoryService
             .getCategory(reqBody.getCategoryType())
@@ -48,11 +51,16 @@ public class PostService {
     return PostMapper.postToDTO(post);
   }
 
-  public PostUpdateResponseDTO update(Long memeId, PostUpdateRequestDTO reqBody) {
+  public PostUpdateResponseDTO update(Account reqAccount, Long memeId, PostUpdateRequestDTO reqBody){
+
     Post currentPost =
         postRepository
             .findByIdWithTag(memeId)
-            .orElseThrow(() -> new IllegalArgumentException("게시글 오류 발생"));
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
+
+    if(!validateId(currentPost.getAccount().getId(), reqAccount.getId())){
+      throw new AccessDeniedException("수정 권한이 없습니다.");
+    }
 
     if (reqBody.hasTitle()) {
       currentPost.updateTitle(reqBody.getTitle());
@@ -88,11 +96,16 @@ public class PostService {
     return PostMapper.postToUpdateDTO(updatedPost);
   }
 
-  public PostDeleteResponseDTO delete(Long memeId) {
+  public PostDeleteResponseDTO delete(Account reqAccount, Long memeId) {
     Post currentPost =
         postRepository
             .findByIdWithTag(memeId)
-            .orElseThrow(() -> new IllegalArgumentException("게시글 오류 발생"));
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 콘텐츠입니다."));
+
+    if(!validateId(currentPost.getAccount().getId(), reqAccount.getId())){
+      throw new AccessDeniedException("삭제 권한이 없습니다.");
+    }
+
     currentPost.updateIsDeleted();
     currentPost.updateDeletedAt();
     Post updatedPost = postRepository.save(currentPost);

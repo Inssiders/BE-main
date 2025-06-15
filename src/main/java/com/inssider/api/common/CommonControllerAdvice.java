@@ -1,5 +1,6 @@
 package com.inssider.api.common;
 
+import org.springframework.security.access.AccessDeniedException;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -47,6 +48,16 @@ class CommonControllerAdvice {
     ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
     problemDetail.setType(Util.buildAbsoluteUri("/error/conflict"));
     problemDetail.setTitle("Conflict");
+    problemDetail.setDetail(ex.getMessage());
+    return problemDetail;
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  public ProblemDetail accessDeniedHandler(AccessDeniedException ex) {
+    ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+    problemDetail.setType(Util.buildAbsoluteUri("/error/access-denied"));
+    problemDetail.setTitle("Access Denied");
     problemDetail.setDetail(ex.getMessage());
     return problemDetail;
   }
