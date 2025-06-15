@@ -14,9 +14,17 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Run spotlessCheck
         run: ./gradlew spotlessCheck
+
+      - name: Print build version
+        run: |
+          ./gradlew bootBuildInfo -x test --no-daemon
+          cat build/resources/main/META-INF/build-info.properties || echo "build-info not found"
 
       - name: Docker meta
         id: meta

@@ -29,7 +29,7 @@ WORKDIR /app
 # wget 설치
 RUN apk add --no-cache wget
 
-COPY --from=builder /app/build/libs/*-SNAPSHOT.jar app.jar
+COPY --from=builder /app/build/libs/*.jar app.jar
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
   CMD ["sh", "-c", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
