@@ -44,5 +44,6 @@ springdoc:
   swagger-ui:
     use-root-path: true
     display-request-duration: true
+    version: ${build.version:0.0.10-SNAPSHOT}
   paths-to-match:
     - /api/**
