@@ -30,7 +30,11 @@ group = "com.inssider"
 version = versionTag
 
 springBoot {
-    buildInfo()
+    buildInfo {
+        properties {
+            version = versionTag
+        }
+    }
 }
 
 val javaVersion =
