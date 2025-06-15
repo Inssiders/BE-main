@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
     java
     id("org.springframework.boot") version "4.0.0-SNAPSHOT"
@@ -95,6 +97,10 @@ sourceSets {
 
 tasks {
     val activeProfile = System.getProperty("spring.profiles.active")
+
+    withType<BootJar> {
+        dependsOn("bootBuildInfo")
+    }
 
     withType<Test> {
         useJUnitPlatform()
