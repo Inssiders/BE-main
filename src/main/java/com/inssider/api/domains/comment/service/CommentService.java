@@ -1,5 +1,6 @@
 package com.inssider.api.domains.comment.service;
 
+import com.inssider.api.common.service.VerifyService;
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
 import com.inssider.api.domains.comment.dto.*;
@@ -9,6 +10,8 @@ import com.inssider.api.domains.comment.repository.CommentRepository;
 import com.inssider.api.domains.post.entity.Post;
 import com.inssider.api.domains.post.service.PostService;
 import jakarta.transaction.Transactional;
+
+import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +20,18 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CommentService {
+public class CommentService implements VerifyService {
 
   private final CommentRepository commentRepository;
   private final PostService postService;
   // 인증 적용 후 삭제 예정
   private final AccountService accountService;
 
-  public CommentCreateResponseDTO create(Long memeId, CommentCreateRequestDTO requestDTO) {
-    // 인증 적용 후 삭제 예정
-    Account account = accountService.findById(2L).get();
+  public CommentCreateResponseDTO create(
+      Account reqAccount, Long memeId, CommentCreateRequestDTO requestDTO) {
+
+    Account account =
+        accountService.findById(reqAccount.getId()).orElseThrow(NoSuchElementException::new);
     Post post = postService.get(memeId);
 
     Comment parentComment = null;
@@ -50,8 +55,12 @@ public class CommentService {
     return CommentMapper.toDTO(createdComment);
   }
 
-  public CommentDeleteResponseDTO delete(Long commentId) {
+  public CommentDeleteResponseDTO delete(Account reqAccount, Long commentId) {
     Comment currentComment = findById(commentId);
+
+    if(!validateId(currentComment.getAccount().getId(), reqAccount.getId())){
+      throw new AccessDeniedException("삭제 권한이 없습니다.");
+    }
 
     if (!currentComment.getChildComments().isEmpty())
       throw new IllegalStateException("하위 댓글이 존재하여 삭제가 불가능합니다.");
@@ -71,16 +80,25 @@ public class CommentService {
     throw new NoSuchElementException("존재하지 않는 콘텐츠입니다.");
   }
 
-  public CommentUpdateResponseDTO update(Long commentId, CommentUpdateRequestDTO reqBody) {
-    Comment comment = findById(commentId);
-    comment.updateContent(reqBody.getContent());
+  public CommentUpdateResponseDTO update(Account reqAccount, Long commentId, CommentUpdateRequestDTO reqBody){
+    Comment currentComment = findById(commentId);
+
+    if(!validateId(currentComment.getAccount().getId(), reqAccount.getId())){
+      throw new AccessDeniedException("수정 권한이 없습니다.");
+    }
+
+    currentComment.updateContent(reqBody.getContent());
     commentRepository.flush();
-    return CommentMapper.toUpdateDTO(comment);
+    return CommentMapper.toUpdateDTO(currentComment);
   }
 
   public Comment findById(Long commentId) {
     return commentRepository
         .findById(commentId)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 댓글입니다."));
+  }
+
+  public boolean isComment(Long commentId) {
+    return commentRepository.existsById(commentId);
   }
 }

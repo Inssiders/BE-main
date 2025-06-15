@@ -2,6 +2,7 @@ package com.inssider.api.domains.like.service;
 
 import com.inssider.api.domains.account.Account;
 import com.inssider.api.domains.account.AccountService;
+import com.inssider.api.domains.comment.service.CommentService;
 import com.inssider.api.domains.like.LikeTargetType;
 import com.inssider.api.domains.like.dto.LikeRequestDTO;
 import com.inssider.api.domains.like.dto.LikeResponseDTO;
@@ -21,15 +22,13 @@ public class LikeService {
 
   private final LikeRepository likeRepository;
   private final PostService postService;
-
-  // 인증 적용 후 삭제 예정
+  private final CommentService commentService;
   private final AccountService accountService;
 
-  public LikeResponseDTO post(Long targetId, LikeRequestDTO requestDTO) {
+  public LikeResponseDTO post(Account reqAccount, Long targetId, LikeRequestDTO requestDTO) {
     boolean liked = true;
-    // 인증 적용 후 삭제 예정
-    Account account = accountService.findById(1L).get();
-
+    Account account = accountService.findById(reqAccount.getId())
+            .orElseThrow(() -> new IllegalStateException("인증 절차 완료 후 접근해주세요."));
     validateTarget(targetId, requestDTO.getTargetType());
     boolean currentLiked =
         likeRepository.existsByAccountIdAndTargetTypeAndTargetId(
@@ -39,7 +38,7 @@ public class LikeService {
 
     if (currentLiked) {
       likeRepository.deleteByAccountIdAndTargetTypeAndTargetId(
-          account.getId(), requestDTO.getTargetType(), targetId);
+              account.getId(), requestDTO.getTargetType(), targetId);
       liked = false;
       return LikeMapper.toUnLikedDTO(
           requestDTO.getTargetType().name(), targetId, liked, totalLikeCount - 1);
@@ -63,7 +62,10 @@ public class LikeService {
           throw new EntityNotFoundException("존재하지 않는 콘텐츠입니다.");
         }
         break;
-      case COMMENT: // 추가 예정
+      case COMMENT:
+        if (!commentService.isComment(targetId)) {
+          throw new EntityNotFoundException("존재하지 않는 댓글입니다.");
+        }
         break;
     }
   }
